@@ -2,6 +2,14 @@ import './style.css'
 
 const docs = [
   {
+    title: '云雨分 · Mihomo 配置模板',
+    subtitle: '四机场合并 · 住宅 IP 双链路',
+    desc: '渔舍 + 良心云 + 赔钱 + 极风合并配置，AI 专用分流，UDP 443 REJECT 防泄露，完整规则注释',
+    href: '/yunyufen-config.html',
+    tag: '配置',
+    tagColor: '#3dd68c',
+  },
+  {
     title: '梅林固件设置指南',
     subtitle: 'AX82U & RAX80',
     desc: 'Merlin 固件完整配置教程，包含 Mihomo 代理、JFFS 脚本、WireGuard 等',

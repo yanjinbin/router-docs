@@ -249,7 +249,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
           <div class="diff-item">AND UDP 443 REJECT（防 AI 服务泄露真实 IP）</div>
           <div class="diff-item">hy2 节点无法使用</div>
           <div class="diff-item">prefer-h3: false 关闭</div>
-          <div class="diff-item">MC2 ARM32 最高 1.2.1</div>
+          <div class="diff-item">MC2 ARM32 1.0.3（1.2.1 不稳定）</div>
         </div>
         <div class="diff-col after">
           <div class="diff-col-title">RAX80 迁移后（ARM64）</div>
@@ -278,7 +278,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
     <div class="info-grid">
       <div class="info-card"><div class="info-label">项目名称</div><div class="info-val">Magic Catling 2</div></div>
       <div class="info-card"><div class="info-label">当前版本</div><div class="info-val">1.0.3 <span class="tag tag-amber">ARM32</span></div></div>
-      <div class="info-card"><div class="info-label">ARM32 最新</div><div class="info-val">1.2.1 <span class="tag tag-green">可升级</span></div></div>
+      <div class="info-card"><div class="info-label">ARM32 最新</div><div class="info-val">1.2.1 <span class="tag tag-red">有崩溃</span></div></div>
       <div class="info-card"><div class="info-label">ARM64 版本</div><div class="info-val">1.0.3 <span class="tag tag-blue">RAX80 用</span></div></div>
       <div class="info-card"><div class="info-label">Mihomo 内核</div><div class="info-val">v1.19.24</div></div>
       <div class="info-card"><div class="info-label">支持协议</div><div class="info-val">SS SSR VMess VLess Trojan Hy2</div></div>
@@ -287,9 +287,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
       <a class="ext-link" href="https://mcreadme.gitbook.io/mc" target="_blank">📖 官方 Wiki</a>
       <a class="ext-link" href="https://t.me/merlinclashfile" target="_blank">✈ Telegram @merlinclashfile</a>
     </div>
-    <div class="alert alert-info" style="margin-top:.75rem">
-      <span class="alert-icon">ℹ</span>
-      <span>AX82U 可将 MC2 从 1.0.3 ARM32 升级到 <strong>1.2.1 ARM32</strong>，软件中心 → 离线安装覆盖即可，config.yaml 不受影响。</span>
+    <div class="alert alert-danger" style="margin-top:.75rem">
+      <span class="alert-icon">⚠️</span>
+      <span>AX82U 上 <strong>1.2.1 ARM32</strong> 已出现崩溃，当前稳定版为 <strong>1.0.3 ARM32</strong>，暂勿升级。</span>
     </div>
   </div>
 
@@ -357,13 +357,13 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
         <tr>
           <td><span class="filename">MC2_1.2.1_ARM32.tar.gz</span></td>
           <td><span class="filesize">12.13 MB</span></td>
-          <td><span style="font-size:12px;color:var(--text2)">MC2 ARM32 最新版 <span class="tag tag-green">推荐升级</span></span></td>
+          <td><span style="font-size:12px;color:var(--text2)">MC2 ARM32 最新版 <span class="tag tag-red">有崩溃，不推荐</span></span></td>
           <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_388/RT-AX82U/" target="_blank">↓ 下载</a></td>
         </tr>
         <tr>
           <td><span class="filename">MC2_1.0.3_ARM32.tar.gz</span></td>
           <td><span class="filesize">10.08 MB</span></td>
-          <td><span style="font-size:12px;color:var(--text2)">MC2 ARM32 旧版（备用）</span></td>
+          <td><span style="font-size:12px;color:var(--text2)">MC2 ARM32 稳定版 <span class="tag tag-green">当前在用</span></span></td>
           <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_388/RT-AX82U/" target="_blank">↓ 下载</a></td>
         </tr>
       </tbody>
@@ -440,7 +440,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
       <button class="tab-btn" onclick="switchTab(this,'cfg-dns')">DNS</button>
       <button class="tab-btn" onclick="switchTab(this,'cfg-sniffer')">Sniffer</button>
       <button class="tab-btn" onclick="switchTab(this,'cfg-providers')">订阅结构</button>
-      <button class="tab-btn" onclick="switchTab(this,'cfg-rax80')">RAX80 差异</button>
     </div>
 
     <div id="cfg-base" class="tab-content active">
@@ -631,32 +630,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
   - <span class="c-hidden">{name: "东京动态住宅IP", type: http, server: "***", port: 443, username: "***", password: "***", dialer-proxy: "🔌 🇯🇵"}</span></pre>
       </div>
     </div>
-
-    <div id="cfg-rax80" class="tab-content">
-      <div class="code-wrap">
-        <div class="code-header"><span class="code-label">RAX80 迁移差异 · 需修改的配置项</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
-<pre><span class="c-comment"># ── 迁移 RAX80 时需要做的修改 ──────────────────────────────────</span>
-
-<span class="c-comment"># 1. 移除或改为 true（ARM64 无崩溃风险）</span>
-<span class="c-key">udp</span>: <span class="c-bool">true</span>           <span class="c-comment"># 原来是 false，改为 true</span>
-<span class="c-key">prefer-h3</span>: <span class="c-bool">false</span>    <span class="c-comment"># 可按需开启</span>
-
-<span class="c-comment"># 2. 删除 rules 中的这两条</span>
-<span class="c-comment"># - IP-CIDR6,::/0,REJECT,no-resolve         # 可保留，继续阻断 IPv6</span>
-<span class="c-comment"># - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT  ← 删除此行，hy2 才能工作</span>
-
-<span class="c-comment"># 3. 住宅 IP 节点可加回 udp: true</span>
-<span class="c-key">proxies</span>:
-  - <span class="c-str">{name: "圣何塞静态住宅IP", ..., udp: true, tfo: true, ip-version: ipv4}</span>
-  - <span class="c-str">{name: "东京静态住宅IP", ..., udp: true, ip-version: ipv4}</span>
-
-<span class="c-comment"># 4. external-controller 改为 RAX80 的 LAN IP</span>
-<span class="c-key">external-controller</span>: <span class="c-str">192.168.1.1:9990</span>   <span class="c-comment"># 根据你的 LAN IP 调整</span>
-
-<span class="c-comment"># 5. MC2 换 ARM64 包</span>
-<span class="c-comment"># MC2_1.0.3_ARM64.tar.gz  （非 ARM32）</span></pre>
-      </div>
-    </div>
   </div>
 
   <!-- 检查清单 -->
@@ -720,11 +693,12 @@ function toggleCheck(box) {
 
 <div class="__site-nav">
   <h3>相关文档</h3>
-  <div class="__site-nav-grid">
+    <div class="__site-nav-grid">
 <a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C 刷机教程</span><span class="__site-nav-sub">ImmortalWrt 完整流程</span></a>
 <a class="__site-nav-link" href="/arm_softrouter_full_comparison.html"><span class="__site-nav-title">ARM 软路由横向对比</span><span class="__site-nav-sub">全平台综合评测</span></a>
 <a class="__site-nav-link" href="/hinlink_series_vs_r4s_comparison.html"><span class="__site-nav-title">Hinlink 系列 vs R4S</span><span class="__site-nav-sub">重点机型深度对比</span></a>
 <a class="__site-nav-link" href="/softrouter_full_8way_comparison.html"><span class="__site-nav-title">软路由八强对决</span><span class="__site-nav-sub">旗舰机型全面评测</span></a>
+<a class="__site-nav-link" href="/yunyufen-config.html"><span class="__site-nav-title">云雨分 · Mihomo 配置模板</span><span class="__site-nav-sub">四机场合并 · 住宅 IP 双链路</span></a>
   </div>
   <a class="__site-nav-home" href="/">← 返回首页</a>
 </div>

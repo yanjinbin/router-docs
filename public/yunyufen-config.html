@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云雨分 · Mihomo 配置模板</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:#4f8ef7;border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px}
+.nav-brand span{color:var(--accent)}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover{color:var(--text);border-bottom-color:var(--accent)}
+
+/* ── LAYOUT ── */
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
+
+/* ── HERO ── */
+.hero{padding:48px 0 32px}
+.hero-tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(22px,3.5vw,32px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:13px;color:var(--text2);max-width:600px;line-height:1.7}
+
+/* ── ALERT ── */
+.alert{display:flex;gap:10px;align-items:flex-start;padding:.9rem 1.1rem;border-radius:8px;font-size:12px;line-height:1.6;margin:0 0 28px}
+.alert-amber{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25)}
+.alert-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+
+/* ── SECTION ── */
+.section{margin-bottom:40px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:15px;font-weight:600}
+.section-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;margin-left:6px;vertical-align:middle}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+.badge-amber{background:rgba(245,166,35,.12);color:var(--amber)}
+.badge-red{background:rgba(240,96,96,.12);color:var(--red)}
+
+/* ── CODE BLOCK ── */
+.code-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.code-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--text2);text-transform:uppercase}
+.copy-btn{font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:color .15s,border-color .15s}
+.copy-btn:hover{color:var(--text);border-color:var(--accent)}
+.copy-btn.copied{color:var(--green);border-color:var(--green)}
+pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.65;color:var(--text)}
+
+/* syntax */
+.ck{color:#79b8ff}   /* key */
+.cv{color:#9ecbff}   /* value / string */
+.cn{color:#f8c555}   /* number */
+.cb{color:#56d364}   /* bool */
+.cc{color:#5f6680;font-style:italic} /* comment */
+.cs{color:#f97583}   /* special / url placeholder */
+.cg{color:var(--green)} /* group name */
+
+/* ── OVERVIEW GRID ── */
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:28px}
+.ov-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.ov-label{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:500}
+.ov-val{font-size:14px;font-weight:600;color:var(--text)}
+.ov-val small{font-size:11px;color:var(--text2);font-weight:400;margin-left:4px}
+
+/* ── PROVIDERS TABLE ── */
+.ptable{width:100%;border-collapse:collapse;font-size:12.5px}
+.ptable th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--text3);text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border2);background:var(--bg3)}
+.ptable td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.ptable tr:last-child td{border-bottom:none}
+.ptable tr:hover td{background:rgba(255,255,255,.02)}
+.mono{font-family:var(--mono);font-size:11.5px}
+
+/* ── RULES SUMMARY ── */
+.rules-list{display:flex;flex-direction:column;gap:6px}
+.rule-item{display:flex;align-items:flex-start;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12.5px}
+.rule-num{width:20px;height:20px;border-radius:5px;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.rule-body{flex:1}
+.rule-title{font-weight:600;color:var(--text);margin-bottom:2px}
+.rule-detail{color:var(--text2);font-size:11.5px}
+
+@media(max-width:640px){
+  .overview-grid{grid-template-columns:1fr 1fr}
+  nav{padding:0 16px}
+  .wrap{padding:0 16px 64px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-home">← 返回首页</a>
+  <div class="nav-brand">云雨分 <span>·</span> Mihomo 配置模板</div>
+  <div class="nav-links">
+    <a href="#overview">概览</a>
+    <a href="#providers">订阅源</a>
+    <a href="#groups">代理组</a>
+    <a href="#rules">规则</a>
+    <a href="#full">完整配置</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-tag">AX82U · ARMv7 · Mihomo v1.19.24</div>
+    <h1>云雨分 · 多机场合并配置模板</h1>
+    <p>渔舍 + 良心云 + 赔钱 + 极风四机场合并，住宅 IP 出口双链路，AI 专用分流。<br>UDP 全局关闭 · IPv6 关闭 · UDP 443 REJECT（防 AI 服务 QUIC 泄露真实 IP）。</p>
+  </div>
+
+  <div class="alert alert-amber">
+    <span class="alert-icon">⚠️</span>
+    <span>以下配置已脱敏处理：订阅 URL、住宅 IP 节点的 <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">server / username / password</code> 均以占位符替代，使用时填入实际值。</span>
+  </div>
+
+  <!-- 概览 -->
+  <div id="overview" class="section">
+    <div class="section-header">
+      <div class="section-title">配置概览</div>
+    </div>
+    <div class="overview-grid">
+      <div class="ov-card"><div class="ov-label">Mixed Port</div><div class="ov-val">23456</div></div>
+      <div class="ov-card"><div class="ov-label">Redir Port</div><div class="ov-val">23457</div></div>
+      <div class="ov-card"><div class="ov-label">DNS Port</div><div class="ov-val">23453</div></div>
+      <div class="ov-card"><div class="ov-label">面板端口</div><div class="ov-val">9990</div></div>
+      <div class="ov-card"><div class="ov-label">DNS 模式</div><div class="ov-val">fake-ip</div></div>
+      <div class="ov-card"><div class="ov-label">UDP</div><div class="ov-val" style="color:var(--red)">false <small>ARMv7 关闭</small></div></div>
+      <div class="ov-card"><div class="ov-label">IPv6</div><div class="ov-val" style="color:var(--red)">false</div></div>
+      <div class="ov-card"><div class="ov-label">prefer-h3</div><div class="ov-val" style="color:var(--red)">false</div></div>
+      <div class="ov-card"><div class="ov-label">Fingerprint</div><div class="ov-val">chrome</div></div>
+      <div class="ov-card"><div class="ov-label">面板</div><div class="ov-val">zashboard</div></div>
+      <div class="ov-card"><div class="ov-label">机场数量</div><div class="ov-val">4 <small>渔舍/良心云/赔钱/极风</small></div></div>
+      <div class="ov-card"><div class="ov-label">住宅 IP 出口</div><div class="ov-val">2 <small>🇺🇸 圣何塞 / 🇯🇵 东京</small></div></div>
+    </div>
+  </div>
+
+  <!-- 订阅源 -->
+  <div id="providers" class="section">
+    <div class="section-header">
+      <div class="section-title">Proxy Providers · 订阅源</div>
+      <div class="section-sub">4 个机场 + 2 个住宅 IP 静态节点</div>
+    </div>
+    <table class="ptable" style="margin-bottom:16px">
+      <thead><tr><th>名称</th><th>类型</th><th>过滤规则</th><th>备注</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>渔舍</strong></td>
+          <td><span class="badge badge-blue">http</span></td>
+          <td><span style="color:var(--text2);font-size:11.5px">不过滤</span></td>
+          <td><span style="font-size:11.5px;color:var(--text2)">全节点，select 组</span></td>
+        </tr>
+        <tr>
+          <td><strong>良心云</strong></td>
+          <td><span class="badge badge-blue">http</span></td>
+          <td><span class="mono">🇭🇰🇸🇬🇯🇵🇰🇷🇲🇴 台湾等亚太节点</span></td>
+          <td><span style="font-size:11.5px;color:var(--text2)">过滤直连/流量包提示</span></td>
+        </tr>
+        <tr>
+          <td><strong>赔钱</strong></td>
+          <td><span class="badge badge-blue">http</span></td>
+          <td><span class="mono">推荐 × 亚太区（HK/SG/JP/KR/TH/AU/CH）</span></td>
+          <td><span style="font-size:11.5px;color:var(--text2)">正则精选推荐节点</span></td>
+        </tr>
+        <tr>
+          <td><strong>极风</strong></td>
+          <td><span class="badge badge-blue">http</span></td>
+          <td><span style="color:var(--text2);font-size:11.5px">过滤直连/流量包提示</span></td>
+          <td><span style="font-size:11.5px;color:var(--text2)">hidden: true</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="ptable">
+      <thead><tr><th>住宅 IP 节点</th><th>协议</th><th>出口</th><th>dialer-proxy</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>圣何塞静态住宅IP</strong></td>
+          <td><span class="badge badge-green">socks5</span></td>
+          <td>🇺🇸 加州圣何塞</td>
+          <td><span class="mono">🔌 🇺🇸</span></td>
+        </tr>
+        <tr>
+          <td><strong>圣何塞动态住宅IP</strong></td>
+          <td><span class="badge badge-amber">http</span></td>
+          <td>🇺🇸 加州圣何塞</td>
+          <td><span class="mono">🔌 🇺🇸</span></td>
+        </tr>
+        <tr>
+          <td><strong>东京静态住宅IP</strong></td>
+          <td><span class="badge badge-green">socks5</span></td>
+          <td>🇯🇵 东京</td>
+          <td><span class="mono">🔌 🇯🇵</span></td>
+        </tr>
+        <tr>
+          <td><strong>东京动态住宅IP</strong></td>
+          <td><span class="badge badge-amber">http</span></td>
+          <td>🇯🇵 东京</td>
+          <td><span class="mono">🔌 🇯🇵</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 代理组 -->
+  <div id="groups" class="section">
+    <div class="section-header">
+      <div class="section-title">Proxy Groups · 代理组结构</div>
+    </div>
+    <div class="rules-list">
+      <div class="rule-item">
+        <div class="rule-num">①</div>
+        <div class="rule-body">
+          <div class="rule-title">🌐 节点选择 <span class="badge badge-blue">select</span></div>
+          <div class="rule-detail">顶层选择器，包含故障转移、自动选择、各机场直接入口、住宅 IP 出口等</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">②</div>
+        <div class="rule-body">
+          <div class="rule-title">🛡️ 故障转移 <span class="badge badge-amber">fallback</span></div>
+          <div class="rule-detail">渔舍 → 极风 → 良心云 → 赔钱，120s 检测，300ms 容差</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">③</div>
+        <div class="rule-body">
+          <div class="rule-title">♻️ 自动选择 <span class="badge badge-green">url-test</span></div>
+          <div class="rule-detail">四机场合并，过滤港日美新节点，60s 测速，250ms 容差</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">④</div>
+        <div class="rule-body">
+          <div class="rule-title">AI 分流 <span class="badge badge-blue">select</span></div>
+          <div class="rule-detail">
+            <strong>🪬 Claude 专用</strong>：🗼 日本出口（东京静态/动态住宅 IP）<br>
+            <strong>Gemini 专用</strong>：🗽 美国出口 / 🗼 日本出口<br>
+            <strong>AI 双链路</strong>：美国或日本出口 + 渔舍/极风兜底，覆盖 OpenAI / Copilot / Antigravity
+          </div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">⑤</div>
+        <div class="rule-body">
+          <div class="rule-title">流媒体分流 <span class="badge badge-amber">fallback</span></div>
+          <div class="rule-detail">
+            <strong>油管</strong>：vless 精选优先 → 香港/日本自动<br>
+            <strong>流媒体/Emby</strong>：香港 → 日本 auto-test 组<br>
+            <strong>Spotify</strong>：香港 → 日本 auto-test 组<br>
+            <strong>社交媒体/TikTok</strong>：日本 → 美国出口（排除香港澳门）
+          </div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">⑥</div>
+        <div class="rule-body">
+          <div class="rule-title">住宅 IP 出口 <span class="badge badge-green">select</span></div>
+          <div class="rule-detail">
+            <strong>🗽 美国出口</strong>：圣何塞静态 / 圣何塞动态住宅 IP<br>
+            <strong>🗼 日本出口</strong>：东京静态 / 东京动态住宅 IP<br>
+            <strong>🔌 🇺🇸 / 🔌 🇯🇵</strong>：为住宅 IP 节点提供上游机场落地（hidden）
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 规则优先级 -->
+  <div id="rules" class="section">
+    <div class="section-header">
+      <div class="section-title">Rules · 规则优先级</div>
+      <div class="section-sub">从上到下依次匹配</div>
+    </div>
+    <div class="rules-list">
+      <div class="rule-item" style="border-left:3px solid var(--red)">
+        <div class="rule-num" style="background:rgba(240,96,96,.12);color:var(--red)">0</div>
+        <div class="rule-body">
+          <div class="rule-title" style="color:var(--red)">IPv6 + UDP 443 拦截</div>
+          <div class="rule-detail"><code class="mono">IP-CIDR6,::/0,REJECT</code> · <code class="mono">AND,((DST-PORT,443),(NETWORK,UDP)),REJECT</code><br>阻断 IPv6 全段；拦截 QUIC（UDP 443）防 Gemini 等 AI 服务绕过代理暴露真实 IP</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">1</div>
+        <div class="rule-body">
+          <div class="rule-title">局域网 / 私有网段 DIRECT</div>
+          <div class="rule-detail">private / bypass / tailscale / GEOIP:LAN / 192.168 / 10.x / 172.16</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">2</div>
+        <div class="rule-body">
+          <div class="rule-title">国内媒体 / NTP DIRECT</div>
+          <div class="rule-detail">STUN / ChinaMedia / IPTVMainland</div>
+        </div>
+      </div>
+      <div class="rule-item" style="border-left:3px solid var(--red)">
+        <div class="rule-num" style="background:rgba(240,96,96,.12);color:var(--red)">3</div>
+        <div class="rule-body">
+          <div class="rule-title" style="color:var(--red)">广告屏蔽 REJECT</div>
+          <div class="rule-detail">AdvertisingMiTV / privacy-reject / adblock-lite / 秋风广告规则 / doubaoime-block / apple-ota</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">4</div>
+        <div class="rule-body">
+          <div class="rule-title">自定义代理 + 加密货币</div>
+          <div class="rule-detail">auto-proxy / Binance / OKX / Crypto / Cryptocurrency → 节点选择</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">5</div>
+        <div class="rule-body">
+          <div class="rule-title">Emby</div>
+          <div class="rule-detail">emby-direct → DIRECT · emby-proxy → Emby 观影代理</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">6</div>
+        <div class="rule-body">
+          <div class="rule-title">Apple 全家桶</div>
+          <div class="rule-detail">apns / music / tv / proxy / id / store / apple → 节点选择</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">7</div>
+        <div class="rule-body">
+          <div class="rule-title">流媒体</div>
+          <div class="rule-detail">YouTube Music + Spotify → Spotify组 · YouTube + Twitter-video → 油管组 · Netflix/HBO/Disney/AppleTV → 流媒体组</div>
+        </div>
+      </div>
+      <div class="rule-item" style="border-left:3px solid var(--accent)">
+        <div class="rule-num" style="background:rgba(79,142,247,.12);color:var(--accent)">8</div>
+        <div class="rule-body">
+          <div class="rule-title" style="color:var(--accent)">AI 服务专用分流</div>
+          <div class="rule-detail">Claude/Anthropic → 🪬 Claude专用（东京住宅 IP）<br>Gemini/OpenAI/Antigravity/Copilot/Google → AI双链路（美日住宅 IP）</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">9</div>
+        <div class="rule-body">
+          <div class="rule-title">社交媒体</div>
+          <div class="rule-detail">Twitter → 社交媒体组 · Telegram/TikTok → TikTok媒体组 · LinkedIn → 社交媒体组</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">10</div>
+        <div class="rule-body">
+          <div class="rule-title">开发工具</div>
+          <div class="rule-detail">Microsoft / Docker / GitHub → 自动选择组</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">11</div>
+        <div class="rule-body">
+          <div class="rule-title">IP 检测工具</div>
+          <div class="rule-detail">ipleak.net / dnsleaktest.com / ipapi.co → 美国出口 · ugtop.com / myip.com → 日本出口</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">12</div>
+        <div class="rule-body">
+          <div class="rule-title">国内直连兜底</div>
+          <div class="rule-detail">GEOSITE:cn + GEOIP:cn → DIRECT</div>
+        </div>
+      </div>
+      <div class="rule-item" style="border-left:3px solid var(--amber)">
+        <div class="rule-num" style="background:rgba(245,166,35,.12);color:var(--amber)">13</div>
+        <div class="rule-body">
+          <div class="rule-title" style="color:var(--amber)">MATCH 兜底</div>
+          <div class="rule-detail">所有未匹配流量 → 🌐 节点选择</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 完整配置 -->
+  <div id="full" class="section">
+    <div class="section-header">
+      <div class="section-title">完整配置文件 <span class="badge badge-red">已脱敏</span></div>
+      <div class="section-sub">订阅 URL 与住宅 IP 凭证已替换为占位符</div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-label">基础参数</span><button class="copy-btn" onclick="copyBlock(this)">复制</button></div>
+<pre><span class="cc"># ================================================================</span>
+<span class="cc"># 渔舍 良心云 赔钱 极风 四机场合并</span>
+<span class="cc"># UDP 全局关闭 / IPv6 关闭 / HTTP3 关闭 — 防真实 IP 泄露（ARMv7）</span>
+<span class="cc"># ================================================================</span>
+
+<span class="ck">mixed-port</span>: <span class="cn">23456</span>
+<span class="ck">redir-port</span>: <span class="cn">23457</span>
+<span class="ck">external-controller</span>: <span class="cv">192.168.2.1:9990</span>
+<span class="ck">external-ui</span>: <span class="cv">dashboard</span>
+<span class="ck">external-ui-name</span>: <span class="cv">zashboard</span>
+<span class="ck">external-ui-url</span>: <span class="cv">https://github.com/Zephyruso/zashboard/releases/latest/download/dist-cdn-fonts.zip</span>
+<span class="ck">secret</span>: <span class="cv">"clash"</span>
+
+<span class="ck">profile</span>:
+  <span class="ck">store-selected</span>: <span class="cb">false</span>
+  <span class="ck">store-fake-ip</span>: <span class="cb">false</span>
+
+<span class="ck">geodata-mode</span>: <span class="cb">true</span>
+<span class="ck">geox-url</span>:
+  <span class="ck">geoip</span>: <span class="cv">"https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip-lite.dat"</span>
+  <span class="ck">geosite</span>: <span class="cv">"https://testingcf.jsdelivr.net/gh/flyhigherpi/merlinclash_clash_related@refs/heads/master/geosite/geosite.dat"</span>
+
+<span class="ck">allow-lan</span>: <span class="cb">true</span>
+<span class="ck">mode</span>: <span class="cv">rule</span>
+<span class="ck">log-level</span>: <span class="cv">error</span>
+<span class="ck">ipv6</span>: <span class="cb">false</span>
+<span class="ck">unified-delay</span>: <span class="cb">true</span>
+<span class="ck">udp</span>: <span class="cb">false</span>         <span class="cc"># ARMv7 gcsweep 崩溃风险，保持关闭</span>
+<span class="ck">prefer-h3</span>: <span class="cb">false</span>
+<span class="ck">udp-timeout</span>: <span class="cn">300</span>
+<span class="ck">keep-alive-interval</span>: <span class="cn">15</span>
+<span class="ck">global-client-fingerprint</span>: <span class="cv">chrome</span>
+<span class="ck">tcp-concurrent</span>: <span class="cb">false</span>
+<span class="ck">find-process-mode</span>: <span class="cv">off</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-label">DNS</span><button class="copy-btn" onclick="copyBlock(this)">复制</button></div>
+<pre><span class="ck">dns</span>:
+  <span class="ck">enable</span>: <span class="cb">true</span>
+  <span class="ck">ipv6</span>: <span class="cb">false</span>
+  <span class="ck">listen</span>: <span class="cv">:23453</span>
+  <span class="ck">enhanced-mode</span>: <span class="cv">fake-ip</span>
+  <span class="ck">fake-ip-range</span>: <span class="cv">198.18.0.1/16</span>
+  <span class="ck">use-hosts</span>: <span class="cb">true</span>
+  <span class="ck">respect-rules</span>: <span class="cb">false</span>
+  <span class="ck">default-nameserver</span>:
+    - <span class="cv">223.5.5.5</span>
+  <span class="ck">nameserver</span>:
+    - <span class="cv">223.5.5.5</span>
+  <span class="ck">nameserver-policy</span>:
+    <span class="cv">'geosite:gfw'</span>:
+      - <span class="cv">https://223.5.5.5/dns-query</span>
+      - <span class="cv">https://doh.pub/dns-query</span>
+  <span class="ck">fallback</span>:
+    - <span class="cv">https://223.5.5.5/dns-query</span>
+    - <span class="cv">https://doh.pub/dns-query</span>
+  <span class="ck">fallback-filter</span>:
+    <span class="ck">geoip</span>: <span class="cb">true</span>
+    <span class="ck">geoip-code</span>: <span class="cv">CN</span>
+    <span class="ck">geosite</span>:
+      - <span class="cv">gfw</span>
+    <span class="ck">ipcidr</span>:
+      - <span class="cv">240.0.0.0/4</span>
+  <span class="ck">proxy-server-nameserver</span>:
+    - <span class="cv">223.5.5.5</span>
+    - <span class="cv">https://sh.dns44.cn:44443/dns-query</span>
+  <span class="ck">fake-ip-filter</span>:
+    - <span class="cv">'geosite:cn'</span>
+    - <span class="cv">'*.lan'</span>
+    - <span class="cv">'*.local'</span>
+    - <span class="cv">'*.localhost'</span>
+    - <span class="cv">'*.localdomain'</span>
+    - <span class="cv">'*.internal'</span>
+    - <span class="cv">'*.home.arpa'</span>
+    - <span class="cv">'*.msftconnecttest.com'</span>
+    - <span class="cv">'*.msftncsi.com'</span>
+    - <span class="cv">'captive.apple.com'</span>
+    - <span class="cv">'connectivitycheck.gstatic.com'</span>
+    - <span class="cv">'+.pool.ntp.org'</span>
+    - <span class="cv">'time.*.com'</span>
+    - <span class="cv">'+.stun.*.*'</span>
+    - <span class="cv">'*.ts.net'</span>
+    - <span class="cv">'*.tailscale.com'</span>
+    - <span class="cv">'100.100.100.100'</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-label">Proxy Providers · 订阅源（URL 已脱敏）</span><button class="copy-btn" onclick="copyBlock(this)">复制</button></div>
+<pre><span class="ck">proxy-providers</span>:
+
+  <span class="cg">极风</span>:
+    <span class="ck">type</span>: <span class="cv">http</span>
+    <span class="ck">url</span>: <span class="cs">"&lt;极风订阅URL&gt;"</span>
+    <span class="ck">path</span>: <span class="cv">./proxy_providers/jifeng.yaml</span>
+    <span class="ck">proxy</span>: <span class="cv">DIRECT</span>
+    <span class="ck">headers</span>:
+      <span class="ck">User-Agent</span>: <span class="cv">"clash.meta"</span>
+    <span class="ck">exclude-filter</span>: <span class="cv">"(?i)直连|中转|官网|收藏|超时|重新导入|剩余流量|下次重置|套餐到期"</span>
+    <span class="ck">hidden</span>: <span class="cb">true</span>
+
+  <span class="cg">渔舍</span>:
+    <span class="ck">type</span>: <span class="cv">http</span>
+    <span class="ck">url</span>: <span class="cs">"&lt;渔舍订阅URL&gt;"</span>
+    <span class="ck">path</span>: <span class="cv">./proxy_providers/yushe.yaml</span>
+    <span class="ck">proxy</span>: <span class="cv">DIRECT</span>
+    <span class="ck">headers</span>:
+      <span class="ck">User-Agent</span>: <span class="cv">"clash.meta"</span>
+
+  <span class="cg">良心云</span>:
+    <span class="ck">type</span>: <span class="cv">http</span>
+    <span class="ck">url</span>: <span class="cs">"&lt;良心云订阅URL&gt;"</span>
+    <span class="ck">path</span>: <span class="cv">./proxy_providers/liangxin.yaml</span>
+    <span class="ck">proxy</span>: <span class="cv">DIRECT</span>
+    <span class="ck">headers</span>:
+      <span class="ck">User-Agent</span>: <span class="cv">"clash.meta"</span>
+    <span class="ck">filter</span>: <span class="cv">"🇭🇰|🇸🇬|🇯🇵|🇰🇷|🇲🇴|台湾|韩国|澳门|新加坡"</span>
+    <span class="ck">exclude-filter</span>: <span class="cv">"(?i)直连|中转|官网|收藏|超时|重新导入|剩余流量|下次重置|套餐到期|距离下次"</span>
+
+  <span class="cg">赔钱</span>:
+    <span class="ck">type</span>: <span class="cv">http</span>
+    <span class="ck">url</span>: <span class="cs">"&lt;赔钱订阅URL&gt;"</span>
+    <span class="ck">path</span>: <span class="cv">./proxy_providers/peiqian.yaml</span>
+    <span class="ck">proxy</span>: <span class="cv">DIRECT</span>
+    <span class="ck">headers</span>:
+      <span class="ck">User-Agent</span>: <span class="cv">"clash.meta"</span>
+    <span class="ck">filter</span>: <span class="cv">"^(?!.*?(0\\.01倍|下载|剩余|重置|到期|流量|套餐|官网)).*(新加坡|澳门|香港|台湾|日本|韩国|泰国|澳大利亚|瑞士|🇸🇬|🇲🇴|🇭🇰|🇯🇵|🇰🇷|🇹🇭|🇦🇺|🇨🇭).*(推荐).*$"</span>
+
+<span class="ck">proxies</span>:
+  - <span class="cs">{name: "圣何塞静态住宅IP", type: socks5, server: "&lt;IP&gt;", port: 443, username: "&lt;user&gt;", password: "&lt;pass&gt;", dialer-proxy: "🔌 🇺🇸", udp: false, tfo: true, ip-version: ipv4}</span>
+  - <span class="cs">{name: "圣何塞动态住宅IP", type: http, server: "&lt;host&gt;", port: 1000, username: "&lt;user&gt;", password: "&lt;pass&gt;", dialer-proxy: "🔌 🇺🇸", udp: false}</span>
+  - <span class="cs">{name: "东京静态住宅IP", type: socks5, server: "&lt;IP&gt;", port: 443, username: "&lt;user&gt;", password: "&lt;pass&gt;", dialer-proxy: "🔌 🇯🇵", udp: false, ip-version: ipv4}</span>
+  - <span class="cs">{name: "东京动态住宅IP", type: http, server: "&lt;host&gt;", port: 443, username: "&lt;user&gt;", password: "&lt;pass&gt;", dialer-proxy: "🔌 🇯🇵"}</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-label">Rules · 分流规则</span><button class="copy-btn" onclick="copyBlock(this)">复制</button></div>
+<pre><span class="ck">rules</span>:
+
+  <span class="cc"># ── 0) IPv6 + QUIC 拦截（最前，防泄露）──</span>
+  - <span class="cv">IP-CIDR6,::/0,REJECT,no-resolve</span>
+  - <span class="cv">AND,((DST-PORT,443),(NETWORK,UDP)),REJECT</span>  <span class="cc"># 防 AI 服务 QUIC 泄露真实 IP</span>
+
+  <span class="cc"># ── 1) 局域网直连 ──</span>
+  - <span class="cv">RULE-SET,private,DIRECT,no-resolve</span>
+  - <span class="cv">RULE-SET,bypass,DIRECT,no-resolve</span>
+  - <span class="cv">RULE-SET,tailscale,DIRECT,no-resolve</span>
+  - <span class="cv">GEOIP,LAN,DIRECT,no-resolve</span>
+  - <span class="cv">IP-CIDR,192.168.0.0/16,DIRECT,no-resolve</span>
+  - <span class="cv">IP-CIDR,10.0.0.0/8,DIRECT,no-resolve</span>
+  - <span class="cv">IP-CIDR,172.16.0.0/12,DIRECT,no-resolve</span>
+
+  <span class="cc"># ── 2) 国内媒体直连 ──</span>
+  - <span class="cv">RULE-SET,STUN,DIRECT</span>
+  - <span class="cv">RULE-SET,ChinaMedia,DIRECT</span>
+  - <span class="cv">RULE-SET,IPTVMainland,DIRECT</span>
+
+  <span class="cc"># ── 3) 广告屏蔽 ──</span>
+  - <span class="cv">RULE-SET,AdvertisingMiTV,REJECT</span>
+  - <span class="cv">RULE-SET,privacy-reject,REJECT</span>
+  - <span class="cv">RULE-SET,adblock-lite,REJECT</span>
+  - <span class="cv">RULE-SET,秋风广告规则,REJECT</span>
+  - <span class="cv">RULE-SET,doubaoime-block,REJECT</span>
+  - <span class="cv">RULE-SET,apple-ota,REJECT</span>
+
+  <span class="cc"># ── 4) 自定义代理 + 加密货币 ──</span>
+  - <span class="cv">RULE-SET,auto-proxy,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,Binance,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,OKX,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,Crypto,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,Cryptocurrency,🌐 节点选择</span>
+
+  <span class="cc"># ── 5) Emby ──</span>
+  - <span class="cv">RULE-SET,emby-direct,DIRECT</span>
+  - <span class="cv">RULE-SET,emby-proxy,Emby-观影代理</span>
+
+  <span class="cc"># ── 6) Apple ──</span>
+  - <span class="cv">RULE-SET,apns,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,apple-music,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,apple-tv,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,apple-proxy,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,apple-id,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,apple-store,🌐 节点选择</span>
+  - <span class="cv">RULE-SET,apple,🌐 节点选择</span>
+
+  <span class="cc"># ── 7) 流媒体 ──</span>
+  - <span class="cv">RULE-SET,youtube-music,Spotify-音乐</span>
+  - <span class="cv">RULE-SET,Spotify,Spotify-音乐</span>
+  - <span class="cv">RULE-SET,youtube,油管</span>
+  - <span class="cv">RULE-SET,twitter-video,油管</span>
+  - <span class="cv">RULE-SET,Netflix,流媒体</span>
+  - <span class="cv">RULE-SET,HBO,流媒体</span>
+  - <span class="cv">RULE-SET,Disney,流媒体</span>
+  - <span class="cv">RULE-SET,AppleTV,流媒体</span>
+
+  <span class="cc"># ── 8) AI 服务专用分流 ──</span>
+  - <span class="cv">RULE-SET,claude-pro,🪬 Claude专用</span>
+  - <span class="cv">RULE-SET,claude,🪬 Claude专用</span>
+  - <span class="cv">RULE-SET,anthropic,🪬 Claude专用</span>
+  - <span class="cv">RULE-SET,gemini-plus,AI双链路</span>
+  - <span class="cv">RULE-SET,gemini-pro,AI双链路</span>
+  - <span class="cv">RULE-SET,openai,AI双链路</span>
+  - <span class="cv">RULE-SET,Antigravity,AI双链路</span>
+  - <span class="cv">RULE-SET,gemini,AI双链路</span>
+  - <span class="cv">RULE-SET,copilot,AI双链路</span>
+  - <span class="cv">RULE-SET,google,AI双链路</span>
+
+  <span class="cc"># ── 9) 社交媒体 ──</span>
+  - <span class="cv">RULE-SET,twitter,社交媒体</span>
+  - <span class="cv">RULE-SET,telegram,TikTok媒体</span>
+  - <span class="cv">RULE-SET,Tiktok,TikTok媒体</span>
+  - <span class="cv">RULE-SET,linkedin,社交媒体</span>
+
+  <span class="cc"># ── 10) 开发工具 ──</span>
+  - <span class="cv">RULE-SET,microsoft,♻️ 自动选择</span>
+  - <span class="cv">RULE-SET,docker,♻️ 自动选择</span>
+
+  <span class="cc"># ── 11) IP 检测工具 ──</span>
+  - <span class="cv">DOMAIN-SUFFIX,ipleak.net,🗽 美国出口</span>
+  - <span class="cv">DOMAIN-SUFFIX,dnsleaktest.com,🗽 美国出口</span>
+  - <span class="cv">DOMAIN-SUFFIX,ipapi.co,🗽 美国出口</span>
+  - <span class="cv">DOMAIN-SUFFIX,ugtop.com,🗼 日本出口</span>
+  - <span class="cv">DOMAIN-SUFFIX,myip.com,🗼 日本出口</span>
+
+  <span class="cc"># ── 12) 国内直连兜底 ──</span>
+  - <span class="cv">GEOSITE,cn,DIRECT</span>
+  - <span class="cv">GEOIP,cn,DIRECT,no-resolve</span>
+
+  <span class="cc"># ── 13) 兜底 ──</span>
+  - <span class="cv">MATCH,🌐 节点选择</span></pre>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function copyBlock(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '已复制 ✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+
+
+<style id="__site-nav-css">
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC',sans-serif}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+</style>
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+<a class="__site-nav-link" href="/merlin-setup-guide.html"><span class="__site-nav-title">梅林固件设置指南</span><span class="__site-nav-sub">AX82U & RAX80</span></a>
+<a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C 刷机教程</span><span class="__site-nav-sub">ImmortalWrt 完整流程</span></a>
+<a class="__site-nav-link" href="/arm_softrouter_full_comparison.html"><span class="__site-nav-title">ARM 软路由横向对比</span><span class="__site-nav-sub">全平台综合评测</span></a>
+<a class="__site-nav-link" href="/hinlink_series_vs_r4s_comparison.html"><span class="__site-nav-title">Hinlink 系列 vs R4S</span><span class="__site-nav-sub">重点机型深度对比</span></a>
+<a class="__site-nav-link" href="/softrouter_full_8way_comparison.html"><span class="__site-nav-title">软路由八强对决</span><span class="__site-nav-sub">旗舰机型全面评测</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+</body>
+</html>
