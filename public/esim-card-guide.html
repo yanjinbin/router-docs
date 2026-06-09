@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eSIM 实体卡选购指南 · BeeSIM / eSTK / 9eSIM / xeSIM</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:#4f8ef7;border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover{color:var(--text);border-bottom-color:var(--accent)}
+
+/* LAYOUT */
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
+
+/* HERO */
+.hero{padding:48px 0 32px}
+.hero-tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:13px;color:var(--text2);max-width:640px;line-height:1.7}
+
+/* SECTION */
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:baseline;gap:10px;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:16px;font-weight:700}
+.section-sub{font-size:11px;color:var(--text3)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;vertical-align:middle;white-space:nowrap}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+.badge-amber{background:rgba(245,166,35,.12);color:var(--amber)}
+.badge-red{background:rgba(240,96,96,.12);color:var(--red)}
+.badge-purple{background:rgba(192,132,252,.12);color:var(--purple)}
+.badge-gray{background:rgba(255,255,255,.06);color:var(--text3)}
+
+/* TIER CARDS */
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.tier-card{border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:10px}
+.tier-entry{background:rgba(255,255,255,.04);border:1px solid var(--border)}
+.tier-mid{background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.25)}
+.tier-top{background:rgba(61,214,140,.06);border:1px solid rgba(61,214,140,.25)}
+.tier-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.tier-entry .tier-label{color:var(--text3)}
+.tier-mid .tier-label{color:var(--accent)}
+.tier-top .tier-label{color:var(--green)}
+.tier-chip{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+.tier-products{display:flex;gap:6px;flex-wrap:wrap}
+.tier-product{font-size:11px;font-weight:600;padding:3px 8px;border-radius:5px;font-family:var(--mono)}
+.tier-entry .tier-product{background:rgba(255,255,255,.06);color:var(--text2)}
+.tier-mid .tier-product{background:rgba(79,142,247,.12);color:var(--accent)}
+.tier-top .tier-product{background:rgba(61,214,140,.1);color:var(--green)}
+.tier-note{font-size:12px;color:var(--text2);line-height:1.55}
+
+/* CMP TABLE */
+.cmp-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.cmp-table th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:10px 14px;border-bottom:1px solid var(--border2);background:var(--bg3)}
+.cmp-table td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table tr:hover td{background:rgba(255,255,255,.018)}
+.yes{color:var(--green)}
+.no{color:var(--text3)}
+.partial{color:var(--amber)}
+
+/* ANALOGY BOX */
+.analogy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.analogy-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;text-align:center}
+.analogy-icon{font-size:22px;margin-bottom:8px}
+.analogy-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.analogy-sub{font-size:11px;color:var(--text2);line-height:1.5}
+
+/* SELECT CARDS */
+.select-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.select-card{border-radius:12px;padding:18px 20px}
+.select-entry{background:rgba(255,255,255,.03);border:1px solid var(--border)}
+.select-mid{background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.2)}
+.select-top{background:rgba(61,214,140,.06);border:1px solid rgba(61,214,140,.2)}
+.select-scene{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+.select-entry .select-scene{color:var(--text3)}
+.select-mid .select-scene{color:var(--accent)}
+.select-top .select-scene{color:var(--green)}
+.select-rec{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px}
+.select-body{font-size:12.5px;color:var(--text2);line-height:1.6}
+.select-body strong{color:var(--text)}
+
+/* KIGEN EXPLAIN */
+.explain-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin-bottom:20px}
+.explain-title{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--text)}
+.explain-body{font-size:13px;color:var(--text2);line-height:1.7}
+.explain-body strong{color:var(--text)}
+.explain-body code{font-family:var(--mono);font-size:11.5px;background:rgba(255,255,255,.07);padding:1px 6px;border-radius:3px}
+
+/* ALERT */
+.alert{display:flex;gap:10px;align-items:flex-start;padding:.9rem 1.1rem;border-radius:8px;font-size:12.5px;line-height:1.6;margin-bottom:28px}
+.alert-amber{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25)}
+.alert-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+
+@media(max-width:700px){
+  .tier-grid,.analogy-grid{grid-template-columns:1fr}
+  nav{padding:0 16px}
+  .wrap{padding:0 16px 64px}
+}
+@media(max-width:900px){
+  .tier-grid{grid-template-columns:1fr}
+  .analogy-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-home">← 返回首页</a>
+  <div class="nav-brand">eSIM 实体卡选购</div>
+  <div class="nav-links">
+    <a href="#tier">芯片分层</a>
+    <a href="#compare">产品对比</a>
+    <a href="#kigen">Kigen 是什么</a>
+    <a href="#select">怎么选</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-tag">eSIM · eUICC · 实体卡方案</div>
+  <h1>eSIM 实体卡选购指南</h1>
+  <p>BeeSIM · eSTK · 9eSIM · xeSIM · 小白卡，核心差异在芯片方案这一层。搞懂 ECP / Kigen / G+D 三个档次，选卡不再踩坑。</p>
+</div>
+
+<div class="alert alert-amber">
+  <span class="alert-icon">⚠️</span>
+  <span>eSIM 实体卡（eUICC）≠ 运营商内置 eSIM。这里说的是可以反复写入不同 Profile（运营商配置文件）的 <strong>可编程 eSIM 实体卡</strong>，主要用于手机备用号、境外流量卡等场景。</span>
+</div>
+
+<!-- ═══════════════════════════
+     SECTION 1: 芯片分层
+═══════════════════════════ -->
+<div id="tier" class="section">
+  <div class="section-header">
+    <div class="section-title">芯片方案分层</div>
+    <div class="section-sub">决定兼容性天花板的那一层</div>
+  </div>
+
+  <div class="tier-grid">
+    <div class="tier-card tier-entry">
+      <div class="tier-label">入门档</div>
+      <div class="tier-chip">东信和平 ECP</div>
+      <div class="tier-products">
+        <span class="tier-product">小白卡</span>
+        <span class="tier-product">9eSIM v0</span>
+        <span class="tier-product">xeSIM</span>
+      </div>
+      <div class="tier-note">国内厂商方案，成本低，主攻国内市场。标准实现有偏差，遇到挑剔的运营商或设备可能激活失败。</div>
+    </div>
+
+    <div class="tier-card tier-mid">
+      <div class="tier-label">进阶档 <span class="badge badge-blue" style="margin-left:4px">性价比最优</span></div>
+      <div class="tier-chip">ARM Kigen OS</div>
+      <div class="tier-products">
+        <span class="tier-product">9eSIM v3</span>
+      </div>
+      <div class="tier-note">ARM 出品，严格按 GSMA 国际标准实现。主流运营商 SM-DP+ 服务器基本都做过 Kigen 验证，兼容性大幅高于 ECP。</div>
+    </div>
+
+    <div class="tier-card tier-top">
+      <div class="tier-label">顶级档 <span class="badge badge-green" style="margin-left:4px">苹果同款</span></div>
+      <div class="tier-chip">G+D（Giesecke+Devrient）</div>
+      <div class="tier-products">
+        <span class="tier-product">eSTK</span>
+        <span class="tier-product">BeeSIM</span>
+      </div>
+      <div class="tier-note">德国老牌安全芯片厂，苹果 iPhone 内置 eSIM 用的就是 G+D 方案。运营商适配优先级最高，兼容性天花板。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     SECTION 2: 产品对比
+═══════════════════════════ -->
+<div id="compare" class="section">
+  <div class="section-header">
+    <div class="section-title">产品横向对比</div>
+    <div class="section-sub">5 款主流产品</div>
+  </div>
+
+  <div class="cmp-wrap">
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>产品</th>
+          <th>芯片方案</th>
+          <th>档次</th>
+          <th>兼容性</th>
+          <th>价格区间</th>
+          <th>适合人群</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>小白卡</strong></td>
+          <td><span class="no">东信和平 ECP</span></td>
+          <td>入门</td>
+          <td><span class="no">一般</span></td>
+          <td>最便宜</td>
+          <td>极度预算有限，轻度尝鲜</td>
+        </tr>
+        <tr>
+          <td><strong>xeSIM</strong></td>
+          <td><span class="no">东信和平 ECP</span></td>
+          <td>入门</td>
+          <td><span class="no">一般</span></td>
+          <td>低</td>
+          <td>预算有限、国内常用运营商</td>
+        </tr>
+        <tr>
+          <td><strong>9eSIM v0</strong></td>
+          <td><span class="no">东信和平 ECP</span></td>
+          <td>入门</td>
+          <td><span class="no">一般</span></td>
+          <td>低</td>
+          <td>9eSIM 老版本，不推荐新购</td>
+        </tr>
+        <tr style="background:rgba(79,142,247,.03)">
+          <td><strong>9eSIM v3</strong> <span class="badge badge-blue">推荐</span></td>
+          <td><span class="partial">ARM Kigen</span></td>
+          <td>进阶</td>
+          <td><span class="partial">较好</span></td>
+          <td>中</td>
+          <td>主力使用、怕折腾、性价比首选</td>
+        </tr>
+        <tr style="background:rgba(61,214,140,.03)">
+          <td><strong>eSTK</strong> <span class="badge badge-green">推荐</span></td>
+          <td><span class="yes">G+D（苹果同款）</span></td>
+          <td>顶级</td>
+          <td><span class="yes">最高</span></td>
+          <td>较贵</td>
+          <td>iPhone 用户、高频换卡、不差钱</td>
+        </tr>
+        <tr style="background:rgba(61,214,140,.03)">
+          <td><strong>BeeSIM</strong> <span class="badge badge-green">推荐</span></td>
+          <td><span class="yes">G+D（苹果同款）</span></td>
+          <td>顶级</td>
+          <td><span class="yes">最高</span></td>
+          <td>较贵</td>
+          <td>同 eSTK，看 App 体验和售后偏好</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-size:12px;color:var(--text3);line-height:1.6">
+    💡 eSTK vs BeeSIM：芯片层面完全一致（都是 G+D），差异在配套 App 界面、Profile 管理体验、客服售后。选哪个看个人偏好。
+  </p>
+</div>
+
+<!-- ═══════════════════════════
+     SECTION 3: Kigen 是什么
+═══════════════════════════ -->
+<div id="kigen" class="section">
+  <div class="section-header">
+    <div class="section-title">ARM Kigen 是什么</div>
+    <div class="section-sub">为什么它比 ECP 兼容性好</div>
+  </div>
+
+  <div class="explain-box">
+    <div class="explain-title">本质：跑在安全芯片上的操作系统</div>
+    <div class="explain-body">
+      eSIM 实体卡里有一块安全芯片（<strong>eUICC</strong>），芯片上需要跑一个 OS 来管理 Profile（运营商配置文件）的下载、安装、删除。这个 OS 就是芯片方案的核心。<br><br>
+      运营商侧的 <strong>SM-DP+ 服务器</strong>负责推送 Profile，服务器在对接时会按照某个芯片方案去测试和优化。ARM Kigen 严格遵循 <code>GSMA SGP.02</code> / <code>SGP.22</code> 国际标准，主流运营商基本都做过 Kigen 的兼容验证，而 ECP 是国内厂商自己的实现，细节偏差导致部分运营商/设备报错或激活失败。
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px;font-size:13px;color:var(--text2)">类比理解：</div>
+  <div class="analogy-grid">
+    <div class="analogy-card">
+      <div class="analogy-icon">🤖</div>
+      <div class="analogy-title">ECP ≈ 国产安卓魔改</div>
+      <div class="analogy-sub">能跑，但和标准有偏差，遇到严格检测的应用偶尔翻车</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🟢</div>
+      <div class="analogy-title">Kigen ≈ 原生 Android</div>
+      <div class="analogy-sub">ARM 自己出的标准实现，主流测试基准，兼容性有保障</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🍎</div>
+      <div class="analogy-title">G+D ≈ iOS</div>
+      <div class="analogy-sub">苹果钦定的芯片厂，运营商优先适配，天花板级兼容性</div>
+    </div>
+  </div>
+
+  <div class="cmp-wrap">
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>方案</th>
+          <th>出品方</th>
+          <th>定位</th>
+          <th>GSMA 标准合规</th>
+          <th>运营商适配优先级</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>ECP</strong>（东信和平）</td>
+          <td>国内厂商</td>
+          <td>低成本，主攻国内市场</td>
+          <td><span class="partial">△ 有偏差</span></td>
+          <td><span class="no">低</span></td>
+        </tr>
+        <tr>
+          <td><strong>Kigen OS</strong></td>
+          <td>ARM</td>
+          <td>国际标准，IoT/消费级通用</td>
+          <td><span class="yes">✓ 严格遵循</span></td>
+          <td><span class="partial">中高</span></td>
+        </tr>
+        <tr>
+          <td><strong>G+D</strong></td>
+          <td>Giesecke+Devrient（德国）</td>
+          <td>金融级安全芯片，苹果合作</td>
+          <td><span class="yes">✓ 最严格</span></td>
+          <td><span class="yes">最高</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;font-size:12.5px;color:var(--text2);line-height:1.65">
+    <strong style="color:var(--text)">核心结论：</strong> 卡激活失败、Profile 下载报错，根源往往不在 App 操作，也不在网络，而在芯片方案这一层——ECP 遇到挑剔的运营商 SM-DP+ 服务器就会翻车，Kigen / G+D 则基本不会有这个问题。
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     SECTION 4: 怎么选
+═══════════════════════════ -->
+<div id="select" class="section">
+  <div class="section-header">
+    <div class="section-title">按场景选购</div>
+    <div class="section-sub">三种典型用法</div>
+  </div>
+
+  <div class="select-grid">
+
+    <div class="select-card select-entry">
+      <div class="select-scene">💰 预算有限 / 轻度尝鲜</div>
+      <div class="select-rec">→ xeSIM 或 9eSIM v0</div>
+      <div class="select-body">够用，价格最低。但部分运营商/设备<strong>可能有坑</strong>，遇到激活失败需要有心理准备。国内主流运营商普通套餐一般能跑通。</div>
+    </div>
+
+    <div class="select-card select-mid">
+      <div class="select-scene">⚡ 主力使用 / 怕折腾</div>
+      <div class="select-rec">→ 9eSIM v3</div>
+      <div class="select-body">Kigen 方案，<strong>现在性价比最优解</strong>。兼容性比 ECP 大幅提升，价格比 G+D 方案低，日常使用 + 偶尔境外流量卡基本无忧。</div>
+    </div>
+
+    <div class="select-card select-top">
+      <div class="select-scene">🍎 iPhone / 高频换卡 / 不差钱</div>
+      <div class="select-rec">→ eSTK 或 BeeSIM</div>
+      <div class="select-body">G+D 就是苹果自家 eSIM 用的芯片厂，<strong>兼容性天花板</strong>，Profile 推送/删除频率高也没问题。<br><br>eSTK vs BeeSIM 芯片层面一致，看 App 界面和售后偏好选其一。</div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:24px;background:rgba(61,214,140,.05);border:1px solid rgba(61,214,140,.18);border-radius:12px;padding:18px 22px;font-size:13px;color:var(--text2);line-height:1.7">
+    <strong style="color:var(--green)">场景补充：</strong> 如果你路由器翻墙已经跑起来，eSIM 实体卡一般用在<strong style="color:var(--text)">手机备用号 / 境外流量卡</strong>场景。<br>
+    国内日常 + 偶尔出境 → <strong style="color:var(--text)">9eSIM v3 够用</strong>；主力机是 iPhone 且对 Profile 推送/删除频率高 → <strong style="color:var(--text)">直接上 BeeSIM / eSTK 省心</strong>。
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<style id="__site-nav-css">
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC',sans-serif}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+</style>
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+<a class="__site-nav-link" href="/yunyufen-config.html"><span class="__site-nav-title">多机场订阅组合</span><span class="__site-nav-sub">良心云 · 渔舍 · 赔钱 · 极风</span></a>
+<a class="__site-nav-link" href="/merlin-setup-guide.html"><span class="__site-nav-title">梅林固件设置指南</span><span class="__site-nav-sub">AX82U & RAX80</span></a>
+<a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C 刷机教程</span><span class="__site-nav-sub">ImmortalWrt 完整流程</span></a>
+<a class="__site-nav-link" href="/openwrt-proxy-plugins.html"><span class="__site-nav-title">OpenWrt 代理插件横评</span><span class="__site-nav-sub">Nikki · OpenClash · HomeProxy…</span></a>
+<a class="__site-nav-link" href="/arm_softrouter_full_comparison.html"><span class="__site-nav-title">ARM 软路由横向对比</span><span class="__site-nav-sub">全平台综合评测</span></a>
+<a class="__site-nav-link" href="/hinlink_series_vs_r4s_comparison.html"><span class="__site-nav-title">Hinlink 系列 vs R4S</span><span class="__site-nav-sub">重点机型深度对比</span></a>
+<a class="__site-nav-link" href="/softrouter_full_8way_comparison.html"><span class="__site-nav-title">软路由八强对决</span><span class="__site-nav-sub">旗舰机型全面评测</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+</body>
+</html>

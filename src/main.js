@@ -42,6 +42,14 @@ const docs = [
     tagColor: '#f5a623',
   },
   {
+    title: 'eSIM 实体卡选购指南',
+    subtitle: 'BeeSIM · eSTK · 9eSIM · xeSIM',
+    desc: 'ECP / Kigen / G+D 三档芯片方案详解，兼容性差异根源、产品横向对比，按预算和场景一步到位选卡',
+    href: '/esim-card-guide.html',
+    tag: '指南',
+    tagColor: '#4f8ef7',
+  },
+  {
     title: 'OpenWrt 代理插件横评',
     subtitle: 'Nikki · OpenClash · HomeProxy · PassWall…',
     desc: '11 款 OpenWrt 代理插件全横评：Nikki vs OpenClash 深度对比，sing-box / Mihomo / Xray 三大阵营逐一详解，按场景选型建议',
