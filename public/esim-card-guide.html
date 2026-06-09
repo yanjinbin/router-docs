@@ -131,8 +131,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
   <div class="nav-links">
     <a href="#tier">芯片分层</a>
     <a href="#compare">产品对比</a>
+    <a href="#estk-vs-beesim">eSTK vs BeeSIM</a>
     <a href="#kigen">Kigen 是什么</a>
     <a href="#select">怎么选</a>
+    <a href="#strategy">选购策略</a>
   </div>
 </nav>
 
@@ -197,7 +199,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
 <div id="compare" class="section">
   <div class="section-header">
     <div class="section-title">产品横向对比</div>
-    <div class="section-sub">5 款主流产品</div>
+    <div class="section-sub">6 款主流产品 · 含实际价格</div>
   </div>
 
   <div class="cmp-wrap">
@@ -206,25 +208,25 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
         <tr>
           <th>产品</th>
           <th>芯片方案</th>
-          <th>档次</th>
+          <th>写卡方式</th>
           <th>兼容性</th>
-          <th>价格区间</th>
+          <th>实际价格</th>
           <th>适合人群</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><strong>小白卡</strong></td>
+          <td><strong>小白卡</strong> <span class="badge badge-gray">安卓首选</span></td>
           <td><span class="no">东信和平 ECP</span></td>
-          <td>入门</td>
+          <td>读卡器 / STK</td>
           <td><span class="no">一般</span></td>
-          <td>最便宜</td>
-          <td>极度预算有限，轻度尝鲜</td>
+          <td><span class="yes">¥20 左右（淘宝）</span></td>
+          <td>安卓用户、不碰美日运营商</td>
         </tr>
         <tr>
           <td><strong>xeSIM</strong></td>
           <td><span class="no">东信和平 ECP</span></td>
-          <td>入门</td>
+          <td>读卡器 / STK</td>
           <td><span class="no">一般</span></td>
           <td>低</td>
           <td>预算有限、国内常用运营商</td>
@@ -232,42 +234,100 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
         <tr>
           <td><strong>9eSIM v0</strong></td>
           <td><span class="no">东信和平 ECP</span></td>
-          <td>入门</td>
+          <td>读卡器 / STK</td>
           <td><span class="no">一般</span></td>
           <td>低</td>
-          <td>9eSIM 老版本，不推荐新购</td>
+          <td>老版本，不推荐新购</td>
         </tr>
         <tr style="background:rgba(79,142,247,.03)">
-          <td><strong>9eSIM v3</strong> <span class="badge badge-blue">推荐</span></td>
+          <td><strong>9eSIM v3</strong> <span class="badge badge-blue">性价比</span></td>
           <td><span class="partial">ARM Kigen</span></td>
-          <td>进阶</td>
+          <td>读卡器 / STK</td>
           <td><span class="partial">较好</span></td>
           <td>中</td>
           <td>主力使用、怕折腾、性价比首选</td>
         </tr>
         <tr style="background:rgba(61,214,140,.03)">
-          <td><strong>eSTK</strong> <span class="badge badge-green">推荐</span></td>
+          <td><strong>eSTK</strong> <span class="badge badge-green">G+D</span></td>
           <td><span class="yes">G+D（苹果同款）</span></td>
-          <td>顶级</td>
+          <td>读卡器 + STK / nLPA2</td>
           <td><span class="yes">最高</span></td>
-          <td>较贵</td>
-          <td>iPhone 用户、高频换卡、不差钱</td>
+          <td>ECV3 ¥160+；EXE ECV2 Pro ¥200+<br><span style="font-size:11px;color:var(--text3)">+读卡器约 ¥220+；官网优惠码 NAIXI 9折</span></td>
+          <td>iPhone / 高频换卡 / 需要读卡器抢救</td>
         </tr>
         <tr style="background:rgba(61,214,140,.03)">
-          <td><strong>BeeSIM</strong> <span class="badge badge-green">推荐</span></td>
+          <td><strong>BeeSIM</strong> <span class="badge badge-green">G+D</span></td>
           <td><span class="yes">G+D（苹果同款）</span></td>
-          <td>顶级</td>
+          <td>蓝牙 BLE（微信小程序）</td>
           <td><span class="yes">最高</span></td>
-          <td>较贵</td>
-          <td>同 eSTK，看 App 体验和售后偏好</td>
+          <td>拼多多约 ¥190；淘宝客服发 #NAIXI 隐藏优惠</td>
+          <td>不想备读卡器、操作更便捷</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <p style="font-size:12px;color:var(--text3);line-height:1.6">
-    💡 eSTK vs BeeSIM：芯片层面完全一致（都是 G+D），差异在配套 App 界面、Profile 管理体验、客服售后。选哪个看个人偏好。
+  <p style="font-size:12px;color:var(--text3);line-height:1.6;margin-top:12px">
+    💡 eSTK 与 BeeSIM 芯片层面完全一致（G+D，EID 前缀 89069032），与 Apple 内置 eUICC 同一供应商，不会被美国运营商、日本 NTT DOCOMO 拉黑 EID。
   </p>
+</div>
+
+<!-- ═══════════════════════════
+     SECTION 2.5: eSTK vs BeeSIM
+═══════════════════════════ -->
+<div id="estk-vs-beesim" class="section">
+  <div class="section-header">
+    <div class="section-title">eSTK vs BeeSIM 深度对比</div>
+    <div class="section-sub">同芯片，不同交互逻辑</div>
+  </div>
+
+  <div class="cmp-wrap" style="margin-bottom:20px">
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>对比项</th>
+          <th>eSTKme</th>
+          <th>BeeSIM</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>芯片</td><td><span class="yes">G+D（EID 89069032）</span></td><td><span class="yes">G+D（EID 89069032）</span></td></tr>
+        <tr><td>写卡方式</td><td>读卡器 + STK 菜单 / nLPA2</td><td>蓝牙 BLE，微信小程序控制</td></tr>
+        <tr><td>炸卡后救援</td><td><span class="yes">✓ 读卡器可抢救</span></td><td><span class="no">✕ 只能寄回售后</span></td></tr>
+        <tr><td>Bootstrap 种子卡</td><td><span class="yes">新款内置（类 Xesim SeedLink）</span></td><td><span class="no">无</span></td></tr>
+        <tr><td>老款来源</td><td>G+D 直接制卡</td><td><span class="partial">外版 iPhone 双卡改机卡槽（部分有锁），T-Mobile / Google Fi / Tello 可能写入失败</span></td></tr>
+        <tr><td>新款来源</td><td>G+D 直接制卡</td><td><span class="yes">G+D 直接制卡，无有锁问题</span></td></tr>
+        <tr><td>价格</td><td>ECV3 ¥160+；EXE ECV2 Pro ¥200+；+读卡器约 ¥220+</td><td>拼多多约 ¥190</td></tr>
+        <tr><td>优惠码</td><td>官网使用 <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">NAIXI</code> 可 9 折</td><td>淘宝客服发送 <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">#NAIXI</code> 触发隐藏优惠</td></tr>
+        <tr><td>定位</td><td>老牌，功能更全，可离线救砖</td><td>华强北超雪团队出品，操作更便捷</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+    <div style="background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.2);border-radius:10px;padding:16px 18px">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">选 eSTK 的理由</div>
+      <ul style="list-style:none;font-size:12.5px;color:var(--text2);display:flex;flex-direction:column;gap:5px">
+        <li>✓ 读卡器可离线救砖，风险可控</li>
+        <li>✓ nLPA2 独家功能，写卡管理更灵活</li>
+        <li>✓ 新款内置 Bootstrap 种子卡，安卓写卡体验接近小白卡</li>
+        <li>✓ 老牌产品，文档和社区资料多</li>
+      </ul>
+    </div>
+    <div style="background:rgba(61,214,140,.06);border:1px solid rgba(61,214,140,.2);border-radius:10px;padding:16px 18px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">选 BeeSIM 的理由</div>
+      <ul style="list-style:none;font-size:12.5px;color:var(--text2);display:flex;flex-direction:column;gap:5px">
+        <li>✓ 蓝牙 BLE 控制，无需读卡器</li>
+        <li>✓ 微信小程序操作，上手门槛最低</li>
+        <li>✓ 新款直接 G+D 制卡，无有锁风险</li>
+        <li>△ 炸卡只能寄回售后，但概率极低</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.22);border-radius:10px;padding:14px 18px;font-size:12.5px;color:var(--text2);line-height:1.65">
+    <strong style="color:var(--amber)">⚠ 炸卡风险说明：</strong> 两家都存在写满后炸卡的可能，但属于幸存者偏差，实际概率极低。每张 eUICC <strong style="color:var(--text)">写入不超过 6–8 张 Profile</strong> 是安全上限。iOS 新系统已加入写卡边界保护，早期 iPhone 11 炸卡案例较多是历史问题。
+  </div>
 </div>
 
 <!-- ═══════════════════════════
@@ -354,34 +414,73 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
 <div id="select" class="section">
   <div class="section-header">
     <div class="section-title">按场景选购</div>
-    <div class="section-sub">三种典型用法</div>
+    <div class="section-sub">四种典型用法</div>
   </div>
 
   <div class="select-grid">
 
     <div class="select-card select-entry">
-      <div class="select-scene">💰 预算有限 / 轻度尝鲜</div>
-      <div class="select-rec">→ xeSIM 或 9eSIM v0</div>
-      <div class="select-body">够用，价格最低。但部分运营商/设备<strong>可能有坑</strong>，遇到激活失败需要有心理准备。国内主流运营商普通套餐一般能跑通。</div>
+      <div class="select-scene">🤖 安卓用户 · 不碰美日运营商</div>
+      <div class="select-rec">→ 小白卡（¥20 淘宝）</div>
+      <div class="select-body">直接买，够用。ECP 方案在国内主流运营商 + 大多数境外流量卡场景完全能跑通。<strong>只有运营商有 EID 白名单要求时才需要 G+D</strong>，否则没必要多花几百块。</div>
     </div>
 
-    <div class="select-card select-mid">
-      <div class="select-scene">⚡ 主力使用 / 怕折腾</div>
+    <div class="select-card select-entry">
+      <div class="select-scene">⚡ 主力使用 / 怕折腾 / 兼容性优先</div>
       <div class="select-rec">→ 9eSIM v3</div>
       <div class="select-body">Kigen 方案，<strong>现在性价比最优解</strong>。兼容性比 ECP 大幅提升，价格比 G+D 方案低，日常使用 + 偶尔境外流量卡基本无忧。</div>
     </div>
 
+    <div class="select-card select-mid">
+      <div class="select-scene">🔧 需要读卡器救砖 / 功能全面</div>
+      <div class="select-rec">→ eSTK（ECV3 ¥160+）</div>
+      <div class="select-body">G+D 最高兼容性，<strong>读卡器可离线救砖</strong>，nLPA2 写卡管理更灵活，新款内置 Bootstrap 种子卡。官网 <code style="font-family:var(--mono);font-size:11px">NAIXI</code> 优惠码 9 折。</div>
+    </div>
+
     <div class="select-card select-top">
-      <div class="select-scene">🍎 iPhone / 高频换卡 / 不差钱</div>
-      <div class="select-rec">→ eSTK 或 BeeSIM</div>
-      <div class="select-body">G+D 就是苹果自家 eSIM 用的芯片厂，<strong>兼容性天花板</strong>，Profile 推送/删除频率高也没问题。<br><br>eSTK vs BeeSIM 芯片层面一致，看 App 界面和售后偏好选其一。</div>
+      <div class="select-scene">📱 操作便捷 / 不想备读卡器</div>
+      <div class="select-rec">→ BeeSIM（拼多多 ¥190）</div>
+      <div class="select-body">蓝牙 BLE + 微信小程序操作，<strong>上手门槛最低</strong>。G+D 同等兼容性，新款直接 G+D 制卡无有锁问题。淘宝客服发 <code style="font-family:var(--mono);font-size:11px">#NAIXI</code> 获隐藏优惠。</div>
     </div>
 
   </div>
+</div>
 
-  <div style="margin-top:24px;background:rgba(61,214,140,.05);border:1px solid rgba(61,214,140,.18);border-radius:12px;padding:18px 22px;font-size:13px;color:var(--text2);line-height:1.7">
-    <strong style="color:var(--green)">场景补充：</strong> 如果你路由器翻墙已经跑起来，eSIM 实体卡一般用在<strong style="color:var(--text)">手机备用号 / 境外流量卡</strong>场景。<br>
-    国内日常 + 偶尔出境 → <strong style="color:var(--text)">9eSIM v3 够用</strong>；主力机是 iPhone 且对 Profile 推送/删除频率高 → <strong style="color:var(--text)">直接上 BeeSIM / eSTK 省心</strong>。
+<!-- ═══════════════════════════
+     SECTION 5: 选购策略
+═══════════════════════════ -->
+<div id="strategy" class="section">
+  <div class="section-header">
+    <div class="section-title">选购策略总结</div>
+    <div class="section-sub">来自 @realNyarime 奶昔的建议</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px">
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;font-size:13px;line-height:1.7">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">决策树</div>
+      <div style="font-family:var(--mono);font-size:12.5px;color:var(--text2);line-height:2">
+        你是安卓用户？<br>
+        &nbsp;&nbsp;├─ 是 → 不碰美国运营商 / 日本 NTT DOCOMO？<br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 是 → <strong style="color:var(--green)">小白卡（¥20）搞定</strong><br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ 否 → 运营商有 EID 白名单要求 → <strong style="color:var(--accent)">G+D（eSTK / BeeSIM）</strong><br>
+        &nbsp;&nbsp;└─ 否（iPhone）<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ 需要读卡器救砖 → <strong style="color:var(--accent)">eSTK</strong>；不想备读卡器 → <strong style="color:var(--green)">BeeSIM</strong>
+      </div>
+    </div>
+
+    <div style="background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.22);border-radius:10px;padding:14px 18px;font-size:12.5px;color:var(--text2);line-height:1.65">
+      <strong style="color:var(--amber)">⚠ 写卡上限：</strong>每张 eUICC 建议写入不超过 <strong style="color:var(--text)">6–8 张 Profile</strong>，写满是炸卡的主要原因。iOS 新系统已有写卡边界保护，早期 iPhone 11 炸卡案例是历史问题。
+    </div>
+
+    <div style="background:rgba(240,96,96,.06);border:1px solid rgba(240,96,96,.18);border-radius:10px;padding:14px 18px;font-size:12.5px;color:var(--text2);line-height:1.65">
+      <strong style="color:var(--red)">⚠ BeeSIM 老款注意：</strong>老款来源于外版 iPhone 双卡改机卡槽，部分有锁，在 T-Mobile / Google Fi / Tello 等运营商会无法写入。<strong style="color:var(--text)">购买时确认是新款（G+D 直接制卡）</strong>。
+    </div>
+
+    <div style="background:rgba(61,214,140,.05);border:1px solid rgba(61,214,140,.18);border-radius:10px;padding:14px 18px;font-size:12.5px;color:var(--text2);line-height:1.65">
+      <strong style="color:var(--green)">💡 保号场景提示：</strong>对于需要保留的电话号码（转移麻烦、需去当地门市等），优先选实体 eUICC——换手机时号码不受影响，比内置 eSIM 更灵活。<strong style="color:var(--text)">电话号码的寿命往往比一部手机长</strong>。
+    </div>
+
   </div>
 </div>
 
