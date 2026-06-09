@@ -703,5 +703,28 @@ function toggleCheck(box) {
   box.nextElementSibling.classList.toggle('checked');
 }
 </script>
+<style id="__site-nav-css">
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC',sans-serif}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+</style>
+
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+<a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C 刷机教程</span><span class="__site-nav-sub">ImmortalWrt 完整流程</span></a>
+<a class="__site-nav-link" href="/arm_softrouter_full_comparison.html"><span class="__site-nav-title">ARM 软路由横向对比</span><span class="__site-nav-sub">全平台综合评测</span></a>
+<a class="__site-nav-link" href="/hinlink_series_vs_r4s_comparison.html"><span class="__site-nav-title">Hinlink 系列 vs R4S</span><span class="__site-nav-sub">重点机型深度对比</span></a>
+<a class="__site-nav-link" href="/softrouter_full_8way_comparison.html"><span class="__site-nav-title">软路由八强对决</span><span class="__site-nav-sub">旗舰机型全面评测</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+
 </body>
 </html>
