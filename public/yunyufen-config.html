@@ -641,6 +641,74 @@ function copyBlock(btn) {
 </script>
 
 
+<style id="__clients-css">
+#clients{padding:40px 24px 0}
+.clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:20px}
+.client-card{background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.client-card a.client-name{font-size:14px;font-weight:700;color:#e8eaf0;text-decoration:none}
+.client-card a.client-name:hover{color:#4f8ef7}
+.client-platform{display:flex;gap:6px;flex-wrap:wrap}
+.plat{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;background:#1e2232;color:#9aa0b4}
+.plat.ios{background:#1a2a3a;color:#4f8ef7}
+.plat.mac{background:#1a2d1a;color:#3dd68c}
+.plat.win{background:#2a1f2d;color:#c084fc}
+.plat.cross{background:#2d2318;color:#f59e0b}
+.client-note{font-size:12px;color:#6b7280;margin-top:4px}
+.badge-owned{font-size:10px;background:#0f3020;color:#3dd68c;border:1px solid #1d5535;border-radius:4px;padding:1px 6px;align-self:flex-start}
+.badge-free{font-size:10px;background:#1a1f30;color:#9aa0b4;border:1px solid #2a2f45;border-radius:4px;padding:1px 6px;align-self:flex-start}
+</style>
+<div id="clients" class="section">
+  <div class="section-header">
+    <div class="section-title">代理客户端 · 已购汇总</div>
+    <div class="section-sub">iOS / macOS / 跨平台</div>
+  </div>
+  <div class="clients-grid">
+
+    <div class="client-card">
+      <a class="client-name" href="https://clashbar.vercel.app/" target="_blank">ClashBar</a>
+      <div class="client-platform"><span class="plat mac">macOS</span></div>
+      <span class="badge-owned">已购</span>
+      <div class="client-note">macOS 菜单栏原生客户端，完整支持 Mihomo 配置，界面简洁流畅。</div>
+    </div>
+
+    <div class="client-card">
+      <a class="client-name" href="https://apps.apple.com/app/surge-5/id1442620678" target="_blank">Surge</a>
+      <div class="client-platform"><span class="plat ios">iOS</span><span class="plat mac">macOS</span></div>
+      <span class="badge-owned">已购</span>
+      <div class="client-note">iOS/macOS 最成熟的代理客户端，规则调试能力强，企业级稳定性。目前主要备用。</div>
+    </div>
+
+    <div class="client-card">
+      <a class="client-name" href="https://quantumult.app/x/" target="_blank">Quantumult X</a>
+      <div class="client-platform"><span class="plat ios">iOS</span></div>
+      <span class="badge-owned">已购</span>
+      <div class="client-note">iOS 上功能最丰富的客户端之一，支持脚本重写、MitM 抓包，深度定制能力强。</div>
+    </div>
+
+    <div class="client-card">
+      <a class="client-name" href="https://apps.apple.com/app/shadowrocket/id932747118" target="_blank">Shadowrocket</a>
+      <div class="client-platform"><span class="plat ios">iOS</span></div>
+      <span class="badge-owned">已购 · 主力使用</span>
+      <div class="client-note">iOS 日常主力，轻量快速，支持 SS/VMess/Trojan/VLESS 等协议，性价比极高。</div>
+    </div>
+
+    <div class="client-card">
+      <a class="client-name" href="https://nsloon.app/" target="_blank">Loon</a>
+      <div class="client-platform"><span class="plat ios">iOS</span></div>
+      <span class="badge-owned">已购</span>
+      <div class="client-note">界面友好，支持插件生态，脚本能力接近 Surge，适合需要规则精调的场景。</div>
+    </div>
+
+    <div class="client-card">
+      <a class="client-name" href="https://clash.wiki/" target="_blank">Clash / Clash Verge</a>
+      <div class="client-platform"><span class="plat cross">Windows</span><span class="plat mac">macOS</span><span class="plat win">Linux</span></div>
+      <span class="badge-free">免费 · 跨平台</span>
+      <div class="client-note">原生支持 Mihomo（.yaml）配置文件，本文档配置直接导入即用。跨平台首选。</div>
+    </div>
+
+  </div>
+</div>
+
 <style id="__site-nav-css">
 .__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC',sans-serif}
 .__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
