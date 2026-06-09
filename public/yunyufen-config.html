@@ -117,7 +117,7 @@ pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-h
 <div class="wrap">
 
   <div class="hero">
-    <div class="hero-tag">AX82U · ARMv7 · Mihomo v1.19.24</div>
+    <div class="hero-tag">AX82U · Mihomo v1.19.24</div>
     <h1>多机场订阅组合 · 良心云 + 渔舍 + 赔钱 + 极风</h1>
     <p>渔舍 + 良心云 + 赔钱 + 极风四机场合并，住宅 IP 出口双链路，AI 专用分流。<br>UDP 全局关闭 · IPv6 关闭 · UDP 443 REJECT（防 AI 服务 QUIC 泄露真实 IP）。</p>
   </div>
@@ -138,7 +138,7 @@ pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-h
       <div class="ov-card"><div class="ov-label">DNS Port</div><div class="ov-val">23453</div></div>
       <div class="ov-card"><div class="ov-label">面板端口</div><div class="ov-val">9990</div></div>
       <div class="ov-card"><div class="ov-label">DNS 模式</div><div class="ov-val">fake-ip</div></div>
-      <div class="ov-card"><div class="ov-label">UDP</div><div class="ov-val" style="color:var(--red)">false <small>ARMv7 关闭</small></div></div>
+      <div class="ov-card"><div class="ov-label">UDP</div><div class="ov-val" style="color:var(--red)">false <small>防 AI QUIC 泄露</small></div></div>
       <div class="ov-card"><div class="ov-label">IPv6</div><div class="ov-val" style="color:var(--red)">false</div></div>
       <div class="ov-card"><div class="ov-label">prefer-h3</div><div class="ov-val" style="color:var(--red)">false</div></div>
       <div class="ov-card"><div class="ov-label">Fingerprint</div><div class="ov-val">chrome</div></div>
@@ -397,7 +397,7 @@ pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-h
       <div class="code-header"><span class="code-label">基础参数</span><button class="copy-btn" onclick="copyBlock(this)">复制</button></div>
 <pre><span class="cc"># ================================================================</span>
 <span class="cc"># 渔舍 良心云 赔钱 极风 四机场合并</span>
-<span class="cc"># UDP 全局关闭 / IPv6 关闭 / HTTP3 关闭 — 防真实 IP 泄露（ARMv7）</span>
+<span class="cc"># UDP 全局关闭 / IPv6 关闭 / HTTP3 关闭 — 防真实 IP 泄露（QUIC 封锁）</span>
 <span class="cc"># ================================================================</span>
 
 <span class="ck">mixed-port</span>: <span class="cn">23456</span>
@@ -422,7 +422,7 @@ pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-h
 <span class="ck">log-level</span>: <span class="cv">error</span>
 <span class="ck">ipv6</span>: <span class="cb">false</span>
 <span class="ck">unified-delay</span>: <span class="cb">true</span>
-<span class="ck">udp</span>: <span class="cb">false</span>         <span class="cc"># ARMv7 gcsweep 崩溃风险，保持关闭</span>
+<span class="ck">udp</span>: <span class="cb">false</span>
 <span class="ck">prefer-h3</span>: <span class="cb">false</span>
 <span class="ck">udp-timeout</span>: <span class="cn">300</span>
 <span class="ck">keep-alive-interval</span>: <span class="cn">15</span>
