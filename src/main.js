@@ -42,6 +42,14 @@ const docs = [
     tagColor: '#f5a623',
   },
   {
+    title: '苹果礼品卡购买指南',
+    subtitle: '土耳其区 · 尼日利亚区',
+    desc: '低价区 App Store 礼品卡购买渠道，土耳其区推荐 SEAGM.com，含全球 AI 订阅价格对比工具',
+    href: '/apple-giftcard-guide.html',
+    tag: '指南',
+    tagColor: '#f5a623',
+  },
+  {
     title: 'eSIM 实体卡选购指南',
     subtitle: 'BeeSIM · eSTK · 9eSIM · xeSIM',
     desc: 'ECP / Kigen / G+D 三档芯片方案详解，兼容性差异根源、产品横向对比，按预算和场景一步到位选卡',
