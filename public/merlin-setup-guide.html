@@ -237,13 +237,15 @@
     <div style="flex:1">
       <div class="migrate-title">为什么建议从 AX82U 迁移到 RAX80？</div>
       <div class="migrate-desc">
-        AX82U 是 <strong>ARMv7 32-bit</strong>，Mihomo 在处理 QUIC/hy2 协议时存在堆内存崩溃风险。你目前的 yaml 已通过 <code>udp: false</code> 和 <code>AND,((DST-PORT,443),(NETWORK,UDP)),REJECT</code> 规避了崩溃，但代价是 <strong>hy2 节点完全无法使用</strong>，所有 UDP 流量被拦截。<br>RAX80 是 ARM64，无此问题，可以开启 UDP 和 hy2，节点选择更自由。
+        AX82U 是 <strong>ARMv7 32-bit</strong>，偶发的 <code>gcsweep: found pointer to free object</code> 崩溃是 Go runtime 在 ARMv7 平台的已知问题（内存屏障精度不足），与 UDP 配置<strong>无关</strong>，升级到 ARM64 平台才能根本解决。<br><br>
+        <code>udp: false</code> + <code>AND,((DST-PORT,443),(NETWORK,UDP)),REJECT</code> 这两条规则的目的是<strong>防止真实 IP 泄露</strong>：Gemini、ChatGPT 等 AI 服务会主动发起 QUIC（UDP 443）连接，若不拦截会绕过代理直连，暴露真实 IP 触发风控。代价是 hy2 节点无法使用。<br><br>
+        RAX80 是 ARM64，无 gcsweep 崩溃问题，但 <strong>UDP 443 REJECT 规则在迁移后仍应保留</strong>，除非确认所有 AI 服务流量都已走代理。
       </div>
       <div class="diff-grid">
         <div class="diff-col before">
           <div class="diff-col-title">AX82U 现状（ARMv7）</div>
           <div class="diff-item">udp: false 全局关闭</div>
-          <div class="diff-item">AND UDP 443 全部 REJECT</div>
+          <div class="diff-item">AND UDP 443 REJECT（防 AI 服务泄露真实 IP）</div>
           <div class="diff-item">hy2 节点无法使用</div>
           <div class="diff-item">prefer-h3: false 关闭</div>
           <div class="diff-item">MC2 ARM32 最高 1.2.1</div>
@@ -251,7 +253,7 @@
         <div class="diff-col after">
           <div class="diff-col-title">RAX80 迁移后（ARM64）</div>
           <div class="diff-item">移除 udp: false 限制</div>
-          <div class="diff-item">移除 UDP 443 REJECT 规则</div>
+          <div class="diff-item">保留 UDP 443 REJECT（防 AI 泄露）</div>
           <div class="diff-item">hy2 节点正常使用</div>
           <div class="diff-item">可按需开启 HTTP/3</div>
           <div class="diff-item">MC2 ARM64 1.0.3</div>
@@ -312,25 +314,25 @@
           <td><span class="filename">RAX80_386.8_1_ubi_1d22867_koolcenter.chk</span></td>
           <td><span class="filesize">81.25 MB</span></td>
           <td><span style="font-size:12px;color:var(--text2)">从<strong>原厂固件</strong>刷入用 <span class="tag tag-green">.chk</span></span></td>
-          <td><a class="dl-btn" href="https://www.ilanzou.com/s/elN1vnwn" target="_blank">↓ 下载</a></td>
+          <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_386/Netgear/RAX80/" target="_blank">↓ 下载</a></td>
         </tr>
         <tr>
           <td><span class="filename">RAX80_386.8_1_ubi_d70a1a6_koolcenter.w</span></td>
           <td><span class="filesize">81.25 MB</span></td>
           <td><span style="font-size:12px;color:var(--text2)">从<strong>梅林升梅林</strong>用 <span class="tag tag-blue">.w</span></span></td>
-          <td><a class="dl-btn" href="https://www.ilanzou.com/s/elN1vnwn" target="_blank">↓ 下载</a></td>
+          <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_386/Netgear/RAX80/" target="_blank">↓ 下载</a></td>
         </tr>
         <tr>
           <td><span class="filename">原版固件 RAX80-V1.0.11.148.zip</span></td>
           <td><span class="filesize">70.25 MB</span></td>
           <td><span style="font-size:12px;color:var(--text2)">救砖备用，原厂固件</span></td>
-          <td><a class="dl-btn" href="https://www.ilanzou.com/s/elN1vnwn" target="_blank">↓ 下载</a></td>
+          <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_386/Netgear/RAX80/" target="_blank">↓ 下载</a></td>
         </tr>
         <tr>
           <td><span class="filename">MC2_1.0.3_ARM64.tar.gz</span></td>
           <td><span class="filesize">~12 MB</span></td>
           <td><span style="font-size:12px;color:var(--text2)">撸猫 MC2 <span class="tag tag-blue">ARM64 RAX80 专用</span></span></td>
-          <td><a class="dl-btn" href="https://www.ilanzou.com/s/elN1vnwn" target="_blank">↓ 下载</a></td>
+          <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_386/Netgear/RAX80/" target="_blank">↓ 下载</a></td>
         </tr>
       </tbody>
     </table>
@@ -343,25 +345,25 @@
           <td><span class="filename">RT-AX82U_386.7_2_cferom_puresqubi_2af03d8_koolcenter.w</span></td>
           <td><span class="filesize">61.38 MB</span></td>
           <td><span style="font-size:12px;color:var(--text2)">koolshare 梅林 386.7_2 <span class="tag tag-green">稳定推荐</span></span></td>
-          <td><a class="dl-btn" href="https://www.ilanzou.com/s/LXF1vnQ7" target="_blank">↓ 下载</a></td>
+          <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_388/RT-AX82U/" target="_blank">↓ 下载</a></td>
         </tr>
         <tr>
           <td><span class="filename">RT-AX82U_3004_388.10_2_puresqubi-20251119.w</span></td>
           <td><span class="filesize">—</span></td>
           <td><span style="font-size:12px;color:var(--text2)">梅林官方版（无 koolshare 软件中心）<span class="tag tag-amber">当前在用</span></span></td>
-          <td><a class="dl-btn" href="https://www.ilanzou.com/s/LXF1vnQ7" target="_blank">↓ 下载</a></td>
+          <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_388/RT-AX82U/" target="_blank">↓ 下载</a></td>
         </tr>
         <tr>
           <td><span class="filename">MC2_1.2.1_ARM32.tar.gz</span></td>
           <td><span class="filesize">12.13 MB</span></td>
           <td><span style="font-size:12px;color:var(--text2)">MC2 ARM32 最新版 <span class="tag tag-green">推荐升级</span></span></td>
-          <td><a class="dl-btn" href="https://www.ilanzou.com/s/LXF1vnQ7" target="_blank">↓ 下载</a></td>
+          <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_388/RT-AX82U/" target="_blank">↓ 下载</a></td>
         </tr>
         <tr>
           <td><span class="filename">MC2_1.0.3_ARM32.tar.gz</span></td>
           <td><span class="filesize">10.08 MB</span></td>
           <td><span style="font-size:12px;color:var(--text2)">MC2 ARM32 旧版（备用）</span></td>
-          <td><a class="dl-btn" href="https://www.ilanzou.com/s/LXF1vnQ7" target="_blank">↓ 下载</a></td>
+          <td><a class="dl-btn" href="https://fw.koolcenter.com/KoolCenter_Merlin_New_Gen_388/RT-AX82U/" target="_blank">↓ 下载</a></td>
         </tr>
       </tbody>
     </table>
@@ -371,7 +373,7 @@
   <div id="flash" class="section">
     <div class="section-header">
       <div class="step-num">2</div>
-      <div><div class="section-title">刷机步骤</div><div class="section-sub">选择对应设备</div></div>
+      <div><div class="section-title">刷机步骤</div><div class="section-sub">选择对应设备 · <a href="https://www.koolcenter.com/t/topic/695" target="_blank" style="color:var(--accent);text-decoration:none">AX82U 官方刷机指南 →</a></div></div>
     </div>
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab(this,'rax80-flash')">RAX80</button>
