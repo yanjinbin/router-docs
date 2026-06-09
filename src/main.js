@@ -2,9 +2,9 @@ import './style.css'
 
 const docs = [
   {
-    title: '云雨分 · Mihomo 配置模板',
-    subtitle: '四机场合并 · 住宅 IP 双链路',
-    desc: '渔舍 + 良心云 + 赔钱 + 极风合并配置，AI 专用分流，UDP 443 REJECT 防泄露，完整规则注释',
+    title: '多机场订阅组合',
+    subtitle: '良心云 · 渔舍 · 赔钱 · 极风',
+    desc: '四机场合并配置模板，住宅 IP 双链路出口，AI 专用分流，UDP 443 REJECT 防泄露，完整规则注释',
     href: '/yunyufen-config.html',
     tag: '配置',
     tagColor: '#3dd68c',
@@ -18,9 +18,9 @@ const docs = [
     tagColor: '#4f8ef7',
   },
   {
-    title: 'NanoPi R5C 刷机教程',
-    subtitle: 'ImmortalWrt 完整流程',
-    desc: '从刷入 ImmortalWrt 到配置软路由的完整步骤，含 TF 卡启动与 eMMC 写入',
+    title: 'NanoPi R5C · 软路由指南',
+    subtitle: 'TF 卡万能引导 → eMMC 稳定安装',
+    desc: 'TF 卡作为万能引导系统，完成调试后写入 eMMC 保证稳定性。含 ImmortalWrt 刷入、网络配置全流程',
     href: '/nanopi_r5c_guide.html',
     tag: '教程',
     tagColor: '#3dd68c',
@@ -75,7 +75,7 @@ document.querySelector('#app').innerHTML = `
 
   <div class="grid">
     ${docs.map(d => `
-      <a class="card" href="${d.href}" target="_blank">
+      <a class="card" href="${d.href}">
         <div class="card-top">
           <span class="tag" style="--tag-color:${d.tagColor}">${d.tag}</span>
         </div>
