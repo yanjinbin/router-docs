@@ -18,7 +18,8 @@
   html{scroll-behavior:smooth}
   body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7}
 
-  nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:52px;gap:0}
+  .nav-home{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-right:1px solid var(--border);margin-right:8px;white-space:nowrap;transition:color .15s}.nav-home:hover{color:var(--accent)}
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:52px;gap:0}
   .nav-brand{font-size:13px;font-weight:600;color:var(--text);letter-spacing:.04em;margin-right:2rem;white-space:nowrap}
   .nav-brand span{color:var(--accent)}
   .nav-links{display:flex;gap:0;overflow-x:auto}
@@ -161,7 +162,7 @@
 <body>
 
 <nav>
-  <div class="nav-brand">梅林固件 <span>·</span> 设置指南</div>
+  <a href="/" class="nav-home">← 首页</a><div class="nav-brand">梅林固件 <span>·</span> 设置指南</div>
   <div class="nav-links">
     <a href="#devices">设备对比</a>
     <a href="#migrate">迁移建议</a>
