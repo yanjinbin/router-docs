@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenWrt 代理插件全横评 · Nikki / OpenClash / PassWall / HomeProxy…</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:#4f8ef7;border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover{color:var(--text);border-bottom-color:var(--accent)}
+
+/* LAYOUT */
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px 80px}
+
+/* HERO */
+.hero{padding:48px 0 32px}
+.hero-tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:13px;color:var(--text2);max-width:680px;line-height:1.7}
+
+/* SECTION */
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:baseline;gap:10px;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:16px;font-weight:700}
+.section-sub{font-size:11px;color:var(--text3)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;vertical-align:middle;white-space:nowrap}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+.badge-amber{background:rgba(245,166,35,.12);color:var(--amber)}
+.badge-red{background:rgba(240,96,96,.12);color:var(--red)}
+.badge-purple{background:rgba(192,132,252,.12);color:var(--purple)}
+.badge-gray{background:rgba(255,255,255,.06);color:var(--text3)}
+
+/* COMPARISON TABLE (Nikki vs OpenClash) */
+.cmp-table{width:100%;border-collapse:collapse;font-size:13px}
+.cmp-table th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:10px 14px;border-bottom:1px solid var(--border2);background:var(--bg3)}
+.cmp-table th:first-child{width:160px}
+.cmp-table td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top;font-size:12.5px;line-height:1.55}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table tr:hover td{background:rgba(255,255,255,.018)}
+.cmp-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+
+/* TREE */
+.tree-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;font-family:var(--mono);font-size:12.5px;line-height:1.8;color:var(--text2)}
+.tree-box .hl{color:var(--accent)}
+.tree-box .hl2{color:var(--green)}
+.tree-box .note{color:var(--text3);font-style:italic}
+
+/* PLUGIN CARDS */
+.plugin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.plugin-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s}
+.plugin-card:hover{border-color:rgba(79,142,247,.35)}
+.plugin-card.highlight{border-color:rgba(61,214,140,.3)}
+.plugin-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.plugin-name{font-size:15px;font-weight:700;color:var(--text)}
+.plugin-core{font-size:11px;font-family:var(--mono);color:var(--text3);margin-top:1px}
+.plugin-desc{font-size:12.5px;color:var(--text2);line-height:1.6}
+.plugin-tags{display:flex;gap:6px;flex-wrap:wrap}
+.plugin-pros{margin-top:4px}
+.plugin-pros li{font-size:12px;color:var(--text2);list-style:none;padding-left:14px;position:relative;line-height:1.55}
+.plugin-pros li::before{content:'·';position:absolute;left:4px;color:var(--text3)}
+.plugin-pros li.good::before{content:'✓';color:var(--green);left:2px}
+.plugin-pros li.warn::before{content:'△';color:var(--amber);left:2px}
+.plugin-pros li.bad::before{content:'✕';color:var(--red);left:2px}
+
+/* FULL TABLE */
+.full-table-wrap{overflow-x:auto}
+.full-table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+.full-table th{text-align:center;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text3);padding:9px 10px;border-bottom:1px solid var(--border2);background:var(--bg3);white-space:nowrap}
+.full-table th:first-child{text-align:left;width:110px}
+.full-table td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle;font-size:12px}
+.full-table td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.full-table tr:last-child td{border-bottom:none}
+.full-table tr:hover td{background:rgba(255,255,255,.018)}
+.full-table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.yes{color:var(--green)}
+.no{color:var(--text3)}
+.partial{color:var(--amber)}
+.na{color:var(--text3);font-size:11px}
+
+/* REC BOX */
+.rec-box{background:rgba(61,214,140,.06);border:1px solid rgba(61,214,140,.2);border-radius:12px;padding:20px 22px}
+.rec-title{font-size:13px;font-weight:700;color:var(--green);margin-bottom:12px}
+.rec-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px}
+.rec-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.rec-body strong{color:var(--text)}
+.rec-body span{color:var(--text2);font-size:12px}
+
+@media(max-width:700px){
+  .plugin-grid{grid-template-columns:1fr}
+  nav{padding:0 16px}
+  .wrap{padding:0 16px 64px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-home">← 返回首页</a>
+  <div class="nav-brand">OpenWrt 代理插件横评</div>
+  <div class="nav-links">
+    <a href="#nikki-vs-openclash">Nikki vs OpenClash</a>
+    <a href="#all-plugins">全插件对比</a>
+    <a href="#detail">逐一详解</a>
+    <a href="#rec">选型建议</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-tag">OpenWrt · ImmortalWrt · 透明代理</div>
+  <h1>OpenWrt 代理插件全横评</h1>
+  <p>覆盖 Nikki · OpenClash · PassWall · HomeProxy · SSR Plus · Momo · FullCombo Shark! · luci-xray · NeKoBox · v2rayA 共 11 款插件，从内核、透明代理实现到适合人群全面对比。</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 1: Nikki vs OpenClash
+═══════════════════════════════════════════════ -->
+<div id="nikki-vs-openclash" class="section">
+  <div class="section-header">
+    <div class="section-title">Nikki vs OpenClash</div>
+    <div class="section-sub">同根同源，定位分化</div>
+  </div>
+
+  <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.7">
+    两者都是 OpenWrt 上的 <strong style="color:var(--text)">Mihomo（原 Clash Meta）内核</strong> 前端，核心代理能力完全一致，区别在于封装方式和目标用户。
+  </p>
+
+  <div class="cmp-wrap" style="margin-bottom:24px">
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>对比项</th>
+          <th>Nikki <span class="badge badge-green" style="margin-left:4px">ImmortalWrt 原生</span></th>
+          <th>OpenClash <span class="badge badge-blue" style="margin-left:4px">社区最广</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>原名</td><td>openwrt-mihomo</td><td>OpenClash</td></tr>
+        <tr><td>内核</td><td>Mihomo（内置，随包更新）</td><td>Mihomo / Clash，需单独下载或手动更新</td></tr>
+        <tr><td>平台支持</td><td>ImmortalWrt <span class="badge badge-green">官方收录</span></td><td>OpenWrt / ImmortalWrt 均可</td></tr>
+        <tr><td>安装方式</td><td><code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.07);padding:1px 6px;border-radius:3px">opkg install nikki</code></td><td>手动装 .ipk 或第三方源</td></tr>
+        <tr><td>配置方式</td><td>直接托管 <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.07);padding:1px 6px;border-radius:3px">config.yaml</code></td><td>LuCI 界面生成配置，也支持托管订阅</td></tr>
+        <tr><td>透明代理</td><td>nftables 原生集成，更干净</td><td>iptables / nftables 均支持</td></tr>
+        <tr><td>DNS 处理</td><td>原生 fake-ip，直接生效</td><td>内置 DNS 劫持逻辑，偶有冲突</td></tr>
+        <tr><td>资源占用</td><td>更轻量</td><td>相对重，功能更多</td></tr>
+        <tr><td>适合人群</td><td>熟悉 Mihomo 配置文件的用户</td><td>喜欢界面操作、不想手写 yaml</td></tr>
+        <tr><td>社区活跃度</td><td>活跃，ImmortalWrt 主推</td><td>活跃，社区更大，资料更多</td></tr>
+        <tr><td>已有 config.yaml 迁移</td><td><span class="yes">✓ 直接复用，零迁移成本</span></td><td><span class="partial">△ 需适配界面格式</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tree-box" style="margin-bottom:20px">
+    <span class="note"># 底层架构关系</span><br>
+    Mihomo 内核<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="hl">Nikki</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">（轻量封装，配置文件驱动）</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="hl2">OpenClash</span>&nbsp;&nbsp;&nbsp;<span class="note">（重量封装，LuCI 界面驱动）</span>
+  </div>
+
+  <div class="rec-box">
+    <div class="rec-title">你的场景怎么选</div>
+    <div class="rec-item">
+      <span class="rec-icon">✅</span>
+      <div class="rec-body"><strong>已有成熟 config.yaml → 选 Nikki</strong><br><span>fake-ip、rule-provider、dialer-proxy chaining 直接复用，nftables 集成更干净，比 OpenClash 少一层抽象，排查问题更直接。</span></div>
+    </div>
+    <div class="rec-item">
+      <span class="rec-icon">📋</span>
+      <div class="rec-body"><strong>从零开始、不想手写 yaml → 选 OpenClash</strong><br><span>LuCI 界面引导配置，订阅链接粘贴即用，社区教程最多。</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 2: 全插件横向对比表
+═══════════════════════════════════════════════ -->
+<div id="all-plugins" class="section">
+  <div class="section-header">
+    <div class="section-title">11 款插件横向对比</div>
+    <div class="section-sub">PassWall · HomeProxy · SSR Plus · OpenClash · PassWall2 · Nikki · Momo · FullCombo Shark! · luci-xray · NeKoBox · v2rayA</div>
+  </div>
+
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr>
+          <th style="text-align:left">插件</th>
+          <th>内核</th>
+          <th>UI</th>
+          <th>透明代理</th>
+          <th>分流规则</th>
+          <th>fake-ip</th>
+          <th>订阅管理</th>
+          <th>资源占用</th>
+          <th>维护状态</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>PassWall</td>
+          <td><span class="badge badge-amber">Xray / sing-box</span></td>
+          <td><span class="yes">LuCI</span></td>
+          <td><span class="yes">iptables/nft</span></td>
+          <td><span class="yes">ACL 规则</span></td>
+          <td><span class="partial">△ 需配置</span></td>
+          <td><span class="yes">✓ 内置</span></td>
+          <td><span class="partial">中</span></td>
+          <td><span class="yes">活跃</span></td>
+        </tr>
+        <tr>
+          <td>PassWall2</td>
+          <td><span class="badge badge-amber">Xray / sing-box</span></td>
+          <td><span class="yes">LuCI</span></td>
+          <td><span class="yes">iptables/nft</span></td>
+          <td><span class="yes">ACL 规则</span></td>
+          <td><span class="partial">△ 需配置</span></td>
+          <td><span class="yes">✓ 内置</span></td>
+          <td><span class="partial">中</span></td>
+          <td><span class="yes">活跃，PW 重构版</span></td>
+        </tr>
+        <tr style="background:rgba(61,214,140,.03)">
+          <td>HomeProxy</td>
+          <td><span class="badge badge-green">sing-box</span></td>
+          <td><span class="yes">LuCI</span></td>
+          <td><span class="yes">nftables 原生</span></td>
+          <td><span class="yes">geoip/geosite</span></td>
+          <td><span class="yes">✓ 原生</span></td>
+          <td><span class="yes">✓ 内置</span></td>
+          <td><span class="yes">轻</span></td>
+          <td><span class="yes">ImmortalWrt 主推</span></td>
+        </tr>
+        <tr>
+          <td>SSR Plus</td>
+          <td><span class="badge badge-gray">SS/SSR/V2Ray</span></td>
+          <td><span class="yes">LuCI</span></td>
+          <td><span class="yes">iptables</span></td>
+          <td><span class="partial">chnroute</span></td>
+          <td><span class="no">✕</span></td>
+          <td><span class="partial">△ 基础</span></td>
+          <td><span class="yes">轻</span></td>
+          <td><span class="partial">维护中，较老</span></td>
+        </tr>
+        <tr>
+          <td>OpenClash</td>
+          <td><span class="badge badge-blue">Mihomo</span></td>
+          <td><span class="yes">LuCI 重</span></td>
+          <td><span class="yes">iptables/nft</span></td>
+          <td><span class="yes">clash 规则</span></td>
+          <td><span class="yes">✓</span></td>
+          <td><span class="yes">✓ 订阅托管</span></td>
+          <td><span class="partial">中重</span></td>
+          <td><span class="yes">活跃，社区最大</span></td>
+        </tr>
+        <tr style="background:rgba(61,214,140,.03)">
+          <td>Nikki</td>
+          <td><span class="badge badge-blue">Mihomo</span></td>
+          <td><span class="partial">LuCI 轻</span></td>
+          <td><span class="yes">nftables 原生</span></td>
+          <td><span class="yes">rule-provider</span></td>
+          <td><span class="yes">✓ 原生</span></td>
+          <td><span class="yes">✓ yaml 直接用</span></td>
+          <td><span class="yes">轻</span></td>
+          <td><span class="yes">活跃，ImmortalWrt 收录</span></td>
+        </tr>
+        <tr>
+          <td>Momo</td>
+          <td><span class="badge badge-green">sing-box</span></td>
+          <td><span class="yes">LuCI</span></td>
+          <td><span class="yes">nftables</span></td>
+          <td><span class="yes">rule-set</span></td>
+          <td><span class="yes">✓</span></td>
+          <td><span class="yes">✓</span></td>
+          <td><span class="yes">轻</span></td>
+          <td><span class="partial">新兴，活跃</span></td>
+        </tr>
+        <tr>
+          <td>FullCombo Shark!</td>
+          <td><span class="badge badge-amber">Xray + sing-box</span></td>
+          <td><span class="yes">LuCI</span></td>
+          <td><span class="yes">nftables</span></td>
+          <td><span class="yes">多格式</span></td>
+          <td><span class="yes">✓</span></td>
+          <td><span class="yes">✓</span></td>
+          <td><span class="partial">中</span></td>
+          <td><span class="partial">小众，活跃</span></td>
+        </tr>
+        <tr>
+          <td>luci-xray</td>
+          <td><span class="badge badge-amber">Xray</span></td>
+          <td><span class="yes">LuCI</span></td>
+          <td><span class="yes">iptables/nft</span></td>
+          <td><span class="partial">基础分流</span></td>
+          <td><span class="partial">△ 需配置</span></td>
+          <td><span class="partial">△ 基础</span></td>
+          <td><span class="partial">中</span></td>
+          <td><span class="partial">维护中</span></td>
+        </tr>
+        <tr>
+          <td>NeKoBox</td>
+          <td><span class="badge badge-green">sing-box</span></td>
+          <td><span class="yes">LuCI</span></td>
+          <td><span class="yes">nftables</span></td>
+          <td><span class="yes">rule-set</span></td>
+          <td><span class="yes">✓</span></td>
+          <td><span class="yes">✓</span></td>
+          <td><span class="yes">轻</span></td>
+          <td><span class="yes">活跃，NeKo 系列</span></td>
+        </tr>
+        <tr>
+          <td>v2rayA</td>
+          <td><span class="badge badge-gray">V2Ray / Xray</span></td>
+          <td><span class="yes">Web UI（独立）</span></td>
+          <td><span class="yes">iptables/nft</span></td>
+          <td><span class="yes">多格式</span></td>
+          <td><span class="partial">△</span></td>
+          <td><span class="yes">✓ 订阅</span></td>
+          <td><span class="partial">中</span></td>
+          <td><span class="yes">活跃，跨平台</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 3: 逐一详解
+═══════════════════════════════════════════════ -->
+<div id="detail" class="section">
+  <div class="section-header">
+    <div class="section-title">逐一详解</div>
+    <div class="section-sub">按内核阵营分组</div>
+  </div>
+
+  <p style="font-size:12px;color:var(--text3);margin-bottom:20px;font-family:var(--mono)">
+    # Mihomo 阵营 &nbsp;·&nbsp; sing-box 阵营 &nbsp;·&nbsp; Xray 阵营 &nbsp;·&nbsp; 经典阵营
+  </p>
+
+  <div class="plugin-grid">
+
+    <!-- Nikki -->
+    <div class="plugin-card highlight">
+      <div class="plugin-top">
+        <span class="plugin-name">Nikki</span>
+        <span class="badge badge-green">推荐（已有 yaml）</span>
+        <span class="badge badge-blue">Mihomo</span>
+      </div>
+      <div class="plugin-core">原名 openwrt-mihomo · ImmortalWrt 官方收录</div>
+      <div class="plugin-desc">Mihomo 内核的轻量封装，配置文件直接托管，nftables 原生透明代理，适合已有 clash 配置的用户零成本迁移。</div>
+      <ul class="plugin-pros">
+        <li class="good">config.yaml 直接复用，fake-ip / rule-provider / dialer-proxy 全支持</li>
+        <li class="good">nftables 原生集成，比 iptables 方案干净</li>
+        <li class="good">ImmortalWrt opkg 一键安装</li>
+        <li class="warn">LuCI 界面偏简，复杂调试仍需 SSH</li>
+      </ul>
+    </div>
+
+    <!-- OpenClash -->
+    <div class="plugin-card">
+      <div class="plugin-top">
+        <span class="plugin-name">OpenClash</span>
+        <span class="badge badge-blue">Mihomo</span>
+        <span class="badge badge-gray">社区最大</span>
+      </div>
+      <div class="plugin-core">v0.46.x · 支持 Mihomo / Clash Premium</div>
+      <div class="plugin-desc">LuCI 重度封装，界面操作完成全部配置，内置订阅托管、节点测速、覆写规则，适合不想手写 yaml 的用户。</div>
+      <ul class="plugin-pros">
+        <li class="good">教程最多，社区资料丰富</li>
+        <li class="good">内置覆写（Mixin）机制，订阅链接直接用</li>
+        <li class="warn">依赖多，安装包较大</li>
+        <li class="warn">DNS 劫持逻辑复杂，偶有与系统 DNS 冲突</li>
+      </ul>
+    </div>
+
+    <!-- HomeProxy -->
+    <div class="plugin-card highlight">
+      <div class="plugin-top">
+        <span class="plugin-name">HomeProxy</span>
+        <span class="badge badge-green">推荐（新装机）</span>
+        <span class="badge badge-green">sing-box</span>
+      </div>
+      <div class="plugin-core">ImmortalWrt 官方收录 · sing-box 内核</div>
+      <div class="plugin-desc">ImmortalWrt 官方推荐的 sing-box 前端，nftables 原生，支持全协议（VLESS/Hysteria2/TUIC 等），资源占用极低。</div>
+      <ul class="plugin-pros">
+        <li class="good">sing-box 最新协议全支持（Hysteria2/TUIC/Reality）</li>
+        <li class="good">nftables 原生，与 ImmortalWrt 集成最好</li>
+        <li class="good">资源占用比 OpenClash 低 30%+</li>
+        <li class="warn">不直接用 clash yaml，需重新配置规则</li>
+      </ul>
+    </div>
+
+    <!-- Momo -->
+    <div class="plugin-card">
+      <div class="plugin-top">
+        <span class="plugin-name">Momo</span>
+        <span class="badge badge-green">sing-box</span>
+        <span class="badge badge-gray">新兴</span>
+      </div>
+      <div class="plugin-core">sing-box 内核 · LuCI 前端</div>
+      <div class="plugin-desc">新兴 sing-box 前端，界面设计比 HomeProxy 更友好，支持订阅转换，活跃开发中。适合追新用户。</div>
+      <ul class="plugin-pros">
+        <li class="good">界面直观，上手比 HomeProxy 快</li>
+        <li class="good">sing-box 完整协议支持</li>
+        <li class="warn">相对年轻，文档和社区资料少于 HomeProxy</li>
+      </ul>
+    </div>
+
+    <!-- NeKoBox -->
+    <div class="plugin-card">
+      <div class="plugin-top">
+        <span class="plugin-name">NeKoBox</span>
+        <span class="badge badge-green">sing-box</span>
+      </div>
+      <div class="plugin-core">NeKo 系列 OpenWrt 版 · sing-box 内核</div>
+      <div class="plugin-desc">NeKo 系列（桌面端 NekoRay / NekoBox-for-Android）的 OpenWrt 延伸，配置体验与桌面端一致，适合全设备统一使用 NeKo 生态的用户。</div>
+      <ul class="plugin-pros">
+        <li class="good">跨设备配置风格统一（桌面 / 手机 / 路由器）</li>
+        <li class="good">sing-box 完整协议</li>
+        <li class="warn">社区资料主要在 TG 频道，文档分散</li>
+      </ul>
+    </div>
+
+    <!-- FullCombo Shark! -->
+    <div class="plugin-card">
+      <div class="plugin-top">
+        <span class="plugin-name">FullCombo Shark!</span>
+        <span class="badge badge-amber">Xray + sing-box</span>
+        <span class="badge badge-gray">小众</span>
+      </div>
+      <div class="plugin-core">双内核混合 · nftables</div>
+      <div class="plugin-desc">同时支持 Xray 和 sing-box 双内核，可根据协议自动选择，覆盖所有协议场景。定位高级用户，配置复杂度较高。</div>
+      <ul class="plugin-pros">
+        <li class="good">双内核各取所长，协议覆盖最全</li>
+        <li class="warn">配置复杂，不适合入门</li>
+        <li class="warn">社区小，踩坑成本高</li>
+      </ul>
+    </div>
+
+    <!-- PassWall -->
+    <div class="plugin-card">
+      <div class="plugin-top">
+        <span class="plugin-name">PassWall</span>
+        <span class="badge badge-amber">Xray</span>
+      </div>
+      <div class="plugin-core">支持 Xray / sing-box · LuCI 前端</div>
+      <div class="plugin-desc">老牌插件，功能稳定全面，ACL 规则体系成熟。支持多节点负载均衡、分流规则精细配置，社区资料多。</div>
+      <ul class="plugin-pros">
+        <li class="good">功能成熟稳定，资料多</li>
+        <li class="good">支持 Xray 全协议（VLESS/XTLS/Vision）</li>
+        <li class="warn">iptables 为主，nftables 支持不如新方案干净</li>
+        <li class="warn">界面略老，交互不如新插件流畅</li>
+      </ul>
+    </div>
+
+    <!-- PassWall2 -->
+    <div class="plugin-card">
+      <div class="plugin-top">
+        <span class="plugin-name">PassWall2</span>
+        <span class="badge badge-amber">Xray / sing-box</span>
+      </div>
+      <div class="plugin-core">PassWall 重构版 · 更干净</div>
+      <div class="plugin-desc">PassWall 的代码重构版本，剔除旧依赖，sing-box 支持更好，推荐新装机时用 PW2 替代 PW。</div>
+      <ul class="plugin-pros">
+        <li class="good">比 PassWall 依赖更少，包更小</li>
+        <li class="good">sing-box 集成改善</li>
+        <li class="warn">与 PassWall 配置不完全兼容，迁移需重配</li>
+      </ul>
+    </div>
+
+    <!-- luci-xray -->
+    <div class="plugin-card">
+      <div class="plugin-top">
+        <span class="plugin-name">luci-xray</span>
+        <span class="badge badge-amber">Xray</span>
+      </div>
+      <div class="plugin-core">纯 Xray 前端</div>
+      <div class="plugin-desc">专注 Xray 内核的轻量 LuCI 前端，配置直观，适合只用 Xray 协议（VLESS/XTLS）且不需要复杂分流的场景。</div>
+      <ul class="plugin-pros">
+        <li class="good">轻量，专注 Xray 协议</li>
+        <li class="warn">分流能力弱于 PassWall/OpenClash</li>
+        <li class="warn">功能较少，适合简单场景</li>
+      </ul>
+    </div>
+
+    <!-- SSR Plus -->
+    <div class="plugin-card">
+      <div class="plugin-top">
+        <span class="plugin-name">SSR Plus</span>
+        <span class="badge badge-gray">SS / SSR / V2Ray</span>
+        <span class="badge badge-gray">老牌</span>
+      </div>
+      <div class="plugin-core">多内核支持 · 历史最悠久</div>
+      <div class="plugin-desc">历史最久的 OpenWrt 代理插件，chnroute 分流方案，兼容 SS/SSR/V2Ray 老协议，适合老设备或历史遗留配置。</div>
+      <ul class="plugin-pros">
+        <li class="good">兼容性最广，老协议都支持</li>
+        <li class="warn">不支持 fake-ip，新协议支持落后</li>
+        <li class="warn">维护频率下降，新功能几乎不更新</li>
+        <li class="bad">不推荐新装机首选</li>
+      </ul>
+    </div>
+
+    <!-- v2rayA -->
+    <div class="plugin-card">
+      <div class="plugin-top">
+        <span class="plugin-name">v2rayA</span>
+        <span class="badge badge-gray">V2Ray / Xray</span>
+        <span class="badge badge-blue">跨平台</span>
+      </div>
+      <div class="plugin-core">独立 Web UI · 跨平台</div>
+      <div class="plugin-desc">通过独立 Web 界面管理，不依赖 LuCI，Linux/Docker/OpenWrt 通用。适合喜欢统一管理界面或无 LuCI 环境的用户。</div>
+      <ul class="plugin-pros">
+        <li class="good">不依赖 LuCI，任何 Linux 设备通用</li>
+        <li class="good">Web 界面美观，操作流畅</li>
+        <li class="warn">OpenWrt 集成不如原生 LuCI 插件深</li>
+        <li class="warn">透明代理配置比专用插件繁琐</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 4: 选型建议
+═══════════════════════════════════════════════ -->
+<div id="rec" class="section">
+  <div class="section-header">
+    <div class="section-title">选型建议</div>
+    <div class="section-sub">按场景匹配</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+
+    <div style="background:rgba(61,214,140,.06);border:1px solid rgba(61,214,140,.2);border-radius:12px;padding:18px 20px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:10px;letter-spacing:.04em">✅ 已有 Mihomo config.yaml</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">→ Nikki</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">配置文件零迁移成本，ImmortalWrt 原生支持，nftables 最干净。本文档 yunyufen 配置直接复用。</div>
+    </div>
+
+    <div style="background:rgba(61,214,140,.06);border:1px solid rgba(61,214,140,.2);border-radius:12px;padding:18px 20px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:10px;letter-spacing:.04em">✅ 新装机，追求新协议 & 轻量</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">→ HomeProxy</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">ImmortalWrt 官方推荐，sing-box 支持 Hysteria2 / TUIC / VLESS Reality 等最新协议，资源占用最低。</div>
+    </div>
+
+    <div style="background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.2);border-radius:12px;padding:18px 20px">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;letter-spacing:.04em">📋 不想手写 yaml，要界面操作</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">→ OpenClash</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">社区资料最多，LuCI 界面全流程引导，订阅链接直接粘贴使用，入门门槛最低。</div>
+    </div>
+
+    <div style="background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.2);border-radius:12px;padding:18px 20px">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;letter-spacing:.04em">🔧 Xray 协议（XTLS/Vision）为主</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">→ PassWall2</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">比 PassWall 更干净，Xray XTLS/Vision 协议支持完善，ACL 规则体系成熟稳定。</div>
+    </div>
+
+    <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:12px;padding:18px 20px">
+      <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:10px;letter-spacing:.04em">⚠️ 不推荐新装机首选</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">SSR Plus / luci-xray</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">SSR Plus 更新停滞，不支持 fake-ip；luci-xray 功能偏少。老设备迁移可用，新装机建议选更活跃的方案。</div>
+    </div>
+
+    <div style="background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.2);border-radius:12px;padding:18px 20px">
+      <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:10px;letter-spacing:.04em">🌐 无 LuCI / 跨平台统一管理</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">→ v2rayA</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">独立 Web 界面，Linux / Docker / OpenWrt 通用，适合喜欢跨设备统一管理界面的用户。</div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<style id="__site-nav-css">
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC',sans-serif}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+</style>
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+<a class="__site-nav-link" href="/yunyufen-config.html"><span class="__site-nav-title">多机场订阅组合</span><span class="__site-nav-sub">良心云 · 渔舍 · 赔钱 · 极风</span></a>
+<a class="__site-nav-link" href="/merlin-setup-guide.html"><span class="__site-nav-title">梅林固件设置指南</span><span class="__site-nav-sub">AX82U & RAX80</span></a>
+<a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C 刷机教程</span><span class="__site-nav-sub">ImmortalWrt 完整流程</span></a>
+<a class="__site-nav-link" href="/arm_softrouter_full_comparison.html"><span class="__site-nav-title">ARM 软路由横向对比</span><span class="__site-nav-sub">全平台综合评测</span></a>
+<a class="__site-nav-link" href="/hinlink_series_vs_r4s_comparison.html"><span class="__site-nav-title">Hinlink 系列 vs R4S</span><span class="__site-nav-sub">重点机型深度对比</span></a>
+<a class="__site-nav-link" href="/softrouter_full_8way_comparison.html"><span class="__site-nav-title">软路由八强对决</span><span class="__site-nav-sub">旗舰机型全面评测</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+</body>
+</html>

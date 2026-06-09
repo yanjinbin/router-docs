@@ -42,6 +42,14 @@ const docs = [
     tagColor: '#f5a623',
   },
   {
+    title: 'OpenWrt 代理插件横评',
+    subtitle: 'Nikki · OpenClash · HomeProxy · PassWall…',
+    desc: '11 款 OpenWrt 代理插件全横评：Nikki vs OpenClash 深度对比，sing-box / Mihomo / Xray 三大阵营逐一详解，按场景选型建议',
+    href: '/openwrt-proxy-plugins.html',
+    tag: '对比',
+    tagColor: '#c084fc',
+  },
+  {
     title: '软路由八强对决',
     subtitle: '旗舰机型全面评测',
     desc: '8 款主流软路由设备综合实测，覆盖性能、稳定性、散热、性价比维度',
