@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NanoPi R5C · 刷入 ImmortalWrt 完整教程</title>
+<style>
+  :root {
+    --teal:       #0F6E56;
+    --teal-light: #E1F5EE;
+    --teal-mid:   #1D9E75;
+    --teal-dark:  #085041;
+    --bg:         #FAFAF8;
+    --surface:    #FFFFFF;
+    --surface2:   #F4F2EC;
+    --border:     #E2E0D8;
+    --text:       #1A1A18;
+    --muted:      #6B6A64;
+    --amber-bg:   #FAEEDA;
+    --amber:      #854F0B;
+    --red-bg:     #FCEBEB;
+    --red:        #A32D2D;
+    --info-bg:    #E6F1FB;
+    --info:       #185FA5;
+    --code-bg:    #EEECEA;
+    --mono:       'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── layout ── */
+  .page { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+  /* ── header ── */
+  .hero {
+    border-left: 4px solid var(--teal);
+    padding: .75rem 0 .75rem 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .hero h1 {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--teal-dark);
+    letter-spacing: -.02em;
+    line-height: 1.2;
+    margin-bottom: .35rem;
+  }
+  .hero p { font-size: .875rem; color: var(--muted); }
+  .hero p span { margin: 0 .4rem; opacity: .4; }
+
+  /* ── prep table ── */
+  .section-label {
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: .6rem;
+  }
+  table.prep {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .875rem;
+    margin-bottom: .75rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  table.prep th {
+    background: var(--surface2);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: .75rem;
+    padding: 7px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  table.prep td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.prep tr:last-child td { border-bottom: none; }
+  table.prep td:first-child { font-weight: 500; color: var(--muted); width: 36%; }
+
+  /* ── phase header ── */
+  .phase { margin-bottom: 2rem; }
+  .phase-hd {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    background: var(--teal);
+    color: #fff;
+    border-radius: 10px;
+    padding: .7rem 1rem;
+    margin-bottom: 1rem;
+  }
+  .phase-badge {
+    font-size: .7rem;
+    font-weight: 600;
+    background: rgba(255,255,255,.18);
+    border-radius: 4px;
+    padding: 2px 8px;
+    white-space: nowrap;
+  }
+  .phase-title { font-size: 1rem; font-weight: 600; flex: 1; }
+  .phase-sub { font-size: .8rem; opacity: .75; }
+
+  /* ── steps ── */
+  .step {
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+    margin-bottom: .8rem;
+  }
+  .step-n {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; font-weight: 600;
+    color: var(--muted);
+    flex-shrink: 0;
+    margin-top: 2px;
+    background: var(--surface);
+  }
+  .step-body { flex: 1; }
+  .step-title { font-weight: 600; font-size: .9375rem; }
+  .step-desc { font-size: .8625rem; color: var(--muted); margin-top: 3px; line-height: 1.6; }
+
+  /* ── callouts ── */
+  .tip, .warn, .info {
+    display: flex; gap: .5rem; align-items: flex-start;
+    border-radius: 7px; padding: .55rem .9rem;
+    font-size: .8375rem; line-height: 1.55;
+    margin: .4rem 0 .7rem;
+  }
+  .tip  { background: var(--amber-bg); color: var(--amber); }
+  .warn { background: var(--red-bg);   color: var(--red); }
+  .info { background: var(--info-bg);  color: var(--info); }
+  .tip svg, .warn svg, .info svg { flex-shrink: 0; margin-top: 2px; }
+
+  /* ── code ── */
+  code {
+    font-family: var(--mono);
+    font-size: .8rem;
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--teal-dark);
+  }
+  .cmd {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: var(--code-bg);
+    border-radius: 8px;
+    padding: .6rem 1rem;
+    font-family: var(--mono);
+    font-size: .875rem;
+    color: var(--teal-dark);
+    margin: .4rem 0 .65rem;
+  }
+  .cmd button {
+    font-size: .7rem;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 9px;
+    cursor: pointer;
+    background: var(--surface);
+    flex-shrink: 0;
+    transition: background .15s;
+  }
+  .cmd button:hover { background: var(--surface2); }
+
+  /* ── addr rows ── */
+  .addr {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2);
+    border-radius: 7px; padding: .55rem 1rem;
+    margin-bottom: .4rem; font-size: .875rem;
+  }
+  .addr code { background: transparent; padding: 0; font-size: .9rem; font-weight: 600; }
+  .addr span { color: var(--muted); font-size: .8rem; }
+
+  /* ── topo box ── */
+  .topo {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: .65rem 1rem;
+    font-family: var(--mono);
+    font-size: .8375rem;
+    color: var(--teal-dark);
+    margin: .4rem 0 .75rem;
+    overflow-x: auto;
+  }
+
+  /* ── tf card box ── */
+  .tf-box {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .9rem 1.1rem;
+  }
+  .tf-row {
+    display: flex; gap: .6rem; align-items: flex-start;
+    font-size: .875rem; margin-bottom: .55rem;
+  }
+  .tf-row:last-child { margin-bottom: 0; }
+  .tf-row svg { flex-shrink: 0; margin-top: 3px; }
+
+  /* ── divider ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 1.75rem 0; }
+
+  /* ── method label ── */
+  .method-label {
+    font-size: .8125rem; font-weight: 600;
+    color: var(--teal); margin: .9rem 0 .5rem;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .method-label::before {
+    content: '';
+    display: inline-block;
+    width: 3px; height: 14px;
+    background: var(--teal-mid);
+    border-radius: 2px;
+  }
+
+  /* ── responsive ── */
+  @media (max-width: 560px) {
+    .page { padding: 1.5rem 1rem 3rem; }
+    .hero h1 { font-size: 1.3rem; }
+    table.prep td:first-child { width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <h1>NanoPi R5C · 刷入 ImmortalWrt 完整教程</h1>
+    <p>Mac 系统<span>·</span>TF 卡引导<span>·</span>R5C 作主路由<span>·</span>AX82U 作 AP</p>
+  </div>
+
+  <!-- PREP -->
+  <div class="section-label">准备材料</div>
+  <table class="prep">
+    <tr><th>所需物品</th><th>说明</th></tr>
+    <tr><td>TF 卡 + USB-C 读卡器</td><td>8 GB 以上，Class 10。MacBook 无原生 SD 卡槽，需读卡器。</td></tr>
+    <tr><td>USB-C 转 RJ45 网卡</td><td>刷机阶段必须走网线，MacBook 无有线网口。</td></tr>
+    <tr><td>引导固件</td><td>FriendlyELEC 官方网盘 → R5C → <code>sd-friendlywrt</code> 镜像。</td></tr>
+    <tr><td>目标固件</td><td><a href="https://firmware-selector.immortalwrt.org" target="_blank" style="color:var(--teal)">firmware-selector.immortalwrt.org</a> 搜 NanoPi R5C，下载 <code>.img.gz</code>。</td></tr>
+    <tr><td>balenaEtcher（Mac）</td><td><a href="https://etcher.balena.io" target="_blank" style="color:var(--teal)">etcher.balena.io</a> 下载 .dmg 安装。</td></tr>
+  </table>
+  <div class="tip">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM8 5a.75.75 0 1 1 0 1.5A.75.75 0 0 1 8 5Zm-.25 2.75h.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-.5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5Z" fill="currentColor"/></svg>
+    Safari 会自动解压 .gz 变成 .img，直接用即可。balenaEtcher 支持直接烧 .img.gz，不要手动解压。
+  </div>
+
+  <hr>
+
+  <!-- PHASE 1 -->
+  <div class="phase">
+    <div class="phase-hd">
+      <span class="phase-badge">阶段一</span>
+      <span class="phase-title">制作 TF 引导卡</span>
+      <span class="phase-sub">约 5 分钟</span>
+    </div>
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-body">
+        <div class="step-title">TF 卡插入读卡器，连接 Mac</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-body">
+        <div class="step-title">打开 balenaEtcher 烧录官方固件</div>
+        <div class="step-desc">Flash from file → 选 <code>sd-friendlywrt</code> 固件 → Select target 选 TF 卡（注意别选外置硬盘）→ Flash!</div>
+        <div class="info">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM8 5a.75.75 0 1 1 0 1.5A.75.75 0 0 1 8 5Zm-.25 2.75h.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-.5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5Z" fill="currentColor"/></svg>
+          Mac 会弹出 Touch ID 或密码授权，正常现象，允许即可。
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-body">
+        <div class="step-title">把 ImmortalWrt 固件拷进 TF 卡</div>
+        <div class="step-desc">烧录完成后 Mac 弹出"无法读取磁盘"提示 → 点<strong>忽略</strong>（绝对不要点初始化）。在 Finder 左栏找到 <code>BOOT</code> 分区，将 ImmortalWrt 固件拖入根目录，改名为 <code>immortalwrt.img.gz</code>。</div>
+        <div class="info">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM8 5a.75.75 0 1 1 0 1.5A.75.75 0 0 1 8 5Zm-.25 2.75h.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-.5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5Z" fill="currentColor"/></svg>
+          找不到 BOOT 分区也没关系，后续可在后台网页直接上传固件。
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">4</div>
+      <div class="step-body">
+        <div class="step-title">在 Finder 右键安全弹出读卡器，拔出 TF 卡</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase">
+    <div class="phase-hd">
+      <span class="phase-badge">阶段二</span>
+      <span class="phase-title">连接与启动</span>
+      <span class="phase-sub">MacBook 网线直连 R5C</span>
+    </div>
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-body"><div class="step-title">R5C 完全断电，插入 TF 卡</div></div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-body">
+        <div class="step-title">网线一端插 R5C 的 LAN 口，另一端通过 USB-C 转 RJ45 插 MacBook</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-body">
+        <div class="step-title">关闭 Mac 的 Wi-Fi</div>
+        <div class="step-desc">菜单栏 Wi-Fi 图标 → 关闭 Wi-Fi。不关 Wi-Fi 会导致浏览器走 Wi-Fi 网关，永远访问不到 R5C 后台。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">4</div>
+      <div class="step-body">
+        <div class="step-title">给 R5C 接通电源</div>
+        <div class="step-desc">RK3568 芯片硬件启动优先级写死为 TF 卡 → eMMC，插卡即自动从 TF 启动，无需按任何键。</div>
+        <div class="warn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566ZM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5Zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z" fill="currentColor"/></svg>
+          <span><strong>若无法从 TF 启动（eMMC 有不兼容固件）：</strong>断电 → 按住 Mask 键不松手 → 通电 → 保持 3~5 秒后松开，强制引导。</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">5</div>
+      <div class="step-body">
+        <div class="step-title">确认 Mac 有线已获取到 IP</div>
+        <div class="step-desc">系统设置 → 网络 → 以太网，显示"已连接"且有 IP 地址（如 192.168.2.x）即可。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase">
+    <div class="phase-hd">
+      <span class="phase-badge">阶段三</span>
+      <span class="phase-title">确认后台地址并登录</span>
+    </div>
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-body">
+        <div class="step-title">打开 Mac 终端，运行以下命令查找网关 IP</div>
+      </div>
+    </div>
+    <div class="cmd">
+      <span>netstat -rn | grep default | awk '{print $2}'</span>
+      <button onclick="copyCmd(this, &quot;netstat -rn | grep default | awk '{print $2}'&quot;)">复制</button>
+    </div>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem">输出的 IP 就是 R5C 后台地址，直接在浏览器打开。规律：Mac 拿到的 IP 是 192.168.X.Y，后台就是 192.168.X.1。</p>
+    <div class="addr"><code>192.168.2.1</code><span>TF 卡临时系统（官方 FriendlyWrt）默认地址</span></div>
+    <div class="addr"><code>192.168.1.1</code><span>eMMC ImmortalWrt 刷入后默认地址</span></div>
+    <div style="height:.6rem"></div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-body">
+        <div class="step-title">浏览器访问后台，登录</div>
+        <div class="step-desc">用户名 <code>root</code>，密码通常为空或 <code>password</code>。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase">
+    <div class="phase-hd">
+      <span class="phase-badge">阶段四</span>
+      <span class="phase-title">将 ImmortalWrt 写入 eMMC</span>
+    </div>
+    <div class="method-label">方法一（推荐）：网页后台一键刷入</div>
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-body"><div class="step-title">进入 系统 → eMMC 刷机助手</div></div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-body">
+        <div class="step-title">上传 ImmortalWrt 固件</div>
+        <div class="step-desc">点击"浏览"选择之前存入 BOOT 分区的固件，或从 Mac 下载目录选取，点击"开始刷机"。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-body"><div class="step-title">等待进度条 100%，提示写入成功</div></div>
+    </div>
+    <div class="warn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566ZM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5Zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z" fill="currentColor"/></svg>
+      写入过程中不要断电、不要关闭浏览器，否则 eMMC 可能写入不完整变砖。
+    </div>
+
+    <div class="method-label">方法二（备选）：SSH 命令行写入</div>
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-body"><div class="step-title">SSH 连接软路由</div></div>
+    </div>
+    <div class="cmd">
+      <span>ssh root@192.168.2.1</span>
+      <button onclick="copyCmd(this,'ssh root@192.168.2.1')">复制</button>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-body"><div class="step-title">确认 eMMC 盘符</div></div>
+    </div>
+    <div class="cmd">
+      <span>lsblk</span>
+      <button onclick="copyCmd(this,'lsblk')">复制</button>
+    </div>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:.6rem">找容量 32 GB 那个设备，通常是 <code>mmcblk0</code>。</p>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-body"><div class="step-title">执行写入脚本</div></div>
+    </div>
+    <div class="cmd">
+      <span>emmc-install</span>
+      <button onclick="copyCmd(this,'emmc-install')">复制</button>
+    </div>
+    <p style="font-size:.85rem;color:var(--muted)">按提示选择固件路径（之前拷到 BOOT 分区的文件），确认执行。</p>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase">
+    <div class="phase-hd">
+      <span class="phase-badge">阶段五</span>
+      <span class="phase-title">拔卡重启，启动新系统</span>
+    </div>
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-body"><div class="step-title">R5C 断电</div></div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-body">
+        <div class="step-title">拔掉 TF 卡</div>
+        <div class="step-desc">不拔卡则下次依然进入 TF 临时系统。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-body">
+        <div class="step-title">重新通电，等待约 30 秒</div>
+        <div class="step-desc">浏览器访问 <code>192.168.1.1</code> 进入 ImmortalWrt 后台，用户名 <code>root</code>，密码 <code>password</code>。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 6 -->
+  <div class="phase">
+    <div class="phase-hd">
+      <span class="phase-badge">阶段六</span>
+      <span class="phase-title">组网：R5C 主路由 + AX82U 作 AP</span>
+      <span class="phase-sub">无线访问后台</span>
+    </div>
+    <div class="topo">光猫 WAN → R5C WAN口 → R5C LAN口 → AX82U LAN口（AP模式）→ Wi-Fi → 设备</div>
+    <p style="font-size:.875rem;font-weight:600;margin-bottom:.5rem">AX82U 改 AP 模式：</p>
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-body"><div class="step-title">进入 AX82U 后台 <code>192.168.50.1</code></div></div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-body">
+        <div class="step-title">高级设置 → 无线路由器（Operation Mode）→ 切换为 Access Point 模式</div>
+        <div class="step-desc">切换后 AX82U 的 DHCP 自动关闭，只负责发射 Wi-Fi，IP 分配全交给 R5C。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-body">
+        <div class="step-title">网线接法：R5C 任意 LAN 口 → AX82U 的 LAN 口</div>
+        <div class="step-desc">AP 模式下接 LAN 口，不是 WAN 口。</div>
+      </div>
+    </div>
+    <div style="height:.5rem"></div>
+    <p style="font-size:.875rem;font-weight:600;margin-bottom:.5rem">无线访问 R5C 后台：</p>
+    <p style="font-size:.875rem;color:var(--muted);margin-bottom:.6rem">MacBook 连上 AX82U 的 Wi-Fi 后，浏览器直接访问 <code>192.168.1.1</code> 即可管理 R5C，无需插网线。此时<strong>不需要关 Wi-Fi</strong>，目标 IP 在局域网内，不存在路由冲突。</p>
+    <p style="font-size:.875rem;color:var(--muted);margin-bottom:.4rem">如需确认后台 IP，连上 Wi-Fi 后在终端运行：</p>
+    <div class="cmd">
+      <span>netstat -rn | grep default | awk '{print $2}'</span>
+      <button onclick="copyCmd(this, &quot;netstat -rn | grep default | awk '{print $2}'&quot;)">复制</button>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- TF CARD -->
+  <p style="font-size:.875rem;font-weight:600;margin-bottom:.65rem">TF 卡保留与重复使用</p>
+  <div class="tf-box">
+    <div class="tf-row">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--teal-mid)"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM11.78 6.28l-4 4a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 0 1 1.06-1.06L7.25 8.69l3.47-3.47a.75.75 0 0 1 1.06 1.06Z" fill="currentColor"/></svg>
+      <div>随时可再次从 TF 引导：<strong>断电 → 插入 TF 卡 → 通电</strong>，R5C 自动优先从 TF 启动。</div>
+    </div>
+    <div class="tf-row">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--teal-mid)"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM11.78 6.28l-4 4a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 0 1 1.06-1.06L7.25 8.69l3.47-3.47a.75.75 0 0 1 1.06 1.06Z" fill="currentColor"/></svg>
+      <div>回到 eMMC 系统：<strong>断电 → 拔掉 TF 卡 → 通电</strong>，即可切回。</div>
+    </div>
+    <div class="tf-row">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--amber)"><path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256Z" fill="currentColor"/></svg>
+      <div><strong>强烈建议永久保留这张卡作为救砖盘</strong>，贴标签注明"R5C 救砖盘"存好。eMMC 系统崩溃时插卡即可修复，节省大量时间。</div>
+    </div>
+    <div class="tf-row">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--amber)"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566ZM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5Zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z" fill="currentColor"/></svg>
+      eMMC 固件大版本升级后，建议同步更新 TF 卡镜像，避免内核版本不兼容。
+    </div>
+  </div>
+
+</div>
+<script>
+function copyCmd(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已复制';
+    setTimeout(() => btn.textContent = '复制', 1500);
+  });
+}
+</script>
+</body>
+</html>

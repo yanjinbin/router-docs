@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>梅林固件设置指南 · AX82U & RAX80</title>
+<style>
+  :root {
+    --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+    --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+    --accent:#4f8ef7;--accent2:#3a6fd4;
+    --green:#3dd68c;--amber:#f5a623;--red:#f06060;
+    --mono:'JetBrains Mono','Fira Code',monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7}
+
+  nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:52px;gap:0}
+  .nav-brand{font-size:13px;font-weight:600;color:var(--text);letter-spacing:.04em;margin-right:2rem;white-space:nowrap}
+  .nav-brand span{color:var(--accent)}
+  .nav-links{display:flex;gap:0;overflow-x:auto}
+  .nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+  .nav-links a:hover{color:var(--text);border-bottom-color:var(--accent)}
+
+  .hero{padding:3.5rem 2rem 2rem;max-width:900px;margin:0 auto}
+  .hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:.6rem}
+  .hero h1{font-size:clamp(24px,4vw,36px);font-weight:700;line-height:1.2;color:var(--text);margin-bottom:.75rem}
+  .hero h1 em{font-style:normal;color:var(--accent)}
+  .hero p{font-size:14px;color:var(--text2);max-width:560px}
+
+  /* STATUS BAR */
+  .status-bar{max-width:900px;margin:0 auto 2rem;padding:0 2rem}
+  .status-inner{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:10px;padding:.9rem 1.2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 6px var(--green)}
+  .status-item{font-size:12px;color:var(--text2)}
+  .status-item strong{color:var(--text);font-weight:500}
+  .status-warn{border-left-color:var(--amber)}
+  .status-warn .status-dot{background:var(--amber);box-shadow:0 0 6px var(--amber)}
+
+  /* DEVICE GRID */
+  .device-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:900px;margin:0 auto 2.5rem;padding:0 2rem}
+  .device-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .device-card.ax82u{border-top:3px solid var(--amber)}
+  .device-card.rax80{border-top:3px solid var(--accent)}
+  .device-img{width:100%;height:160px;object-fit:contain;background:#0a0d14;padding:1rem}
+  .device-body{padding:1rem 1.25rem}
+  .device-name{font-size:15px;font-weight:600;margin-bottom:2px}
+  .device-sub{font-size:11px;color:var(--text3);margin-bottom:.75rem}
+  .spec-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)}
+  .spec-row:last-child{border-bottom:none}
+  .spec-k{color:var(--text2)}
+  .spec-v{font-weight:500;text-align:right}
+  .tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:5px;vertical-align:middle}
+  .tag-blue{background:rgba(79,142,247,.18);color:var(--accent)}
+  .tag-green{background:rgba(61,214,140,.15);color:var(--green)}
+  .tag-amber{background:rgba(245,166,35,.15);color:var(--amber)}
+  .tag-red{background:rgba(240,96,96,.15);color:var(--red)}
+
+  /* MIGRATE BANNER */
+  .migrate-banner{max-width:900px;margin:0 auto 2rem;padding:0 2rem}
+  .migrate-inner{background:linear-gradient(135deg,#0d1a2e 0%,#0f1e35 100%);border:1px solid rgba(79,142,247,.3);border-radius:12px;padding:1.25rem 1.5rem;display:flex;gap:1.25rem;align-items:flex-start}
+  .migrate-icon{font-size:28px;flex-shrink:0;margin-top:2px}
+  .migrate-title{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:.4rem}
+  .migrate-desc{font-size:13px;color:var(--text2);line-height:1.6}
+  .migrate-desc code{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px;color:var(--green)}
+  .diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.75rem}
+  .diff-col{background:rgba(0,0,0,.3);border-radius:8px;padding:.75rem 1rem}
+  .diff-col-title{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.5rem}
+  .diff-col.before .diff-col-title{color:var(--amber)}
+  .diff-col.after .diff-col-title{color:var(--green)}
+  .diff-item{font-size:12px;color:var(--text2);padding:2px 0;display:flex;gap:6px}
+  .diff-item::before{content:'·';color:var(--text3)}
+
+  /* MAIN */
+  .main{max-width:900px;margin:0 auto;padding:0 2rem 5rem}
+  .section{margin-bottom:3rem}
+  .section-header{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+  .step-num{width:28px;height:28px;border-radius:8px;background:var(--accent2);color:var(--accent);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .section-title{font-size:17px;font-weight:600}
+  .section-sub{font-size:12px;color:var(--text3);margin-top:1px}
+
+  .dl-table{width:100%;border-collapse:collapse;font-size:13px}
+  .dl-table th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--text3);text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border2);background:var(--bg3)}
+  .dl-table th:first-child{border-radius:8px 0 0 0}
+  .dl-table th:last-child{border-radius:0 8px 0 0}
+  .dl-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+  .dl-table tr:last-child td{border-bottom:none}
+  .dl-table tr:hover td{background:rgba(255,255,255,.02)}
+  .filename{font-family:var(--mono);font-size:11.5px;color:var(--accent)}
+  .filesize{font-size:12px;color:var(--text2);white-space:nowrap}
+  .dl-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;text-decoration:none;background:rgba(79,142,247,.15);color:var(--accent);border:1px solid rgba(79,142,247,.3);transition:background .15s;white-space:nowrap}
+  .dl-btn:hover{background:rgba(79,142,247,.28)}
+
+  .steps{display:flex;flex-direction:column;gap:10px}
+  .step{display:flex;gap:14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem}
+  .step-icon{width:22px;height:22px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);font-size:11px;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .step-body{flex:1}
+  .step-title{font-size:13px;font-weight:600;margin-bottom:4px}
+  .step-desc{font-size:12px;color:var(--text2)}
+  .step-desc code{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);padding:1px 5px;border-radius:4px;color:var(--green)}
+
+  .alert{display:flex;gap:10px;align-items:flex-start;padding:.9rem 1.1rem;border-radius:8px;font-size:12px;line-height:1.6;margin:1rem 0}
+  .alert-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+  .alert-warn{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);color:#d4a020}
+  .alert-info{background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);color:#7aabfa}
+  .alert-danger{background:rgba(240,96,96,.1);border:1px solid rgba(240,96,96,.2);color:#f08080}
+  .alert-success{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.2);color:var(--green)}
+
+  .code-wrap{background:#0a0d14;border:1px solid var(--border2);border-radius:10px;overflow:hidden;margin:1rem 0}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--bg3);border-bottom:1px solid var(--border)}
+  .code-label{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em}
+  .copy-btn{font-size:11px;padding:3px 9px;border-radius:5px;background:transparent;border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .15s;font-family:var(--sans)}
+  .copy-btn:hover{background:var(--bg2);color:var(--text)}
+  .copy-btn.copied{color:var(--green);border-color:var(--green)}
+  pre{padding:1.2rem 1.4rem;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.75;color:#c9d1e0}
+  .c-comment{color:#4a5568}
+  .c-key{color:#79b8ff}
+  .c-val{color:#9ecbff}
+  .c-str{color:#85e89d}
+  .c-num{color:#f0a050}
+  .c-bool{color:#f97583}
+  .c-section{color:#f5a623;font-weight:600}
+  .c-hidden{color:#555e75;font-style:italic}
+
+  .tabs{display:flex;gap:0;margin-bottom:-1px}
+  .tab-btn{font-size:12px;font-weight:600;padding:8px 16px;border:1px solid var(--border);border-bottom:none;background:var(--bg2);color:var(--text2);cursor:pointer;border-radius:8px 8px 0 0;transition:all .15s;font-family:var(--sans)}
+  .tab-btn.active{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .tab-panel{background:var(--bg3);border:1px solid var(--border2);border-radius:0 8px 8px 8px;padding:1.25rem}
+
+  .checklist{list-style:none}
+  .checklist li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .checklist li:last-child{border-bottom:none}
+  .check-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+  .check-box.checked{background:var(--green);border-color:var(--green)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#0f1117;font-weight:700}
+  .check-label{color:var(--text2);cursor:pointer}
+  .check-label.checked{text-decoration:line-through;color:var(--text3)}
+
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:1rem 0}
+  .info-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem}
+  .info-label{font-size:11px;color:var(--text3);margin-bottom:4px}
+  .info-val{font-size:14px;font-weight:500}
+
+  .link-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:.75rem}
+  .ext-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--accent);text-decoration:none;border:1px solid rgba(79,142,247,.3);padding:4px 12px;border-radius:6px;background:rgba(79,142,247,.08);transition:background .15s}
+  .ext-link:hover{background:rgba(79,142,247,.18)}
+
+  @media(max-width:640px){
+    .device-grid,.diff-grid{grid-template-columns:1fr}
+    nav{padding:0 1rem}
+    .hero,.main,.status-bar,.migrate-banner{padding-left:1rem;padding-right:1rem}
+    .migrate-inner{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">梅林固件 <span>·</span> 设置指南</div>
+  <div class="nav-links">
+    <a href="#devices">设备对比</a>
+    <a href="#migrate">迁移建议</a>
+    <a href="#download">固件下载</a>
+    <a href="#flash">刷机步骤</a>
+    <a href="#mc2">MC2 安装</a>
+    <a href="#config">配置文件</a>
+    <a href="#checklist">检查清单</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Koolshare Merlin · Magic Catling 2 · Mihomo</div>
+  <h1>AX82U &amp; RAX80<br><em>完整设置指南</em></h1>
+  <p>固件下载、刷机步骤、MC2 安装，以及多机场订阅配置参考。建议从 ARMv7 AX82U 迁移至 ARM64 RAX80 获得更稳定的代理体验。</p>
+</div>
+
+<!-- 当前运行状态 -->
+<div class="status-bar">
+  <div class="status-inner status-warn">
+    <div class="status-dot"></div>
+    <div class="status-item"><strong>AX82U 当前运行中</strong></div>
+    <div class="status-item">固件 <strong>3004.388.10_2</strong></div>
+    <div class="status-item">MC2 <strong>1.0.3 ARM32</strong></div>
+    <div class="status-item">Mihomo <strong>v1.19.24</strong></div>
+    <div class="status-item">架构 <strong style="color:var(--amber)">ARMv7 32-bit ⚠</strong></div>
+    <div class="status-item">运行状态 <strong style="color:var(--green)">正常 ✓</strong></div>
+  </div>
+</div>
+
+<!-- 设备对比 -->
+<div id="devices" class="device-grid">
+  <div class="device-card ax82u">
+    <img class="device-img"
+      src="https://www.asus.com.cn/media/global/gallery/7_fh6j_efsf-edition-2_1_1800x1350.png"
+      onerror="this.style.display='none'"
+      alt="ASUS RT-AX82U GUNDAM Edition">
+    <div class="device-body">
+      <div class="device-name">RT-AX82U <span class="tag tag-amber">当前在用</span></div>
+      <div class="device-sub">华硕 · BCM6750 · ARMv7 32-bit · Gundam Edition</div>
+      <div class="spec-row"><span class="spec-k">SoC</span><span class="spec-v">BCM6750 · A7×3 @1.5G</span></div>
+      <div class="spec-row"><span class="spec-k">架构</span><span class="spec-v" style="color:var(--red)">ARMv7 32-bit</span></div>
+      <div class="spec-row"><span class="spec-k">RAM / Flash</span><span class="spec-v">512 MB / 256 MB</span></div>
+      <div class="spec-row"><span class="spec-k">MC2 版本</span><span class="spec-v">ARM32（最新 1.2.1）</span></div>
+      <div class="spec-row"><span class="spec-k">QUIC / hy2</span><span class="spec-v" style="color:var(--red)">崩溃风险，须关 UDP</span></div>
+      <div class="spec-row"><span class="spec-k">梅林固件</span><span class="spec-v">原版 + koolshare 改版</span></div>
+      <div class="spec-row"><span class="spec-k">待机功耗</span><span class="spec-v">~6.5W</span></div>
+    </div>
+  </div>
+  <div class="device-card rax80">
+    <img class="device-img"
+      src="https://www.netgear.com/media/RAX80_hero_tcm148-93553.png"
+      onerror="this.src='https://www.netgear.com/media/RAX80_front_tcm148-93550.png';this.onerror=null"
+      alt="Netgear RAX80">
+    <div class="device-body">
+      <div class="device-name">Netgear RAX80 <span class="tag tag-blue">推荐升级</span></div>
+      <div class="device-sub">Netgear · BCM4908 · ARMv8 64-bit · AX6000</div>
+      <div class="spec-row"><span class="spec-k">SoC</span><span class="spec-v">BCM4908 · A53×4 @1.8G</span></div>
+      <div class="spec-row"><span class="spec-k">架构</span><span class="spec-v" style="color:var(--green)">ARMv8 64-bit ✓</span></div>
+      <div class="spec-row"><span class="spec-k">RAM / Flash</span><span class="spec-v">1 GB / 512 MB JFFS 177MB</span></div>
+      <div class="spec-row"><span class="spec-k">MC2 版本</span><span class="spec-v">ARM64（1.0.3）</span></div>
+      <div class="spec-row"><span class="spec-k">QUIC / hy2</span><span class="spec-v" style="color:var(--green)">稳定运行 ✓</span></div>
+      <div class="spec-row"><span class="spec-k">梅林固件</span><span class="spec-v">koolshare 改版 386.8_1</span></div>
+      <div class="spec-row"><span class="spec-k">待机功耗</span><span class="spec-v">~15–20W</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 迁移建议 -->
+<div id="migrate" class="migrate-banner">
+  <div class="migrate-inner">
+    <div class="migrate-icon">🔄</div>
+    <div style="flex:1">
+      <div class="migrate-title">为什么建议从 AX82U 迁移到 RAX80？</div>
+      <div class="migrate-desc">
+        AX82U 是 <strong>ARMv7 32-bit</strong>，Mihomo 在处理 QUIC/hy2 协议时存在堆内存崩溃风险。你目前的 yaml 已通过 <code>udp: false</code> 和 <code>AND,((DST-PORT,443),(NETWORK,UDP)),REJECT</code> 规避了崩溃，但代价是 <strong>hy2 节点完全无法使用</strong>，所有 UDP 流量被拦截。<br>RAX80 是 ARM64，无此问题，可以开启 UDP 和 hy2，节点选择更自由。
+      </div>
+      <div class="diff-grid">
+        <div class="diff-col before">
+          <div class="diff-col-title">AX82U 现状（ARMv7）</div>
+          <div class="diff-item">udp: false 全局关闭</div>
+          <div class="diff-item">AND UDP 443 全部 REJECT</div>
+          <div class="diff-item">hy2 节点无法使用</div>
+          <div class="diff-item">prefer-h3: false 关闭</div>
+          <div class="diff-item">MC2 ARM32 最高 1.2.1</div>
+        </div>
+        <div class="diff-col after">
+          <div class="diff-col-title">RAX80 迁移后（ARM64）</div>
+          <div class="diff-item">移除 udp: false 限制</div>
+          <div class="diff-item">移除 UDP 443 REJECT 规则</div>
+          <div class="diff-item">hy2 节点正常使用</div>
+          <div class="diff-item">可按需开启 HTTP/3</div>
+          <div class="diff-item">MC2 ARM64 1.0.3</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- MC2 当前状态 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-num" style="background:rgba(61,214,140,.15);color:var(--green)">✓</div>
+      <div>
+        <div class="section-title">MC2 项目信息</div>
+        <div class="section-sub">Magic Catling 2 · 基于 Mihomo 内核</div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="info-label">项目名称</div><div class="info-val">Magic Catling 2</div></div>
+      <div class="info-card"><div class="info-label">当前版本</div><div class="info-val">1.0.3 <span class="tag tag-amber">ARM32</span></div></div>
+      <div class="info-card"><div class="info-label">ARM32 最新</div><div class="info-val">1.2.1 <span class="tag tag-green">可升级</span></div></div>
+      <div class="info-card"><div class="info-label">ARM64 版本</div><div class="info-val">1.0.3 <span class="tag tag-blue">RAX80 用</span></div></div>
+      <div class="info-card"><div class="info-label">Mihomo 内核</div><div class="info-val">v1.19.24</div></div>
+      <div class="info-card"><div class="info-label">支持协议</div><div class="info-val">SS SSR VMess VLess Trojan Hy2</div></div>
+    </div>
+    <div class="link-row">
+      <a class="ext-link" href="https://mcreadme.gitbook.io/mc" target="_blank">📖 官方 Wiki</a>
+      <a class="ext-link" href="https://t.me/merlinclashfile" target="_blank">✈ Telegram @merlinclashfile</a>
+    </div>
+    <div class="alert alert-info" style="margin-top:.75rem">
+      <span class="alert-icon">ℹ</span>
+      <span>AX82U 可将 MC2 从 1.0.3 ARM32 升级到 <strong>1.2.1 ARM32</strong>，软件中心 → 离线安装覆盖即可，config.yaml 不受影响。</span>
+    </div>
+  </div>
+
+  <!-- 下载 -->
+  <div id="download" class="section">
+    <div class="section-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="section-title">资源下载准备</div>
+        <div class="section-sub">刷机前先备好全部文件</div>
+      </div>
+    </div>
+    <div class="alert alert-danger">
+      <span class="alert-icon">🚨</span>
+      <span><strong>RAX80 架构警告：</strong>axhnd 平台固件含 cfe 引导，<strong>切勿用其他品牌机型固件强刷</strong>，cfe 损坏只能编程器救砖。</span>
+    </div>
+
+    <p style="font-size:13px;color:var(--text2);margin:.75rem 0 .5rem;font-weight:600">RAX80 文件包</p>
+    <table class="dl-table" style="margin-bottom:1.5rem">
+      <thead><tr><th>文件名</th><th>大小</th><th>用途</th><th>下载</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="filename">RAX80_386.8_1_ubi_1d22867_koolcenter.chk</span></td>
+          <td><span class="filesize">81.25 MB</span></td>
+          <td><span style="font-size:12px;color:var(--text2)">从<strong>原厂固件</strong>刷入用 <span class="tag tag-green">.chk</span></span></td>
+          <td><a class="dl-btn" href="https://www.ilanzou.com/s/elN1vnwn" target="_blank">↓ 下载</a></td>
+        </tr>
+        <tr>
+          <td><span class="filename">RAX80_386.8_1_ubi_d70a1a6_koolcenter.w</span></td>
+          <td><span class="filesize">81.25 MB</span></td>
+          <td><span style="font-size:12px;color:var(--text2)">从<strong>梅林升梅林</strong>用 <span class="tag tag-blue">.w</span></span></td>
+          <td><a class="dl-btn" href="https://www.ilanzou.com/s/elN1vnwn" target="_blank">↓ 下载</a></td>
+        </tr>
+        <tr>
+          <td><span class="filename">原版固件 RAX80-V1.0.11.148.zip</span></td>
+          <td><span class="filesize">70.25 MB</span></td>
+          <td><span style="font-size:12px;color:var(--text2)">救砖备用，原厂固件</span></td>
+          <td><a class="dl-btn" href="https://www.ilanzou.com/s/elN1vnwn" target="_blank">↓ 下载</a></td>
+        </tr>
+        <tr>
+          <td><span class="filename">MC2_1.0.3_ARM64.tar.gz</span></td>
+          <td><span class="filesize">~12 MB</span></td>
+          <td><span style="font-size:12px;color:var(--text2)">撸猫 MC2 <span class="tag tag-blue">ARM64 RAX80 专用</span></span></td>
+          <td><a class="dl-btn" href="https://www.ilanzou.com/s/elN1vnwn" target="_blank">↓ 下载</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="font-size:13px;color:var(--text2);margin-bottom:.5rem;font-weight:600">AX82U 文件包</p>
+    <table class="dl-table">
+      <thead><tr><th>文件名</th><th>大小</th><th>用途</th><th>下载</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="filename">RT-AX82U_386.7_2_cferom_puresqubi_2af03d8_koolcenter.w</span></td>
+          <td><span class="filesize">61.38 MB</span></td>
+          <td><span style="font-size:12px;color:var(--text2)">koolshare 梅林 386.7_2 <span class="tag tag-green">稳定推荐</span></span></td>
+          <td><a class="dl-btn" href="https://www.ilanzou.com/s/LXF1vnQ7" target="_blank">↓ 下载</a></td>
+        </tr>
+        <tr>
+          <td><span class="filename">RT-AX82U_3004_388.10_2_puresqubi-20251119.w</span></td>
+          <td><span class="filesize">—</span></td>
+          <td><span style="font-size:12px;color:var(--text2)">梅林官方版（无 koolshare 软件中心）<span class="tag tag-amber">当前在用</span></span></td>
+          <td><a class="dl-btn" href="https://www.ilanzou.com/s/LXF1vnQ7" target="_blank">↓ 下载</a></td>
+        </tr>
+        <tr>
+          <td><span class="filename">MC2_1.2.1_ARM32.tar.gz</span></td>
+          <td><span class="filesize">12.13 MB</span></td>
+          <td><span style="font-size:12px;color:var(--text2)">MC2 ARM32 最新版 <span class="tag tag-green">推荐升级</span></span></td>
+          <td><a class="dl-btn" href="https://www.ilanzou.com/s/LXF1vnQ7" target="_blank">↓ 下载</a></td>
+        </tr>
+        <tr>
+          <td><span class="filename">MC2_1.0.3_ARM32.tar.gz</span></td>
+          <td><span class="filesize">10.08 MB</span></td>
+          <td><span style="font-size:12px;color:var(--text2)">MC2 ARM32 旧版（备用）</span></td>
+          <td><a class="dl-btn" href="https://www.ilanzou.com/s/LXF1vnQ7" target="_blank">↓ 下载</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 刷机 -->
+  <div id="flash" class="section">
+    <div class="section-header">
+      <div class="step-num">2</div>
+      <div><div class="section-title">刷机步骤</div><div class="section-sub">选择对应设备</div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this,'rax80-flash')">RAX80</button>
+      <button class="tab-btn" onclick="switchTab(this,'ax82u-flash')">AX82U</button>
+    </div>
+    <div id="rax80-flash" class="tab-content active">
+      <div class="tab-panel">
+        <div class="alert alert-danger" style="margin-top:0;margin-bottom:1rem">
+          <span class="alert-icon">🚨</span>
+          <span>RAX80 固件包含 cfe 引导，<strong>绝不能用其他品牌固件强刷</strong>。损坏 cfe 只能编程器救砖。</span>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="step-icon">1</div><div class="step-body"><div class="step-title">从原厂刷入梅林</div><div class="step-desc">登录 RAX80 管理界面 → <code>高级 → 管理 → 固件更新</code> → 上传 <code>.chk</code> 文件。原厂只认 .chk 格式。</div></div></div>
+          <div class="step"><div class="step-icon">2</div><div class="step-body"><div class="step-title">梅林升梅林</div><div class="step-desc">梅林后台 → <code>系统管理 → 固件升级</code> → 上传 <code>.w</code> 文件。梅林间互刷用 .w。</div></div></div>
+          <div class="step"><div class="step-icon">3</div><div class="step-body"><div class="step-title">刷完恢复出厂</div><div class="step-desc">固件刷入后长按 Reset 10 秒恢复出厂，清除旧配置残留。</div></div></div>
+          <div class="step"><div class="step-icon">4</div><div class="step-body"><div class="step-title">检查 RAX80 Toolbox</div><div class="step-desc">进入 koolshare 软件中心，安装 <code>RAX80 Toolbox</code>，可修复旧版本损坏的原厂分区（MAC/SN 恢复）。386.8_1 新刷可跳过。</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="ax82u-flash" class="tab-content">
+      <div class="tab-panel">
+        <div class="alert alert-info" style="margin-top:0;margin-bottom:1rem">
+          <span class="alert-icon">ℹ</span>
+          <span>当前跑的是 388.10_2 梅林官方版（无 koolshare 软件中心）。若需装 MC2 需先换回 386.7_2 koolshare 改版。</span>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="step-icon">1</div><div class="step-body"><div class="step-title">后台升级固件</div><div class="step-desc">访问 <code>192.168.2.1</code> → <code>系统管理 → 固件升级</code> → 上传 <code>.w</code> 文件。</div></div></div>
+          <div class="step"><div class="step-icon">2</div><div class="step-body"><div class="step-title">刷完恢复出厂</div><div class="step-desc">固件更新后长按 Reset 10 秒，清除旧配置。</div></div></div>
+          <div class="step"><div class="step-icon">3</div><div class="step-body"><div class="step-title">重新配置网络</div><div class="step-desc">重新填写 PPPoE 拨号账号密码，LAN IP 建议保持 <code>192.168.2.1</code>。</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MC2 安装 -->
+  <div id="mc2" class="section">
+    <div class="section-header">
+      <div class="step-num">3</div>
+      <div><div class="section-title">MC2 安装</div><div class="section-sub">RAX80 用 ARM64，AX82U 用 ARM32，不能混用</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-icon">1</div><div class="step-body"><div class="step-title">软件中心 → 离线安装</div><div class="step-desc">梅林后台 → <code>软件中心</code> → 右上角 <code>离线安装</code> → 上传 <code>.tar.gz</code> 文件。RAX80 选 ARM64，AX82U 选 ARM32。</div></div></div>
+      <div class="step"><div class="step-icon">2</div><div class="step-body"><div class="step-title">进入 MC2 初始化</div><div class="step-desc">软件中心 → 撸猫魔法云 → 等待初始化完成，内核自动下载对应架构版本。</div></div></div>
+      <div class="step"><div class="step-icon">3</div><div class="step-body"><div class="step-title">导入 config.yaml</div><div class="step-desc">MC2 → 配置文件管理 → 上传完整 <code>config.yaml</code>，所有机场订阅、规则、DNS 一次性生效。<br><strong style="color:var(--amber)">RAX80 迁移时记得去掉 <code>udp: false</code> 和 UDP REJECT 规则，开启 hy2 支持。</strong></div></div></div>
+      <div class="step"><div class="step-icon">4</div><div class="step-body"><div class="step-title">验证面板</div><div class="step-desc">浏览器访问 <code>http://192.168.2.1:9990/ui</code>，用 secret <code>clash</code> 登录 zashboard，确认节点在线。</div></div></div>
+    </div>
+  </div>
+
+  <!-- 配置文件 -->
+  <div id="config" class="section">
+    <div class="section-header">
+      <div class="step-num">4</div>
+      <div><div class="section-title">配置文件参考</div><div class="section-sub">基础参数 · DNS · Sniffer · 订阅说明</div></div>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠</span>
+      <span>以下配置已<strong>去除机场订阅 URL 和住宅 IP 节点的账号密码及服务器地址</strong>，仅作结构参考。实际使用请填入你自己的订阅链接。</span>
+    </div>
+
+    <div class="tabs" style="margin-top:1rem">
+      <button class="tab-btn active" onclick="switchTab(this,'cfg-base')">基础配置</button>
+      <button class="tab-btn" onclick="switchTab(this,'cfg-dns')">DNS</button>
+      <button class="tab-btn" onclick="switchTab(this,'cfg-sniffer')">Sniffer</button>
+      <button class="tab-btn" onclick="switchTab(this,'cfg-providers')">订阅结构</button>
+      <button class="tab-btn" onclick="switchTab(this,'cfg-rax80')">RAX80 差异</button>
+    </div>
+
+    <div id="cfg-base" class="tab-content active">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-label">config.yaml · 基础参数</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre><span class="c-comment"># ================================================================</span>
+<span class="c-comment"># 渔舍 良心云 赔钱 极风 四机场合并</span>
+<span class="c-comment"># UDP 全局关闭 / IPv6 关闭 / HTTP3 关闭 — 防真实 IP 泄露（ARMv7 专用）</span>
+<span class="c-comment"># ================================================================</span>
+
+<span class="c-comment"># 端口</span>
+<span class="c-key">mixed-port</span>: <span class="c-num">23456</span>
+<span class="c-key">redir-port</span>: <span class="c-num">23457</span>
+
+<span class="c-comment"># 面板</span>
+<span class="c-key">external-controller</span>: <span class="c-str">192.168.2.1:9990</span>
+<span class="c-key">external-ui</span>: <span class="c-str">dashboard</span>
+<span class="c-key">external-ui-name</span>: <span class="c-str">zashboard</span>
+<span class="c-key">external-ui-url</span>: <span class="c-str">https://github.com/Zephyruso/zashboard/releases/latest/download/dist-cdn-fonts.zip</span>
+<span class="c-key">secret</span>: <span class="c-str">"clash"</span>
+
+<span class="c-comment"># 缓存</span>
+<span class="c-key">profile</span>:
+  <span class="c-key">store-selected</span>: <span class="c-bool">false</span>
+  <span class="c-key">store-fake-ip</span>: <span class="c-bool">false</span>
+
+<span class="c-comment"># GEO 数据库</span>
+<span class="c-key">geodata-mode</span>: <span class="c-bool">true</span>
+<span class="c-key">geox-url</span>:
+  <span class="c-key">geoip</span>: <span class="c-str">"https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip-lite.dat"</span>
+  <span class="c-key">geosite</span>: <span class="c-str">"https://testingcf.jsdelivr.net/gh/flyhigherpi/merlinclash_clash_related@refs/heads/master/geosite/geosite.dat"</span>
+
+<span class="c-comment"># 启动参数</span>
+<span class="c-key">allow-lan</span>: <span class="c-bool">true</span>
+<span class="c-key">mode</span>: <span class="c-str">rule</span>
+<span class="c-key">log-level</span>: <span class="c-str">error</span>
+<span class="c-key">ipv6</span>: <span class="c-bool">false</span>
+<span class="c-key">unified-delay</span>: <span class="c-bool">true</span>
+<span class="c-key">udp</span>: <span class="c-bool">false</span>         <span class="c-comment"># ARMv7 必须关闭，迁移 RAX80 后移除此行</span>
+<span class="c-key">prefer-h3</span>: <span class="c-bool">false</span>
+<span class="c-key">udp-timeout</span>: <span class="c-num">300</span>
+<span class="c-key">keep-alive-interval</span>: <span class="c-num">15</span>
+<span class="c-key">global-client-fingerprint</span>: <span class="c-str">chrome</span>
+<span class="c-key">tcp-concurrent</span>: <span class="c-bool">false</span>
+<span class="c-key">find-process-mode</span>: <span class="c-str">off</span></pre>
+      </div>
+    </div>
+
+    <div id="cfg-dns" class="tab-content">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-label">config.yaml · DNS fake-ip 模式</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre><span class="c-key">dns</span>:
+  <span class="c-key">enable</span>: <span class="c-bool">true</span>
+  <span class="c-key">ipv6</span>: <span class="c-bool">false</span>
+  <span class="c-key">listen</span>: <span class="c-str">:23453</span>
+  <span class="c-key">enhanced-mode</span>: <span class="c-str">fake-ip</span>
+  <span class="c-key">fake-ip-range</span>: <span class="c-str">198.18.0.1/16</span>
+  <span class="c-key">use-hosts</span>: <span class="c-bool">true</span>
+  <span class="c-key">respect-rules</span>: <span class="c-bool">false</span>
+  <span class="c-key">default-nameserver</span>:
+    - <span class="c-str">223.5.5.5</span>
+  <span class="c-key">nameserver</span>:
+    - <span class="c-str">223.5.5.5</span>
+  <span class="c-key">nameserver-policy</span>:
+    <span class="c-str">'geosite:gfw'</span>:
+      - <span class="c-str">https://223.5.5.5/dns-query</span>
+      - <span class="c-str">https://doh.pub/dns-query</span>
+  <span class="c-key">fallback</span>:
+    - <span class="c-str">https://223.5.5.5/dns-query</span>
+    - <span class="c-str">https://doh.pub/dns-query</span>
+  <span class="c-key">fallback-filter</span>:
+    <span class="c-key">geoip</span>: <span class="c-bool">true</span>
+    <span class="c-key">geoip-code</span>: <span class="c-str">CN</span>
+    <span class="c-key">geosite</span>:
+      - <span class="c-str">gfw</span>
+    <span class="c-key">ipcidr</span>:
+      - <span class="c-str">240.0.0.0/4</span>
+  <span class="c-key">proxy-server-nameserver</span>:
+    - <span class="c-str">223.5.5.5</span>
+    - <span class="c-str">https://sh.dns44.cn:44443/dns-query</span>
+  <span class="c-key">fake-ip-filter</span>:
+    - <span class="c-str">'geosite:cn'</span>
+    - <span class="c-str">'*.lan'</span>
+    - <span class="c-str">'*.local'</span>
+    - <span class="c-str">'*.localhost'</span>
+    - <span class="c-str">'*.localdomain'</span>
+    - <span class="c-str">'*.internal'</span>
+    - <span class="c-str">'*.home.arpa'</span>
+    - <span class="c-str">'+.pool.ntp.org'</span>
+    - <span class="c-str">'time.*.com'</span>
+    - <span class="c-str">'+.stun.*.*'</span>
+    - <span class="c-str">'*.ts.net'</span>
+    - <span class="c-str">'*.tailscale.com'</span>
+    - <span class="c-str">'100.100.100.100'</span></pre>
+      </div>
+    </div>
+
+    <div id="cfg-sniffer" class="tab-content">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-label">config.yaml · Sniffer 协议嗅探</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre><span class="c-key">sniffer</span>:
+  <span class="c-key">enable</span>: <span class="c-bool">true</span>
+  <span class="c-key">force-dns-mapping</span>: <span class="c-bool">true</span>
+  <span class="c-key">parse-pure-ip</span>: <span class="c-bool">true</span>
+  <span class="c-key">override-destination</span>: <span class="c-bool">true</span>
+  <span class="c-key">sniff</span>:
+    <span class="c-key">TLS</span>:
+      <span class="c-key">ports</span>: [<span class="c-num">443</span>, <span class="c-num">8443</span>]
+    <span class="c-key">HTTP</span>:
+      <span class="c-key">ports</span>: [<span class="c-num">80</span>, <span class="c-num">8080</span>]
+      <span class="c-key">override-destination</span>: <span class="c-bool">true</span>
+  <span class="c-key">skip-dst-address</span>:
+    - <span class="c-str">149.154.160.0/20</span>    <span class="c-comment"># Telegram</span>
+    - <span class="c-str">43.171.80.0/24</span>
+    - <span class="c-str">95.161.76.0/24</span>
+  <span class="c-key">force-domain</span>:
+    - <span class="c-str">'+.v2ex.com'</span>
+  <span class="c-key">skip-domain</span>:
+    - <span class="c-str">'+.apple.com'</span>
+    - <span class="c-str">'+.icloud.com'</span>
+    - <span class="c-str">'+.mi.com'</span>
+    - <span class="c-str">'+.xiaomi.com'</span>
+    - <span class="c-str">'+.weixin.qq.com'</span>
+    - <span class="c-str">'+.wx.qq.com'</span>
+    - <span class="c-str">'+.wechat.com'</span>
+    - <span class="c-str">'+.qq.com'</span>
+    - <span class="c-str">'+.tencent.com'</span>
+    - <span class="c-str">'*.lan'</span>
+    - <span class="c-str">'*.local'</span>
+    - <span class="c-str">'stun.*.*'</span>
+    - <span class="c-str">'+.stun.*.*'</span>
+    - <span class="c-str">'*.ts.net'</span>
+    - <span class="c-str">'*.tailscale.com'</span>
+    - <span class="c-str">'100.100.100.100'</span>
+    - <span class="c-str">'+.ntp.org'</span>
+    - <span class="c-str">'+.pool.ntp.org'</span></pre>
+      </div>
+    </div>
+
+    <div id="cfg-providers" class="tab-content">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-label">proxy-providers · 机场订阅结构（已隐藏订阅 URL）</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre><span class="c-comment"># 注意：订阅 URL 已隐藏，请填入你自己的订阅链接</span>
+<span class="c-key">proxy-providers</span>:
+
+  <span class="c-section">极风</span>:
+    <span class="c-key">type</span>: <span class="c-str">http</span>
+    <span class="c-key">url</span>: <span class="c-hidden">"# 你的极风订阅链接"</span>
+    <span class="c-key">path</span>: <span class="c-str">./proxy_providers/jifeng.yaml</span>
+    <span class="c-key">proxy</span>: <span class="c-str">DIRECT</span>
+    <span class="c-key">headers</span>:
+      <span class="c-key">User-Agent</span>: <span class="c-str">"clash.meta"</span>
+    <span class="c-key">exclude-filter</span>: <span class="c-str">"(?i)直连|中转|官网|剩余流量|下次重置|套餐到期"</span>
+    <span class="c-key">hidden</span>: <span class="c-bool">true</span>
+
+  <span class="c-section">渔舍</span>:
+    <span class="c-key">type</span>: <span class="c-str">http</span>
+    <span class="c-key">url</span>: <span class="c-hidden">"# 你的渔舍订阅链接"</span>
+    <span class="c-key">path</span>: <span class="c-str">./proxy_providers/yushe.yaml</span>
+    <span class="c-key">proxy</span>: <span class="c-str">DIRECT</span>
+    <span class="c-key">headers</span>:
+      <span class="c-key">User-Agent</span>: <span class="c-str">"clash.meta"</span>
+
+  <span class="c-section">良心云</span>:
+    <span class="c-key">type</span>: <span class="c-str">http</span>
+    <span class="c-key">url</span>: <span class="c-hidden">"# 你的良心云订阅链接"</span>
+    <span class="c-key">path</span>: <span class="c-str">./proxy_providers/liangxin.yaml</span>
+    <span class="c-key">proxy</span>: <span class="c-str">DIRECT</span>
+    <span class="c-key">headers</span>:
+      <span class="c-key">User-Agent</span>: <span class="c-str">"clash.meta"</span>
+    <span class="c-key">filter</span>: <span class="c-str">"🇭🇰|🇸🇬|🇯🇵|🇰🇷|🇲🇴|台湾|韩国|澳门|新加坡"</span>
+    <span class="c-key">exclude-filter</span>: <span class="c-str">"(?i)直连|中转|官网|剩余流量|下次重置|套餐到期"</span>
+
+  <span class="c-section">赔钱</span>:
+    <span class="c-key">type</span>: <span class="c-str">http</span>
+    <span class="c-key">url</span>: <span class="c-hidden">"# 你的赔钱订阅链接"</span>
+    <span class="c-key">path</span>: <span class="c-str">./proxy_providers/peiqian.yaml</span>
+    <span class="c-key">proxy</span>: <span class="c-str">DIRECT</span>
+    <span class="c-key">headers</span>:
+      <span class="c-key">User-Agent</span>: <span class="c-str">"clash.meta"</span>
+    <span class="c-key">filter</span>: <span class="c-str">"^(?!.*?(0\\.01倍|下载|剩余|重置|到期)).*(新加坡|澳门|香港|台湾|日本|韩国).*(推荐).*$"</span>
+
+<span class="c-comment"># 住宅 IP 节点（账号密码已隐藏）</span>
+<span class="c-key">proxies</span>:
+  - <span class="c-hidden">{name: "圣何塞静态住宅IP", type: socks5, server: "***", port: 443, username: "***", password: "***", dialer-proxy: "🔌 🇺🇸", udp: false}</span>
+  - <span class="c-hidden">{name: "圣何塞动态住宅IP", type: http, server: "***", port: 1000, username: "***", password: "***", dialer-proxy: "🔌 🇺🇸"}</span>
+  - <span class="c-hidden">{name: "东京静态住宅IP", type: socks5, server: "***", port: 443, username: "***", password: "***", dialer-proxy: "🔌 🇯🇵", udp: false}</span>
+  - <span class="c-hidden">{name: "东京动态住宅IP", type: http, server: "***", port: 443, username: "***", password: "***", dialer-proxy: "🔌 🇯🇵"}</span></pre>
+      </div>
+    </div>
+
+    <div id="cfg-rax80" class="tab-content">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-label">RAX80 迁移差异 · 需修改的配置项</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre><span class="c-comment"># ── 迁移 RAX80 时需要做的修改 ──────────────────────────────────</span>
+
+<span class="c-comment"># 1. 移除或改为 true（ARM64 无崩溃风险）</span>
+<span class="c-key">udp</span>: <span class="c-bool">true</span>           <span class="c-comment"># 原来是 false，改为 true</span>
+<span class="c-key">prefer-h3</span>: <span class="c-bool">false</span>    <span class="c-comment"># 可按需开启</span>
+
+<span class="c-comment"># 2. 删除 rules 中的这两条</span>
+<span class="c-comment"># - IP-CIDR6,::/0,REJECT,no-resolve         # 可保留，继续阻断 IPv6</span>
+<span class="c-comment"># - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT  ← 删除此行，hy2 才能工作</span>
+
+<span class="c-comment"># 3. 住宅 IP 节点可加回 udp: true</span>
+<span class="c-key">proxies</span>:
+  - <span class="c-str">{name: "圣何塞静态住宅IP", ..., udp: true, tfo: true, ip-version: ipv4}</span>
+  - <span class="c-str">{name: "东京静态住宅IP", ..., udp: true, ip-version: ipv4}</span>
+
+<span class="c-comment"># 4. external-controller 改为 RAX80 的 LAN IP</span>
+<span class="c-key">external-controller</span>: <span class="c-str">192.168.1.1:9990</span>   <span class="c-comment"># 根据你的 LAN IP 调整</span>
+
+<span class="c-comment"># 5. MC2 换 ARM64 包</span>
+<span class="c-comment"># MC2_1.0.3_ARM64.tar.gz  （非 ARM32）</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 检查清单 -->
+  <div id="checklist" class="section">
+    <div class="section-header">
+      <div class="step-num">5</div>
+      <div><div class="section-title">刷机前检查清单</div><div class="section-sub">点击勾选</div></div>
+    </div>
+    <ul class="checklist">
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">已下载对应设备固件（RAX80 用 .chk 或 .w / AX82U 用 .w）</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">已下载对应架构 MC2（RAX80 → ARM64 / AX82U → ARM32）</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">已备份当前 config.yaml 到本地</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">已记录宽带 PPPoE 账号密码</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">电脑有线连接路由器（勿用 Wi-Fi 刷机）</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">RAX80：原厂固件刷梅林用 .chk，梅林升梅林用 .w</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">刷机过程中不断电不拔网线</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">刷完执行恢复出厂（Reset 10 秒）</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">RAX80 迁移：config.yaml 移除 udp: false 和 UDP 443 REJECT 规则</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">MC2 安装后导入 config.yaml，确认订阅 URL 填写正确</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">浏览器访问 zashboard 面板，验证节点在线</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span class="check-label">IP 检测工具验证出口 IP 正确（ipleak.net / myip.com）</span></li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+function switchTab(btn, id) {
+  const section = btn.closest('.section,.main');
+  const thisTabs = btn.closest('.tabs');
+  thisTabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  section.querySelectorAll('.tab-content').forEach(c => {
+    if(c.id === id) c.classList.add('active');
+    else c.classList.remove('active');
+  });
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '已复制 ✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function toggleCheck(box) {
+  box.classList.toggle('checked');
+  box.nextElementSibling.classList.toggle('checked');
+}
+</script>
+</body>
+</html>

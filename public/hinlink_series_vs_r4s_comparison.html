@@ -1,0 +1,219 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{padding:1rem 0;font-size:13px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:680px}
+th,td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:middle;text-align:left}
+th{font-weight:500;font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary)}
+.col-label{width:80px;color:var(--color-text-secondary);font-size:12px;background:var(--color-background-secondary);font-weight:500}
+.dn{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.ds{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:var(--border-radius-md);font-weight:500;white-space:nowrap}
+.bg{background:#EAF3DE;color:#27500A}
+.bb{background:#E6F1FB;color:#0C447C}
+.ba{background:#FAEEDA;color:#633806}
+.bgr{background:#F1EFE8;color:#444441}
+.br{background:#FCEBEB;color:#791F1F}
+.bt{background:#E1F5EE;color:#085041}
+.bp{background:#EEEDFE;color:#3C3489}
+.sr td{background:var(--color-background-tertiary);font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 10px}
+.hl{border-left:2px solid #378ADD}
+.good{color:#3B6D11;font-weight:500}
+.warn{color:#854F0B}
+.bad{color:#A32D2D}
+</style>
+<div class="wrap">
+<h2 class="sr-only">HINLINK H28K H29K H66K H68K H69K 与 NanoPi R4S 硬件对比</h2>
+<table>
+<thead>
+<tr>
+<th class="col-label"></th>
+<th><div class="dn">H28K</div><div class="ds">路由狗</div></th>
+<th><div class="dn">H29K</div><div class="ds">路由猫 CPE</div></th>
+<th><div class="dn">H66K</div><div class="ds">路由狗</div></th>
+<th><div class="dn">H68K</div><div class="ds">路由狗</div></th>
+<th><div class="dn">H69K</div><div class="ds">路由猫 CPE</div></th>
+<th class="hl"><div class="dn">R4S ★</div><div class="ds">FriendlyELEC</div></th>
+</tr>
+</thead>
+<tbody>
+<tr class="sr"><td colspan="7">处理器</td></tr>
+<tr>
+<td class="col-label">SoC</td>
+<td>RK3528A</td>
+<td>RK3528A</td>
+<td>RK3568</td>
+<td>RK3568</td>
+<td>RK3568</td>
+<td class="hl">RK3399</td>
+</tr>
+<tr>
+<td class="col-label">CPU</td>
+<td>A53×4<br>@1.5G</td>
+<td>A53×4<br>@1.5G</td>
+<td>A55×4<br>@2.0G</td>
+<td>A55×4<br>@2.0G</td>
+<td>A55×4<br>@2.0G</td>
+<td class="hl"><span class="good">A72×2<br>A53×4</span></td>
+</tr>
+<tr>
+<td class="col-label">架构</td>
+<td><span class="badge ba">ARMv8</span></td>
+<td><span class="badge ba">ARMv8</span></td>
+<td><span class="badge bb">ARMv8</span></td>
+<td><span class="badge bb">ARMv8</span></td>
+<td><span class="badge bb">ARMv8</span></td>
+<td class="hl"><span class="badge bb">ARMv8</span></td>
+</tr>
+<tr class="sr"><td colspan="7">内存 / 存储</td></tr>
+<tr>
+<td class="col-label">RAM</td>
+<td>1–4 GB</td>
+<td>1–4 GB</td>
+<td>2–4 GB</td>
+<td>2–4 GB</td>
+<td>4 GB</td>
+<td class="hl good">4 GB</td>
+</tr>
+<tr>
+<td class="col-label">eMMC</td>
+<td><span class="badge ba">8–32 GB</span></td>
+<td><span class="badge ba">8–32 GB</span></td>
+<td><span class="badge bg">32 GB</span></td>
+<td><span class="badge bg">32 GB</span></td>
+<td><span class="badge bg">32 GB</span></td>
+<td class="hl"><span class="badge br">无</span></td>
+</tr>
+<tr>
+<td class="col-label">系统盘</td>
+<td><span class="badge ba">eMMC 8G★</span></td>
+<td><span class="badge ba">eMMC 8G★</span></td>
+<td><span class="badge bg">eMMC 32G</span></td>
+<td><span class="badge bg">eMMC 32G</span></td>
+<td><span class="badge bg">eMMC 32G</span></td>
+<td class="hl"><span class="badge br">TF 卡</span></td>
+</tr>
+<tr class="sr"><td colspan="7">网络接口</td></tr>
+<tr>
+<td class="col-label">有线网口</td>
+<td>2×GbE</td>
+<td>1×GbE</td>
+<td><span class="good">1×2.5G<br>1×GbE</span></td>
+<td><span class="good">2×2.5G<br>2×GbE</span></td>
+<td><span class="good">2×2.5G<br>1×GbE</span></td>
+<td class="hl">2×GbE</td>
+</tr>
+<tr>
+<td class="col-label">Wi-Fi</td>
+<td><span class="badge bg">Wi-Fi 6</span></td>
+<td><span class="badge bg">Wi-Fi 6</span></td>
+<td><span class="badge bg">Wi-Fi 6 可选</span></td>
+<td><span class="badge bg">Wi-Fi 6 可选</span></td>
+<td><span class="badge bg">Wi-Fi 6</span></td>
+<td class="hl"><span class="badge br">无</span></td>
+</tr>
+<tr>
+<td class="col-label">5G 模块</td>
+<td><span class="badge br">无</span></td>
+<td><span class="badge bg">RM500U ✓</span></td>
+<td><span class="badge br">无</span></td>
+<td><span class="badge br">无</span></td>
+<td><span class="badge bg">RM500U/520</span></td>
+<td class="hl"><span class="badge br">无</span></td>
+</tr>
+<tr class="sr"><td colspan="7">扩展接口</td></tr>
+<tr>
+<td class="col-label">USB</td>
+<td>1×3.0</td>
+<td>1×3.0</td>
+<td>1×3.0</td>
+<td>1×3.0<br>2×2.0</td>
+<td>1×2.0</td>
+<td class="hl good">2×3.0</td>
+</tr>
+<tr>
+<td class="col-label">HDMI</td>
+<td><span class="badge br">无</span></td>
+<td><span class="badge br">无</span></td>
+<td><span class="badge bg">2.0</span></td>
+<td><span class="badge bg">2.0</span></td>
+<td><span class="badge bg">2.0</span></td>
+<td class="hl"><span class="badge br">无</span></td>
+</tr>
+<tr class="sr"><td colspan="7">功耗 / 定位 / 价格</td></tr>
+<tr>
+<td class="col-label">待机功耗</td>
+<td class="good">~4W</td>
+<td class="good">~4W</td>
+<td>~6W</td>
+<td>~7W</td>
+<td>~7W</td>
+<td class="hl good">~5W</td>
+</tr>
+<tr>
+<td class="col-label">定位</td>
+<td>纯软路由</td>
+<td>5G CPE<br>软路由</td>
+<td>软路由<br>多媒体</td>
+<td>软路由<br>多媒体</td>
+<td>5G CPE<br>软路由</td>
+<td class="hl">纯软路由</td>
+</tr>
+<tr>
+<td class="col-label">参考价</td>
+<td class="good">¥180</td>
+<td>¥400+</td>
+<td>¥250</td>
+<td>¥300</td>
+<td>¥600+</td>
+<td class="hl">¥280</td>
+</tr>
+<tr class="sr"><td colspan="7">固件生态</td></tr>
+<tr>
+<td class="col-label">OpenWrt</td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge ba">有限</span></td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge ba">有限</span></td>
+<td class="hl"><span class="badge bg">完整</span></td>
+</tr>
+<tr>
+<td class="col-label">Kwrt 在线构建</td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge br">✗</span></td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge br">✗</span></td>
+<td class="hl"><span class="badge bg">✓</span></td>
+</tr>
+<tr>
+<td class="col-label">Armbian/Debian</td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge bg">✓</span></td>
+<td><span class="badge bg">✓</span></td>
+<td class="hl"><span class="badge bg">✓</span></td>
+</tr>
+<tr>
+<td class="col-label">社区活跃度</td>
+<td><span class="badge ba">中</span></td>
+<td><span class="badge br">低</span></td>
+<td><span class="badge ba">中</span></td>
+<td><span class="badge ba">中高</span></td>
+<td><span class="badge br">低</span></td>
+<td class="hl"><span class="badge bg">最高</span></td>
+</tr>
+<tr>
+<td class="col-label">7×24h 推荐</td>
+<td><span class="badge ba">可用</span></td>
+<td><span class="badge br">不推荐</span></td>
+<td><span class="badge bg">推荐</span></td>
+<td><span class="badge bg">推荐</span></td>
+<td><span class="badge br">不推荐</span></td>
+<td class="hl"><span class="badge ba">注意TF卡</span></td>
+</tr>
+</tbody>
+</table>
+</div>
