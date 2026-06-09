@@ -83,7 +83,7 @@ document.querySelector('#app').innerHTML = `
         <rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/>
         <line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>
       </svg>
-      友善 R5C 软路由 & 华硕梅林固件指南
+      友善 R5C ARM软路由 & 华硕梅林固件指南
     </div>
     <span class="status-badge">
       <span class="dot"></span>AX82U 稳定运行中
@@ -93,7 +93,7 @@ document.querySelector('#app').innerHTML = `
 
 <main>
   <div class="hero">
-    <h1>友善 R5C 软路由 & 华硕梅林固件指南</h1>
+    <h1>友善 R5C ARM软路由 & 华硕梅林固件指南</h1>
     <p>NanoPi R5C · 华硕 AX82U / RAX80 · ImmortalWrt · 梅林固件 · 设备选型</p>
   </div>
 
