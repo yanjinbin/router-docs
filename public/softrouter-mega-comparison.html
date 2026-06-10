@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软路由终极横评 · 全维度对比 · 17 款设备</title>
+<style>
+:root{--bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;--accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.6}
+
+.topnav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 1.5rem;gap:0;overflow-x:auto}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:var(--accent);border-radius:6px;white-space:nowrap;flex-shrink:0;margin-right:16px}
+.nav-tab{font-size:12px;color:var(--text2);padding:0 14px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--sans);transition:color .15s,border-color .15s}
+.nav-tab:hover,.nav-tab.active{color:var(--text);border-bottom-color:var(--accent)}
+
+.hero{max-width:1200px;margin:0 auto;padding:2.5rem 1.5rem 1.5rem}
+.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:.5rem}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:700;line-height:1.2;margin-bottom:.5rem}
+.hero p{font-size:13px;color:var(--text2);max-width:640px}
+.chips{display:flex;gap:8px;margin-top:.75rem;flex-wrap:wrap}
+.chip{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--bg2);border:1px solid var(--border2);color:var(--text2)}
+.chip b{color:var(--text)}
+
+.panel{display:none;max-width:1500px;margin:0 auto;padding:.75rem 1.5rem 4rem}
+.panel.active{display:block}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin-top:.5rem}
+table{width:100%;border-collapse:collapse}
+th,td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;text-align:left;font-size:11.5px;line-height:1.4;white-space:nowrap}
+th{font-size:11px;font-weight:600;color:var(--text2);background:var(--bg3)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+.cl{width:80px;font-size:11px;color:var(--text2);background:var(--bg3);font-weight:500;position:sticky;left:0;z-index:2;white-space:normal}
+th.cl{z-index:3}
+.sr td{background:var(--bg2);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px}
+.dn{font-size:11.5px;font-weight:600;color:var(--text)}
+.ds{font-size:10px;color:var(--text2);margin-top:1px;font-weight:400}
+.grp-row th{background:rgba(255,255,255,.04);font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);text-align:center;border-bottom:1px solid var(--border2)}
+
+.b{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;font-weight:500;white-space:nowrap;line-height:1.6}
+.bg{background:#1a3320;color:#3dd68c}
+.bb{background:#0f2240;color:#4f8ef7}
+.ba{background:#2a1e0a;color:#f5a623}
+.br{background:#2a0f0f;color:#f06060}
+.bt{background:#0a2420;color:#2dd4bf}
+.bp{background:#1e1040;color:#c084fc}
+.bgr{background:#1e1e1e;color:#9aa0b4}
+.good{color:#3dd68c;font-weight:500}
+.warn{color:#f5a623}
+.bad{color:#f06060}
+.x86 td:not(.cl){background:rgba(79,142,247,.03)}
+th.x86c{background:rgba(79,142,247,.07)}
+
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:var(--sans)}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="/" class="nav-home">← 首页</a>
+  <button class="nav-tab active" onclick="sw(this,'hw')">硬件参数</button>
+  <button class="nav-tab" onclick="sw(this,'fw')">固件生态</button>
+  <button class="nav-tab" onclick="sw(this,'bus')">网口总线 &amp; PCIe</button>
+  <button class="nav-tab" onclick="sw(this,'crypto')">加解密 &amp; 性能</button>
+  <button class="nav-tab" onclick="sw(this,'score')">综合评分</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">软路由终极横评 · 2025</div>
+  <h1>17 款设备 · 全维度对比</h1>
+  <p>整合四份对比表：硬件参数、固件生态、网口总线、加解密能力、综合评分，一页查完。</p>
+  <div class="chips">
+    <div class="chip">Intel x86 <b>2</b></div>
+    <div class="chip">FriendlyELEC <b>7</b></div>
+    <div class="chip">HINLINK <b>5</b></div>
+    <div class="chip">无线路由 <b>3</b></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 1  硬件参数
+══════════════════════════════════════ -->
+<div id="panel-hw" class="panel active">
+<div class="tbl-wrap"><table>
+<thead>
+<tr class="grp-row">
+  <th class="cl"></th>
+  <th colspan="2" class="x86c">Intel x86-64</th>
+  <th colspan="7">FriendlyELEC · Rockchip</th>
+  <th colspan="5">HINLINK · Rockchip</th>
+  <th>小马</th>
+  <th colspan="2">无线路由</th>
+</tr>
+<tr>
+  <th class="cl"></th>
+  <th class="x86c"><div class="dn">N100</div><div class="ds">Alder Lake-N</div></th>
+  <th class="x86c"><div class="dn">N150</div><div class="ds">Twin Lake</div></th>
+  <th><div class="dn">R2S</div><div class="ds">RK3328</div></th>
+  <th><div class="dn">R4S</div><div class="ds">RK3399</div></th>
+  <th><div class="dn">R4SE</div><div class="ds">RK3399+eMMC</div></th>
+  <th><div class="dn">R5S</div><div class="ds">RK3568B2</div></th>
+  <th><div class="dn">R5C</div><div class="ds">RK3568B2</div></th>
+  <th><div class="dn">R6S</div><div class="ds">RK3588S</div></th>
+  <th><div class="dn">R76S</div><div class="ds">RK3576</div></th>
+  <th><div class="dn">H28K</div><div class="ds">RK3528A</div></th>
+  <th><div class="dn">H29K</div><div class="ds">RK3528A·5G</div></th>
+  <th><div class="dn">H66K</div><div class="ds">RK3568</div></th>
+  <th><div class="dn">H68K</div><div class="ds">RK3568</div></th>
+  <th><div class="dn">H69K</div><div class="ds">RK3568·5G</div></th>
+  <th><div class="dn">M68S</div><div class="ds">RK3568</div></th>
+  <th><div class="dn">RAX80</div><div class="ds">BCM4908</div></th>
+  <th><div class="dn">AX82U</div><div class="ds">BCM6750</div></th>
+</tr>
+</thead>
+<tbody>
+<tr class="sr"><td colspan="18">处理器</td></tr>
+<tr>
+  <td class="cl">CPU</td>
+  <td>E-core×4<br>@3.4G</td><td>E-core×4<br>@3.6G</td>
+  <td>A53×4<br>@1.5G</td><td>A72×2<br>A53×4</td><td>A72×2<br>A53×4</td>
+  <td>A55×4<br>@2.0G</td><td>A55×4<br>@2.0G</td>
+  <td class="good">A76×4<br>A55×4</td><td class="good">A72×4<br>A53×4</td>
+  <td>A53×4<br>@1.5G</td><td>A53×4<br>@1.5G</td>
+  <td>A55×4<br>@2.0G</td><td>A55×4<br>@2.0G</td><td>A55×4<br>@2.0G</td>
+  <td>A55×4<br>@2.0G</td>
+  <td>A53×4<br>@1.8G</td><td class="bad">A7×3<br>@1.5G</td>
+</tr>
+<tr>
+  <td class="cl">架构</td>
+  <td><span class="b bb">x86-64</span></td><td><span class="b bb">x86-64</span></td>
+  <td><span class="b ba">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td>
+  <td><span class="b bb">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td>
+  <td><span class="b bp">ARMv9 64</span></td><td><span class="b bp">ARMv9 64</span></td>
+  <td><span class="b ba">ARMv8 64</span></td><td><span class="b ba">ARMv8 64</span></td>
+  <td><span class="b bb">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td>
+  <td><span class="b bb">ARMv8 64</span></td>
+  <td><span class="b bb">ARMv8 64</span></td><td><span class="b br">ARMv7 32</span></td>
+</tr>
+<tr>
+  <td class="cl">制程</td>
+  <td class="good">10nm</td><td class="good">10nm</td>
+  <td class="warn">28nm</td><td class="warn">28nm</td><td class="warn">28nm</td>
+  <td>22nm</td><td>22nm</td>
+  <td class="good">8nm TSMC</td><td class="good">8nm TSMC</td>
+  <td>22nm</td><td>22nm</td><td>22nm</td><td>22nm</td><td>22nm</td>
+  <td>22nm</td>
+  <td>16nm</td><td>16nm</td>
+</tr>
+<tr class="sr"><td colspan="18">内存 / 存储</td></tr>
+<tr>
+  <td class="cl">RAM</td>
+  <td>4–16 GB</td><td>4–16 GB</td>
+  <td class="bad">1 GB</td><td class="good">4 GB</td><td class="good">4 GB</td>
+  <td class="good">4 GB</td><td class="good">4 GB</td>
+  <td class="good">8 GB</td><td class="good">4–16 GB</td>
+  <td>1–4 GB</td><td>1–4 GB</td><td>2–4 GB</td><td>2–4 GB</td><td>4 GB</td>
+  <td>4–8 GB</td>
+  <td>1 GB</td><td class="bad">512 MB</td>
+</tr>
+<tr>
+  <td class="cl">eMMC / Flash</td>
+  <td>M.2 SSD</td><td>M.2 SSD</td>
+  <td><span class="b br">TF卡</span></td><td><span class="b br">TF卡</span></td><td><span class="b bg">32 GB</span></td>
+  <td><span class="b ba">8–16 GB</span></td><td><span class="b bg">32 GB</span></td>
+  <td><span class="b bg">32 GB</span></td><td><span class="b bg">32–64 GB</span></td>
+  <td><span class="b ba">8–32 GB</span></td><td><span class="b ba">8–32 GB</span></td>
+  <td><span class="b bg">32 GB</span></td><td><span class="b bg">32 GB</span></td><td><span class="b bg">32 GB</span></td>
+  <td><span class="b bg">32 GB</span></td>
+  <td><span class="b bgr">512MB NOR</span></td><td><span class="b bgr">256MB NOR</span></td>
+</tr>
+<tr>
+  <td class="cl">NVMe / SATA</td>
+  <td class="good">PCIe 3×4</td><td class="good">PCIe 3×4</td>
+  <td class="bad">无</td><td class="bad">无</td><td class="bad">无</td>
+  <td><span class="b bg">M.2 NVMe</span></td><td><span class="b bg">M.2 NVMe</span></td>
+  <td class="bad">无</td><td class="bad">无</td>
+  <td class="bad">无</td><td class="bad">无</td><td class="bad">无</td><td class="bad">无</td><td class="bad">无</td>
+  <td><span class="b bt">SATA 2.5"</span></td>
+  <td class="bad">无</td><td class="bad">无</td>
+</tr>
+<tr class="sr"><td colspan="18">网络接口</td></tr>
+<tr>
+  <td class="cl">有线网口</td>
+  <td class="good">2×2.5G<br>i226-V</td><td class="good">2×2.5G<br>i226-V</td>
+  <td class="warn">2×GbE<br><span style="font-size:10px">1口USB转</span></td>
+  <td>2×GbE</td><td>2×GbE</td>
+  <td class="good">2×2.5G<br>+1×GbE</td><td class="good">2×2.5G</td>
+  <td class="good">2×2.5G<br>+1×GbE</td><td class="good">2×2.5G</td>
+  <td>2×GbE</td><td>1×GbE</td>
+  <td class="good">1×2.5G<br>+1×GbE</td><td class="good">2×2.5G<br>+2×GbE</td><td class="good">2×2.5G<br>+1×GbE</td>
+  <td>2×GbE</td>
+  <td>4×GbE+WAN</td><td>4×GbE+WAN</td>
+</tr>
+<tr>
+  <td class="cl">Wi-Fi</td>
+  <td>可选</td><td>可选</td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+  <td><span class="b bg">Wi-Fi 6</span></td><td><span class="b bg">Wi-Fi 6</span></td>
+  <td><span class="b bg">Wi-Fi 6可选</span></td><td><span class="b bg">Wi-Fi 6可选</span></td><td><span class="b bg">Wi-Fi 6</span></td>
+  <td><span class="b br">无</span></td>
+  <td><span class="b bg">AX6000</span></td><td><span class="b bg">AX5400</span></td>
+</tr>
+<tr>
+  <td class="cl">5G 模块</td>
+  <td><span class="b ba">可选</span></td><td><span class="b ba">可选</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+  <td><span class="b br">无</span></td><td><span class="b bg">RM500U</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td><td><span class="b bg">RM500U/520</span></td>
+  <td><span class="b br">无</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+</tr>
+<tr>
+  <td class="cl">USB</td>
+  <td>多口独立</td><td>多口独立</td>
+  <td>1×3.0</td><td class="good">2×3.0</td><td class="good">2×3.0</td>
+  <td class="good">2×3.0</td><td class="good">2×3.0</td>
+  <td class="good">2×3.0</td><td>1×3.2</td>
+  <td>1×3.0</td><td>1×3.0</td><td>1×3.0</td><td>1×3.0<br>2×2.0</td><td>1×2.0</td>
+  <td class="good">2×3.0</td>
+  <td class="good">2×3.0</td><td>1×3.0</td>
+</tr>
+<tr>
+  <td class="cl">HDMI</td>
+  <td>有</td><td>有</td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+  <td><span class="b bg">有</span></td><td><span class="b bg">有</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+  <td><span class="b bg">2.0</span></td><td><span class="b bg">2.0</span></td><td><span class="b bg">2.0</span></td>
+  <td><span class="b br">无</span></td>
+  <td><span class="b br">无</span></td><td><span class="b br">无</span></td>
+</tr>
+<tr class="sr"><td colspan="18">功耗 / 价格 / 定位</td></tr>
+<tr>
+  <td class="cl">待机功耗</td>
+  <td>~8–12W</td><td>~10W</td>
+  <td class="good">~3W</td><td class="good">~5W</td><td class="good">~5W</td>
+  <td class="good">~6W</td><td class="good">~6W</td>
+  <td>~10W</td><td>~8W</td>
+  <td class="good">~4W</td><td class="good">~4W</td><td>~6W</td><td>~7W</td><td>~7W</td>
+  <td>~7W</td>
+  <td class="bad">~15–20W</td><td class="good">~6.5W</td>
+</tr>
+<tr>
+  <td class="cl">散热</td>
+  <td>被动/主动</td><td>被动/主动</td>
+  <td>铝壳被动</td><td>铝壳被动</td><td>铝壳被动</td>
+  <td>铝壳被动</td><td>铝壳被动</td>
+  <td>铝壳被动</td><td>铝壳被动</td>
+  <td>铝壳被动</td><td>铝壳被动</td><td>铝壳被动</td><td>铝壳被动</td><td>铝壳被动</td>
+  <td>铝壳被动</td>
+  <td class="warn">主动风扇</td><td>铝壳被动</td>
+</tr>
+<tr>
+  <td class="cl">参考价</td>
+  <td>¥600+</td><td>¥700+</td>
+  <td>¥130</td><td>¥280</td><td>¥350</td>
+  <td>¥380</td><td>¥500</td>
+  <td>¥700+</td><td>¥500+</td>
+  <td class="good">¥180</td><td>¥400+</td><td>¥250</td><td>¥300</td><td>¥600+</td>
+  <td>¥350</td>
+  <td>¥500+</td><td>¥200–300</td>
+</tr>
+<tr>
+  <td class="cl">定位</td>
+  <td>软路由<br>NAS/服务器</td><td>软路由<br>NAS/服务器</td>
+  <td>纯软路由</td><td>纯软路由</td><td>纯软路由</td>
+  <td>软路由+NAS</td><td>软路由+NAS</td>
+  <td>软路由+NAS</td><td>软路由<br>多媒体</td>
+  <td>软路由</td><td>5G CPE</td><td>软路由<br>多媒体</td><td>软路由<br>多媒体</td><td>5G CPE</td>
+  <td>软路由+NAS</td>
+  <td>无线路由<br>+代理</td><td>无线路由<br>+代理</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 2  固件生态
+══════════════════════════════════════ -->
+<div id="panel-fw" class="panel">
+<div class="tbl-wrap"><table>
+<thead>
+<tr class="grp-row">
+  <th class="cl"></th>
+  <th colspan="2" class="x86c">Intel x86-64</th>
+  <th colspan="7">FriendlyELEC</th>
+  <th colspan="5">HINLINK</th>
+  <th>小马</th>
+  <th colspan="2">无线路由</th>
+</tr>
+<tr>
+  <th class="cl"></th>
+  <th class="x86c"><div class="dn">N100</div></th><th class="x86c"><div class="dn">N150</div></th>
+  <th><div class="dn">R2S</div></th><th><div class="dn">R4S</div></th><th><div class="dn">R4SE</div></th>
+  <th><div class="dn">R5S</div></th><th><div class="dn">R5C</div></th>
+  <th><div class="dn">R6S</div></th><th><div class="dn">R76S</div></th>
+  <th><div class="dn">H28K</div></th><th><div class="dn">H29K</div></th>
+  <th><div class="dn">H66K</div></th><th><div class="dn">H68K</div></th><th><div class="dn">H69K</div></th>
+  <th><div class="dn">M68S</div></th>
+  <th><div class="dn">RAX80</div></th><th><div class="dn">AX82U</div></th>
+</tr>
+</thead>
+<tbody>
+<tr class="sr"><td colspan="18">固件支持</td></tr>
+<tr>
+  <td class="cl">FriendlyWrt</td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+  <td><span class="b bg">官方</span></td><td><span class="b bg">官方</span></td><td><span class="b bg">官方</span></td>
+  <td><span class="b bg">官方</span></td><td><span class="b bg">官方</span></td>
+  <td><span class="b bg">官方</span></td><td><span class="b bg">官方</span></td>
+  <td><span class="b ba">有</span></td><td><span class="b ba">有</span></td>
+  <td><span class="b ba">有</span></td><td><span class="b ba">有</span></td><td><span class="b ba">有</span></td>
+  <td><span class="b br">✗</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+</tr>
+<tr>
+  <td class="cl">ImmortalWrt</td>
+  <td><span class="b ba">有</span></td><td><span class="b ba">有</span></td>
+  <td><span class="b bg">完整</span></td><td><span class="b bg">完整</span></td><td><span class="b bg">完整</span></td>
+  <td><span class="b bg">完整</span></td><td><span class="b bg">完整</span></td>
+  <td><span class="b ba">有</span></td><td><span class="b ba">新支持</span></td>
+  <td><span class="b ba">社区</span></td><td><span class="b ba">社区</span></td>
+  <td><span class="b ba">社区</span></td><td><span class="b ba">社区</span></td><td><span class="b ba">社区</span></td>
+  <td><span class="b ba">社区</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+</tr>
+<tr>
+  <td class="cl">OpenWrt 官方</td>
+  <td><span class="b bg">完整 x86</span></td><td><span class="b bg">完整 x86</span></td>
+  <td><span class="b bg">支持</span></td><td><span class="b bg">支持</span></td><td><span class="b bg">支持</span></td>
+  <td><span class="b bg">支持</span></td><td><span class="b bg">支持</span></td>
+  <td><span class="b ba">社区</span></td><td><span class="b ba">开发中</span></td>
+  <td><span class="b ba">有</span></td><td><span class="b ba">有限</span></td>
+  <td><span class="b ba">有</span></td><td><span class="b ba">有</span></td><td><span class="b ba">有限</span></td>
+  <td><span class="b ba">社区</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+</tr>
+<tr>
+  <td class="cl">梅林固件</td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+  <td><span class="b br">✗</span></td>
+  <td><span class="b ba">koolshare</span></td><td><span class="b bg">完整支持</span></td>
+</tr>
+<tr>
+  <td class="cl">Armbian / Debian</td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+</tr>
+<tr>
+  <td class="cl">Kwrt 在线构建</td>
+  <td><span class="b bg">✓ x86</span></td><td><span class="b bg">✓ x86</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b ba">部分</span></td><td><span class="b ba">部分</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b br">✗</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td><td><span class="b br">✗</span></td>
+  <td><span class="b ba">有限</span></td>
+  <td><span class="b br">✗</span></td><td><span class="b br">✗</span></td>
+</tr>
+<tr>
+  <td class="cl">Nikki / OpenClash</td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b ba">✓ 较新</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b ba">有限</span></td>
+  <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td><td><span class="b ba">有限</span></td>
+  <td><span class="b bg">✓</span></td>
+  <td><span class="b ba">MC撸猫</span></td><td><span class="b br">ARMv7崩溃</span></td>
+</tr>
+<tr>
+  <td class="cl">Mihomo 适配</td>
+  <td><span class="b bg">amd64</span></td><td><span class="b bg">amd64</span></td>
+  <td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td>
+  <td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td>
+  <td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td>
+  <td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td>
+  <td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td>
+  <td><span class="b bg">arm64</span></td>
+  <td><span class="b bg">arm64</span></td><td><span class="b br">armv7</span></td>
+</tr>
+<tr class="sr"><td colspan="18">社区 / 稳定性</td></tr>
+<tr>
+  <td class="cl">社区活跃度</td>
+  <td><span class="b bg">极高</span></td><td><span class="b bg">极高</span></td>
+  <td><span class="b bg">高</span></td><td><span class="b bg">最高</span></td><td><span class="b bg">最高</span></td>
+  <td><span class="b bg">高</span></td><td><span class="b bg">高</span></td>
+  <td><span class="b ba">成长中</span></td><td><span class="b ba">成长中</span></td>
+  <td><span class="b ba">中</span></td><td><span class="b br">低</span></td>
+  <td><span class="b ba">中</span></td><td><span class="b ba">中高</span></td><td><span class="b br">低</span></td>
+  <td><span class="b ba">中</span></td>
+  <td><span class="b ba">中</span></td><td><span class="b bg">高（梅林）</span></td>
+</tr>
+<tr>
+  <td class="cl">7×24h 推荐</td>
+  <td><span class="b bg">强烈推荐</span></td><td><span class="b bg">强烈推荐</span></td>
+  <td><span class="b br">不推荐</span></td><td><span class="b ba">注意TF卡</span></td><td><span class="b bg">推荐</span></td>
+  <td><span class="b bg">推荐</span></td><td><span class="b bg">首选</span></td>
+  <td><span class="b bg">推荐</span></td><td><span class="b bg">推荐</span></td>
+  <td><span class="b ba">可用</span></td><td><span class="b br">不推荐</span></td>
+  <td><span class="b bg">推荐</span></td><td><span class="b bg">推荐</span></td><td><span class="b br">不推荐</span></td>
+  <td><span class="b bg">推荐</span></td>
+  <td><span class="b ba">WiFi需求</span></td><td><span class="b br">不推荐代理</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 3  网口总线 & PCIe
+══════════════════════════════════════ -->
+<div id="panel-bus" class="panel">
+<div class="tbl-wrap"><table>
+<thead>
+<tr class="grp-row">
+  <th class="cl"></th>
+  <th colspan="2" class="x86c">Intel x86-64</th>
+  <th colspan="6">FriendlyELEC</th>
+  <th>HINLINK</th>
+</tr>
+<tr>
+  <th class="cl"></th>
+  <th class="x86c"><div class="dn">N100</div><div class="ds">Alder Lake-N</div></th>
+  <th class="x86c"><div class="dn">N150</div><div class="ds">Twin Lake</div></th>
+  <th><div class="dn">R2S</div><div class="ds">RK3328</div></th>
+  <th><div class="dn">R4S</div><div class="ds">RK3399</div></th>
+  <th><div class="dn">R5S</div><div class="ds">RK3568B2</div></th>
+  <th><div class="dn">R5C</div><div class="ds">RK3568B2</div></th>
+  <th><div class="dn">R6S</div><div class="ds">RK3588S</div></th>
+  <th><div class="dn">R76S</div><div class="ds">RK3576</div></th>
+  <th><div class="dn">H68K</div><div class="ds">RK3568</div></th>
+</tr>
+</thead>
+<tbody>
+<tr class="sr"><td colspan="10">网口总线设计</td></tr>
+<tr>
+  <td class="cl">网口总线</td>
+  <td><span class="b bb">PCIe 3.0 独立</span><br><span style="font-size:10px;color:var(--text2)">每口独占 PCIe x1</span></td>
+  <td><span class="b bb">PCIe 3.0 独立</span></td>
+  <td><span class="b br">USB 3.0 共享</span><br><span style="font-size:10px;color:var(--text2)">RTL8153 USB转网</span></td>
+  <td><span class="b ba">PCIe 2.1</span><br><span style="font-size:10px;color:var(--text2)">RTL8211 GbE</span></td>
+  <td><span class="b bg">PCIe 3.0 独立</span><br><span style="font-size:10px;color:var(--text2)">独立 PCIe 通道</span></td>
+  <td><span class="b bg">PCIe 3.0 独立</span></td>
+  <td><span class="b bg">PCIe 3.0 独立</span><br><span style="font-size:10px;color:var(--text2)">双口独立通道</span></td>
+  <td><span class="b bg">PCIe 2.1 独立</span><br><span style="font-size:10px;color:var(--text2)">双口独立通道</span></td>
+  <td><span class="b bg">PCIe 3.0 独立</span><br><span style="font-size:10px;color:var(--text2)">GMAC 直连</span></td>
+</tr>
+<tr>
+  <td class="cl">网口速率</td>
+  <td class="good">2×2.5G i226-V</td>
+  <td class="good">2×2.5G i226-V</td>
+  <td class="warn">2×GbE<br><span style="font-size:10px">1口USB转网</span></td>
+  <td>2×GbE</td>
+  <td class="good">2×2.5G+1×GbE</td>
+  <td class="good">2×2.5G</td>
+  <td class="good">2×2.5G+1×GbE</td>
+  <td class="good">2×2.5G</td>
+  <td class="good">2×2.5G+2×GbE</td>
+</tr>
+<tr>
+  <td class="cl">带宽上限</td>
+  <td class="good">无瓶颈<br><span style="font-size:10px">PCIe 3.0×1=985MB/s</span></td>
+  <td class="good">无瓶颈</td>
+  <td class="bad">USB 3.0 共享<br><span style="font-size:10px">上限~400MB/s</span></td>
+  <td class="warn">PCIe 2.1×1<br><span style="font-size:10px">~490MB/s 略紧</span></td>
+  <td class="good">无瓶颈</td>
+  <td class="good">无瓶颈</td>
+  <td class="good">无瓶颈</td>
+  <td class="good">无瓶颈</td>
+  <td class="good">无瓶颈</td>
+</tr>
+<tr class="sr"><td colspan="10">PCIe 扩展 / NVMe</td></tr>
+<tr>
+  <td class="cl">PCIe 总通道</td>
+  <td class="good">9× PCIe 3.0</td>
+  <td class="good">9× PCIe 3.0</td>
+  <td class="bad">无 PCIe</td>
+  <td class="warn">1× PCIe 2.1×4</td>
+  <td>2× PCIe 3.0×1<br>1× PCIe 2.1</td>
+  <td>2× PCIe 3.0×1<br>1× PCIe 2.1</td>
+  <td class="good">3× PCIe 3.0×4<br>1× PCIe 3.0×2</td>
+  <td>4× PCIe 2.1<br>1× PCIe 3.0×4</td>
+  <td>3× PCIe 3.0<br>1× PCIe 2.1</td>
+</tr>
+<tr>
+  <td class="cl">NVMe 扩展</td>
+  <td class="good">M.2 PCIe 3.0×4</td>
+  <td class="good">M.2 PCIe 3.0×4</td>
+  <td class="bad">无</td>
+  <td class="bad">无</td>
+  <td class="good">M.2 NVMe ✓</td>
+  <td class="good">M.2 NVMe ✓</td>
+  <td class="bad">无</td>
+  <td class="bad">无 NVMe<br><span style="font-size:10px">M.2仅SDIO</span></td>
+  <td class="bad">无</td>
+</tr>
+<tr class="sr"><td colspan="10">USB 总线</td></tr>
+<tr>
+  <td class="cl">USB 总线</td>
+  <td class="good">独立控制器<br>不与网口共享</td>
+  <td class="good">独立控制器</td>
+  <td class="bad">USB3.0×1<br>网口占用总线</td>
+  <td>USB3.0×2<br>独立控制器</td>
+  <td>USB3.0×2<br>独立控制器</td>
+  <td>USB3.0×2</td>
+  <td>USB3.0×2<br>独立控制器</td>
+  <td>USB3.2 Gen1×1<br>独立控制器</td>
+  <td>USB3.0×1<br>USB2.0×2<br>独立控制器</td>
+</tr>
+<tr>
+  <td class="cl">USB/网口共享</td>
+  <td><span class="b bg">无共享 ✓</span></td>
+  <td><span class="b bg">无共享 ✓</span></td>
+  <td><span class="b br">共享 ⚠</span></td>
+  <td><span class="b bg">无共享 ✓</span></td>
+  <td><span class="b bg">无共享 ✓</span></td>
+  <td><span class="b bg">无共享 ✓</span></td>
+  <td><span class="b bg">无共享 ✓</span></td>
+  <td><span class="b bg">无共享 ✓</span></td>
+  <td><span class="b bg">无共享 ✓</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 4  加解密 & 性能
+══════════════════════════════════════ -->
+<div id="panel-crypto" class="panel">
+<div class="tbl-wrap"><table>
+<thead>
+<tr class="grp-row">
+  <th class="cl"></th>
+  <th colspan="2" class="x86c">Intel x86-64</th>
+  <th colspan="6">FriendlyELEC</th>
+  <th>HINLINK</th>
+</tr>
+<tr>
+  <th class="cl"></th>
+  <th class="x86c"><div class="dn">N100</div><div class="ds">Alder Lake-N</div></th>
+  <th class="x86c"><div class="dn">N150</div><div class="ds">Twin Lake</div></th>
+  <th><div class="dn">R2S</div><div class="ds">RK3328 A53</div></th>
+  <th><div class="dn">R4S</div><div class="ds">RK3399 A72</div></th>
+  <th><div class="dn">R5S / R5C</div><div class="ds">RK3568B2 A55</div></th>
+  <th><div class="dn">R6S</div><div class="ds">RK3588S A76</div></th>
+  <th><div class="dn">R76S</div><div class="ds">RK3576 A72</div></th>
+  <th><div class="dn">R4SE</div><div class="ds">RK3399 A72</div></th>
+  <th><div class="dn">H68K</div><div class="ds">RK3568 A55</div></th>
+</tr>
+</thead>
+<tbody>
+<tr class="sr"><td colspan="10">加解密指令集</td></tr>
+<tr>
+  <td class="cl">AES 硬件加速</td>
+  <td><span class="b bg">AES-NI ✓</span><br><span style="font-size:10px;color:var(--text2)">x86 原生指令</span></td>
+  <td><span class="b bg">AES-NI ✓</span></td>
+  <td><span class="b ba">ARMv8 Crypto ✓</span></td>
+  <td><span class="b bg">ARMv8 Crypto ✓</span></td>
+  <td><span class="b bg">ARMv8 Crypto ✓</span></td>
+  <td><span class="b bp">ARMv9 Crypto ✓</span></td>
+  <td><span class="b bp">ARMv9 Crypto ✓</span></td>
+  <td><span class="b bg">ARMv8 Crypto ✓</span></td>
+  <td><span class="b bg">ARMv8 Crypto ✓</span></td>
+</tr>
+<tr>
+  <td class="cl">AES 吞吐<br><span style="font-size:10px">单核估算</span></td>
+  <td class="good">~2.5 GB/s<br><span style="font-size:10px">VAES 256-bit宽</span></td>
+  <td class="good">~2.8 GB/s<br><span style="font-size:10px">3.6GHz</span></td>
+  <td class="warn">~450 MB/s<br><span style="font-size:10px">A53@1.5G</span></td>
+  <td>~1.0 GB/s<br><span style="font-size:10px">A72@2.0G</span></td>
+  <td>~1.1 GB/s</td>
+  <td class="good">~1.5 GB/s<br><span style="font-size:10px">A76@2.4G</span></td>
+  <td class="good">~1.2 GB/s<br><span style="font-size:10px">A72@2.2G</span></td>
+  <td>~1.0 GB/s</td>
+  <td>~850 MB/s</td>
+</tr>
+<tr>
+  <td class="cl">SHA 指令集</td>
+  <td class="good">SHA-NI<br>SHA1/256/512</td>
+  <td class="good">SHA-NI<br>SHA1/256/512</td>
+  <td>ARMv8<br>SHA1/256</td>
+  <td>ARMv8<br>SHA1/256</td>
+  <td>ARMv8<br>SHA1/256</td>
+  <td class="good">ARMv9 SHA3 ✓<br>SHA1/256/512</td>
+  <td class="good">ARMv9 SHA3 ✓</td>
+  <td>ARMv8<br>SHA1/256</td>
+  <td>ARMv8<br>SHA1/256</td>
+</tr>
+<tr>
+  <td class="cl">CLMUL/PMULL<br><span style="font-size:10px">GCM 加速</span></td>
+  <td class="good">CLMUL ✓<br><span style="font-size:10px">PCLMULQDQ</span></td>
+  <td class="good">CLMUL ✓</td>
+  <td>PMULL ✓</td>
+  <td>PMULL ✓</td>
+  <td>PMULL ✓</td>
+  <td class="good">PMULL ✓<br>+ SVE2</td>
+  <td class="good">PMULL ✓<br>+ SVE2</td>
+  <td>PMULL ✓</td>
+  <td>PMULL ✓</td>
+</tr>
+<tr>
+  <td class="cl">ChaCha20<br><span style="font-size:10px">软件性能</span></td>
+  <td class="good">~1.5 GB/s<br><span style="font-size:10px">AVX2 向量化</span></td>
+  <td class="good">~1.7 GB/s</td>
+  <td class="bad">~150 MB/s</td>
+  <td class="warn">~320 MB/s</td>
+  <td class="warn">~350 MB/s</td>
+  <td class="good">~700 MB/s</td>
+  <td>~500 MB/s</td>
+  <td class="warn">~320 MB/s</td>
+  <td class="warn">~350 MB/s</td>
+</tr>
+<tr>
+  <td class="cl">专用加密引擎</td>
+  <td class="good">QAT<br><span style="font-size:10px">Quick Assist</span></td>
+  <td class="good">QAT ✓</td>
+  <td><span class="b br">无</span></td>
+  <td><span class="b ba">RK硬件引擎</span></td>
+  <td><span class="b ba">RK硬件引擎<br>有限</span></td>
+  <td><span class="b bg">RK硬件引擎<br>较完善</span></td>
+  <td><span class="b bg">RK硬件引擎<br>较完善</span></td>
+  <td><span class="b ba">RK硬件引擎</span></td>
+  <td><span class="b ba">RK硬件引擎<br>驱动有限</span></td>
+</tr>
+<tr class="sr"><td colspan="10">驱动成熟度</td></tr>
+<tr>
+  <td class="cl">网卡驱动</td>
+  <td class="good">Intel i226-V<br>内核主线 5.13+<br><span style="font-size:10px">最成熟</span></td>
+  <td class="good">Intel i226-V<br>内核主线</td>
+  <td class="warn">RTL8153<br>USB网卡驱动<br><span style="font-size:10px">偶有兼容问题</span></td>
+  <td>内核主线<br>成熟</td>
+  <td>内核主线<br>成熟</td>
+  <td>内核主线<br>RK3588 成熟</td>
+  <td><span class="b ba">内核开发中</span><br><span style="font-size:10px">RK3576 较新</span></td>
+  <td>内核主线<br>成熟</td>
+  <td>内核主线<br>RK3568 GMAC</td>
+</tr>
+<tr>
+  <td class="cl">OpenWrt 主线</td>
+  <td class="good">完整支持 ✓<br>x86-64</td>
+  <td class="good">完整支持 ✓</td>
+  <td class="good">完整支持 ✓</td>
+  <td class="good">完整支持 ✓</td>
+  <td class="good">完整支持 ✓</td>
+  <td><span class="b ba">社区支持</span></td>
+  <td><span class="b ba">snapshot<br>开发中</span></td>
+  <td class="good">完整支持 ✓</td>
+  <td><span class="b ba">社区支持</span></td>
+</tr>
+<tr>
+  <td class="cl">设计成熟度</td>
+  <td class="good">极高<br><span style="font-size:10px">x86生态十年</span></td>
+  <td class="good">极高</td>
+  <td class="good">高<br><span style="font-size:10px">RK3328 稳定</span></td>
+  <td class="good">最高<br><span style="font-size:10px">RK3399 老将</span></td>
+  <td class="good">高<br>RK3568B2</td>
+  <td><span class="b ba">中</span><br><span style="font-size:10px">RK3588 尚新</span></td>
+  <td><span class="b br">低</span><br><span style="font-size:10px">2025 新品</span></td>
+  <td class="good">最高</td>
+  <td><span class="b ba">中等</span><br><span style="font-size:10px">RK3568 较成熟</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 5  综合评分
+══════════════════════════════════════ -->
+<div id="panel-score" class="panel">
+<div class="tbl-wrap"><table>
+<thead>
+<tr class="grp-row">
+  <th class="cl"></th>
+  <th colspan="2" class="x86c">Intel x86-64</th>
+  <th colspan="7">FriendlyELEC</th>
+  <th colspan="5">HINLINK</th>
+  <th>小马</th>
+  <th colspan="2">无线路由</th>
+</tr>
+<tr>
+  <th class="cl"></th>
+  <th class="x86c"><div class="dn">N100</div></th><th class="x86c"><div class="dn">N150</div></th>
+  <th><div class="dn">R2S</div></th><th><div class="dn">R4S</div></th><th><div class="dn">R4SE</div></th>
+  <th><div class="dn">R5S</div></th><th><div class="dn">R5C</div></th>
+  <th><div class="dn">R6S</div></th><th><div class="dn">R76S</div></th>
+  <th><div class="dn">H28K</div></th><th><div class="dn">H29K</div></th>
+  <th><div class="dn">H66K</div></th><th><div class="dn">H68K</div></th><th><div class="dn">H69K</div></th>
+  <th><div class="dn">M68S</div></th>
+  <th><div class="dn">RAX80</div></th><th><div class="dn">AX82U</div></th>
+</tr>
+</thead>
+<tbody>
+<tr class="sr"><td colspan="18">代理 7×24h 场景评分</td></tr>
+<tr>
+  <td class="cl">总线可靠性</td>
+  <td><span class="b bg">★★★★★</span></td><td><span class="b bg">★★★★★</span></td>
+  <td><span class="b br">★★</span></td><td><span class="b ba">★★★</span></td><td><span class="b bg">★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td><td><span class="b bg">★★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b bg">★★★★</span></td><td><span class="b bg">★★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+</tr>
+<tr>
+  <td class="cl">加解密能力</td>
+  <td><span class="b bg">★★★★★</span></td><td><span class="b bg">★★★★★</span></td>
+  <td><span class="b br">★★</span></td><td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b bg">★★★★★</span></td><td><span class="b bg">★★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b br">★★</span></td>
+</tr>
+<tr>
+  <td class="cl">驱动稳定性</td>
+  <td><span class="b bg">★★★★★</span></td><td><span class="b bg">★★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td><td><span class="b bg">★★★★★</span></td><td><span class="b bg">★★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td><td><span class="b bg">★★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b br">★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+</tr>
+<tr>
+  <td class="cl">固件生态</td>
+  <td><span class="b bg">★★★★★</span></td><td><span class="b bg">★★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td><td><span class="b bg">★★★★★</span></td><td><span class="b bg">★★★★★</span></td>
+  <td><span class="b bg">★★★★★</span></td><td><span class="b bg">★★★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b br">★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b bg">★★★★</span></td><td><span class="b br">★★</span></td>
+  <td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+</tr>
+<tr>
+  <td class="cl">性价比</td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b bg">★★★★★</span></td><td><span class="b bg">★★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b bg">★★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b bg">★★★★★</span></td><td><span class="b ba">★★★</span></td>
+  <td><span class="b bg">★★★★</span></td><td><span class="b bg">★★★★</span></td><td><span class="b br">★★</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b ba">★★★</span></td><td><span class="b bg">★★★★</span></td>
+</tr>
+<tr class="sr"><td colspan="18">综合推荐</td></tr>
+<tr>
+  <td class="cl">综合推荐</td>
+  <td><span class="b bg">软路由首选</span></td><td><span class="b bg">软路由首选</span></td>
+  <td><span class="b br">不推荐</span></td><td><span class="b ba">注意TF卡</span></td><td><span class="b bg">推荐</span></td>
+  <td><span class="b bg">推荐</span></td><td><span class="b bg">首选稳定</span></td>
+  <td><span class="b bg">高性能</span></td><td><span class="b ba">新品观望</span></td>
+  <td><span class="b bg">性价比</span></td><td><span class="b br">不推荐</span></td>
+  <td><span class="b bg">多媒体</span></td><td><span class="b bg">多网口</span></td><td><span class="b br">不推荐</span></td>
+  <td><span class="b bt">NAS兼路由</span></td>
+  <td><span class="b ba">WiFi需求</span></td><td><span class="b br">不推荐代理</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+    <a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C 刷机教程</span><span class="__site-nav-sub">ImmortalWrt 完整流程</span></a>
+    <a class="__site-nav-link" href="/merlin-setup-guide.html"><span class="__site-nav-title">梅林固件设置指南</span><span class="__site-nav-sub">AX82U &amp; RAX80</span></a>
+    <a class="__site-nav-link" href="/openwrt-proxy-plugins.html"><span class="__site-nav-title">OpenWrt 代理插件横评</span><span class="__site-nav-sub">Nikki · OpenClash · HomeProxy…</span></a>
+    <a class="__site-nav-link" href="/yunyufen-config.html"><span class="__site-nav-title">多机场订阅组合</span><span class="__site-nav-sub">良心云 · 渔舍 · 赔钱 · 极风</span></a>
+    <a class="__site-nav-link" href="/esim-card-guide.html"><span class="__site-nav-title">eSIM 实体卡选购指南</span><span class="__site-nav-sub">BeeSIM · eSTK · 9eSIM · xeSIM</span></a>
+    <a class="__site-nav-link" href="/apple-giftcard-guide.html"><span class="__site-nav-title">苹果礼品卡购买指南</span><span class="__site-nav-sub">土耳其区 · 尼日利亚区</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+
+<script>
+function sw(btn, id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -26,19 +26,11 @@ const docs = [
     tagColor: '#3dd68c',
   },
   {
-    title: 'ARM 软路由横向对比',
-    subtitle: '全平台综合评测',
-    desc: '多款主流 ARM 软路由设备性能、价格、功耗完整横向对比',
-    href: '/arm_softrouter_full_comparison.html',
-    tag: '对比',
-    tagColor: '#f5a623',
-  },
-  {
-    title: 'Hinlink 系列 vs NanoPi R4S',
-    subtitle: '重点机型深度对比',
-    desc: 'H68K、H88K 等 Hinlink 系列与 NanoPi R4S 详细规格与场景对比',
-    href: '/hinlink_series_vs_r4s_comparison.html',
-    tag: '对比',
+    title: '软路由终极横评 · 17 款全对比',
+    subtitle: 'x86 · FriendlyELEC · HINLINK · 无线路由',
+    desc: '17 款设备 5 维度一页查完：硬件参数、固件生态、网口总线 & PCIe、加解密 & 性能、综合评分。含 N100/N150/R2S~R76S/H28K~H69K/M68S/RAX80/AX82U',
+    href: '/softrouter-mega-comparison.html',
+    tag: '横评',
     tagColor: '#f5a623',
   },
   {
@@ -64,14 +56,6 @@ const docs = [
     href: '/openwrt-proxy-plugins.html',
     tag: '对比',
     tagColor: '#c084fc',
-  },
-  {
-    title: '软路由八强对决',
-    subtitle: '旗舰机型全面评测',
-    desc: '8 款主流软路由设备综合实测，覆盖性能、稳定性、散热、性价比维度',
-    href: '/softrouter_full_8way_comparison.html',
-    tag: '对比',
-    tagColor: '#f5a623',
   },
 ]
 
