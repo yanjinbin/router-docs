@@ -636,17 +636,179 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td class="warn">~320 MB/s</td>
   <td class="warn">~350 MB/s</td>
 </tr>
+<tr class="sr"><td colspan="10">ARMv8 CE · 可选扩展支持</td></tr>
 <tr>
-  <td class="cl">专用加密引擎</td>
-  <td class="good">QAT<br><span style="font-size:10px">Quick Assist</span></td>
-  <td class="good">QAT ✓</td>
-  <td><span class="b br">无</span></td>
-  <td><span class="b ba">RK硬件引擎</span></td>
-  <td><span class="b ba">RK硬件引擎<br>有限</span></td>
-  <td><span class="b bg">RK硬件引擎<br>较完善</span></td>
-  <td><span class="b bg">RK硬件引擎<br>较完善</span></td>
-  <td><span class="b ba">RK硬件引擎</span></td>
-  <td><span class="b ba">RK硬件引擎<br>驱动有限</span></td>
+  <td class="cl">ARMv8 版本</td>
+  <td><span class="b bgr">N/A x86</span></td>
+  <td><span class="b bgr">N/A x86</span></td>
+  <td><span class="b ba">ARMv8.0-A</span><br><span style="font-size:10px;color:var(--text2)">A53</span></td>
+  <td><span class="b bb">ARMv8.0-A</span><br><span style="font-size:10px;color:var(--text2)">A72</span></td>
+  <td><span class="b bg">ARMv8.2-A</span><br><span style="font-size:10px;color:var(--text2)">A55</span></td>
+  <td><span class="b bp">ARMv8.2-A+</span><br><span style="font-size:10px;color:var(--text2)">A76</span></td>
+  <td><span class="b bp">ARMv8.2-A</span><br><span style="font-size:10px;color:var(--text2)">A72/A53</span></td>
+  <td><span class="b bb">ARMv8.0-A</span></td>
+  <td><span class="b bg">ARMv8.2-A</span></td>
+</tr>
+<tr>
+  <td class="cl">AES 指令<br><span style="font-size:10px">AESE/AESD</span></td>
+  <td class="good">✓ AES-NI</td>
+  <td class="good">✓ AES-NI</td>
+  <td class="good">✓</td><td class="good">✓</td><td class="good">✓</td>
+  <td class="good">✓</td><td class="good">✓</td><td class="good">✓</td><td class="good">✓</td>
+</tr>
+<tr>
+  <td class="cl">SHA1/SHA256</td>
+  <td class="good">✓ SHA-NI</td>
+  <td class="good">✓ SHA-NI</td>
+  <td class="good">✓</td><td class="good">✓</td><td class="good">✓</td>
+  <td class="good">✓</td><td class="good">✓</td><td class="good">✓</td><td class="good">✓</td>
+</tr>
+<tr>
+  <td class="cl">SHA512</td>
+  <td class="good">✓</td><td class="good">✓</td>
+  <td class="bad">✗</td><td class="bad">✗</td><td class="bad">✗</td>
+  <td class="good">✓<br><span style="font-size:10px">A76</span></td>
+  <td class="warn">A72✗</td>
+  <td class="bad">✗</td><td class="bad">✗</td>
+</tr>
+<tr>
+  <td class="cl">SHA3<br><span style="font-size:10px">EOR3/RAX1/BCAX</span></td>
+  <td class="bad">✗</td><td class="bad">✗</td>
+  <td class="bad">✗</td><td class="bad">✗</td><td class="bad">✗</td>
+  <td class="good">✓<br><span style="font-size:10px">A76</span></td>
+  <td class="bad">✗</td>
+  <td class="bad">✗</td><td class="bad">✗</td>
+</tr>
+<tr>
+  <td class="cl">PMULL/PMULL2<br><span style="font-size:10px">GHASH/GCM</span></td>
+  <td class="good">CLMUL</td>
+  <td class="good">CLMUL</td>
+  <td class="good">✓</td><td class="good">✓</td><td class="good">✓</td>
+  <td class="good">✓</td><td class="good">✓</td><td class="good">✓</td><td class="good">✓</td>
+</tr>
+<tr>
+  <td class="cl">SM3 / SM4<br><span style="font-size:10px">国密</span></td>
+  <td class="bad">✗</td><td class="bad">✗</td>
+  <td class="bad">✗</td><td class="bad">✗</td>
+  <td class="warn">部分</td>
+  <td class="good">✓<br><span style="font-size:10px">A76</span></td>
+  <td class="warn">部分</td>
+  <td class="bad">✗</td>
+  <td class="warn">部分</td>
+</tr>
+<tr>
+  <td class="cl">SVE / SVE2<br><span style="font-size:10px">向量加速</span></td>
+  <td class="good">AVX2<br><span style="font-size:10px">256-bit</span></td>
+  <td class="good">AVX2</td>
+  <td class="bad">✗</td><td class="bad">✗</td><td class="bad">✗</td>
+  <td class="good">SVE2 ✓<br><span style="font-size:10px">128-bit</span></td>
+  <td class="warn">A72 仅NEON</td>
+  <td class="bad">✗</td><td class="bad">✗</td>
+</tr>
+
+<tr class="sr"><td colspan="10">SoC Crypto Engine · 独立加密协处理器</td></tr>
+<tr>
+  <td class="cl">引擎型号</td>
+  <td><span class="b bg">Intel QAT</span><br><span style="font-size:10px;color:var(--text2)">Quick Assist 2.0</span></td>
+  <td><span class="b bg">Intel QAT 2.0</span></td>
+  <td><span class="b ba">RK Crypto V1</span></td>
+  <td><span class="b ba">RK Crypto V1<br>×2 引擎</span></td>
+  <td><span class="b bg">RK Crypto V2</span></td>
+  <td><span class="b bg">RK Crypto V2+</span><br><span style="font-size:10px;color:var(--text2)">增强版</span></td>
+  <td><span class="b bg">RK Crypto V2</span></td>
+  <td><span class="b ba">RK Crypto V1<br>×2 引擎</span></td>
+  <td><span class="b bg">RK Crypto V2</span></td>
+</tr>
+<tr>
+  <td class="cl">对称加密</td>
+  <td>AES-128/256<br>GCM/CTR/CBC<br>ChaCha20</td>
+  <td>AES-128/256<br>+ ChaCha20</td>
+  <td>AES-128/192/256<br>DES/3DES</td>
+  <td>AES-128/192/256<br>DES/3DES</td>
+  <td>AES-128/256<br>SM4<br>DES/3DES</td>
+  <td>AES-128/256<br>SM4-CBC/CTR/XTS<br>DES/3DES</td>
+  <td>AES-128/256<br>SM4</td>
+  <td>AES-128/192/256<br>DES/3DES</td>
+  <td>AES-128/256<br>SM4</td>
+</tr>
+<tr>
+  <td class="cl">摘要 / HMAC</td>
+  <td class="good">SHA1/256/512<br>HMAC ✓</td>
+  <td class="good">SHA1/256/512<br>HMAC ✓</td>
+  <td>SHA1/256<br>HMAC</td>
+  <td>SHA1/256<br>HMAC</td>
+  <td>SHA1/256/512<br>SM3 / HMAC</td>
+  <td class="good">SHA1–512<br>SM3 / HMAC</td>
+  <td>SHA1–512<br>SM3 / HMAC</td>
+  <td>SHA1/256<br>HMAC</td>
+  <td>SHA1/256/512<br>SM3 / HMAC</td>
+</tr>
+<tr>
+  <td class="cl">非对称 / 公钥</td>
+  <td class="good">RSA-4096<br>ECC P256/384<br>X25519</td>
+  <td class="good">RSA-4096<br>ECC + X25519</td>
+  <td class="bad">无</td>
+  <td class="bad">无</td>
+  <td class="warn">RSA-2048<br>有限</td>
+  <td class="good">RSA-4096<br>ECC<br>SM2</td>
+  <td>RSA-2048<br>ECC</td>
+  <td class="bad">无</td>
+  <td class="warn">RSA-2048<br>有限</td>
+</tr>
+<tr>
+  <td class="cl">TRNG<br><span style="font-size:10px">真随机数</span></td>
+  <td class="good">RDRAND<br>RDSEED</td>
+  <td class="good">RDRAND/RDSEED</td>
+  <td class="good">✓</td><td class="good">✓</td><td class="good">✓</td>
+  <td class="good">✓</td><td class="good">✓</td><td class="good">✓</td><td class="good">✓</td>
+</tr>
+<tr>
+  <td class="cl">引擎吞吐<br><span style="font-size:10px">AES-GCM 估算</span></td>
+  <td class="good">~10 Gbps<br><span style="font-size:10px">QAT 卸载</span></td>
+  <td class="good">~10 Gbps</td>
+  <td class="warn">~200 Mbps</td>
+  <td>~400 Mbps</td>
+  <td>~600 Mbps</td>
+  <td class="good">~1.2 Gbps</td>
+  <td>~800 Mbps</td>
+  <td>~400 Mbps</td>
+  <td>~600 Mbps</td>
+</tr>
+<tr>
+  <td class="cl">Linux 驱动<br><span style="font-size:10px">crypto API</span></td>
+  <td class="good">intel_qat<br>主线</td>
+  <td class="good">intel_qat<br>主线</td>
+  <td class="warn">rk_crypto<br>主线<br><span style="font-size:10px">仅部分算法</span></td>
+  <td class="warn">rk_crypto<br>主线</td>
+  <td>rk_crypto2<br>5.10+</td>
+  <td class="good">rk_crypto2<br>BSP 完整</td>
+  <td><span class="b ba">rk_crypto2<br>BSP</span></td>
+  <td class="warn">rk_crypto</td>
+  <td>rk_crypto2<br>5.10+</td>
+</tr>
+<tr>
+  <td class="cl">OpenSSL 加速<br><span style="font-size:10px">cryptodev/AF_ALG</span></td>
+  <td class="good">原生 EVP<br>+ QAT engine</td>
+  <td class="good">原生 EVP</td>
+  <td class="warn">需 AF_ALG<br>性能一般</td>
+  <td class="warn">AF_ALG</td>
+  <td>AF_ALG</td>
+  <td class="good">AF_ALG ✓</td>
+  <td>AF_ALG</td>
+  <td class="warn">AF_ALG</td>
+  <td>AF_ALG</td>
+</tr>
+<tr>
+  <td class="cl">实际收益<br><span style="font-size:10px">vs CE 指令</span></td>
+  <td class="good">大块加密<br>显著卸载</td>
+  <td class="good">大块加密<br>显著卸载</td>
+  <td class="warn">仅大块有用<br>小包反慢</td>
+  <td class="warn">小包反慢</td>
+  <td>大块略快</td>
+  <td class="good">大块明显<br>+SM国密</td>
+  <td>大块略快</td>
+  <td class="warn">小包反慢</td>
+  <td>大块略快</td>
 </tr>
 <tr class="sr"><td colspan="10">驱动成熟度</td></tr>
 <tr>
