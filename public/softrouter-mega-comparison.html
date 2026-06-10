@@ -29,12 +29,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin-top:.5rem}
 table{width:100%;border-collapse:collapse}
 th,td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;text-align:left;font-size:11.5px;line-height:1.4;white-space:nowrap}
-th{font-size:11px;font-weight:600;color:var(--text2);background:var(--bg3);position:sticky;top:52px;z-index:4}
+th{font-size:11px;font-weight:600;color:var(--text2);background:var(--bg3)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(255,255,255,.015)}
 .cl{width:80px;font-size:11px;color:var(--text2);background:var(--bg3);font-weight:500;position:sticky;left:0;z-index:2;white-space:normal}
-th.cl{z-index:5}
-.grp-row th{position:sticky;top:52px;z-index:4}
+th.cl{z-index:3}
 .sr td{background:var(--bg2);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px}
 .dn{font-size:11.5px;font-weight:600;color:var(--text)}
 .ds{font-size:10px;color:var(--text2);margin-top:1px;font-weight:400}
@@ -1305,7 +1304,79 @@ function sw(btn, id) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
   btn.classList.add('active');
+  // 切 tab 时销毁旧克隆，重新检测
+  stickyH.destroy();
+  setTimeout(() => stickyH.update(), 60);
 }
+
+// ── Sticky thead: JS clone 方案 ──────────────────────────────────
+// 原因：.tbl-wrap 有 overflow-x:auto，浏览器强制把该容器变为纵向
+// scroll container，导致 CSS position:sticky top 无法相对页面生效。
+// 解法：JS 监听页面 scroll，动态克隆 thead 贴在 topnav 下方。
+const stickyH = (() => {
+  let clone = null, srcWrap = null, srcThead = null;
+
+  function getWrap() {
+    const panel = document.querySelector('.panel.active');
+    return panel ? panel.querySelector('.tbl-wrap') : null;
+  }
+
+  function onWrapScroll() {
+    if (!clone || !srcWrap) return;
+    clone.firstChild.style.transform = 'translateX(-' + srcWrap.scrollLeft + 'px)';
+  }
+
+  function update() {
+    const wrap = getWrap();
+    if (!wrap) { hide(); return; }
+    const table = wrap.querySelector('table');
+    const thead = table.querySelector('thead');
+    const theadRect = thead.getBoundingClientRect();
+    const wrapRect  = wrap.getBoundingClientRect();
+
+    if (theadRect.bottom < 52 && wrapRect.bottom > 52) {
+      // 需要显示：第一次或切换了 tab
+      if (srcThead !== thead) {
+        destroy();
+        clone = document.createElement('div');
+        clone.style.cssText =
+          'position:fixed;top:52px;left:0;right:0;z-index:90;overflow:hidden;' +
+          'pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,.5)';
+        const ct = table.cloneNode(false); // 克隆 table 不含子节点
+        ct.style.cssText = 'border-collapse:collapse;table-layout:auto;';
+        ct.appendChild(thead.cloneNode(true));
+        clone.appendChild(ct);
+        document.body.appendChild(clone);
+        srcWrap  = wrap;
+        srcThead = thead;
+        wrap.addEventListener('scroll', onWrapScroll, {passive:true});
+      }
+      // 同步位置和宽度
+      clone.style.left  = wrapRect.left + 'px';
+      clone.style.width = wrapRect.width + 'px';
+      clone.firstChild.style.width     = table.offsetWidth + 'px';
+      clone.firstChild.style.transform = 'translateX(-' + wrap.scrollLeft + 'px)';
+      clone.style.display = 'block';
+    } else {
+      hide();
+    }
+  }
+
+  function hide() {
+    if (clone) clone.style.display = 'none';
+  }
+
+  function destroy() {
+    if (clone) { clone.remove(); clone = null; }
+    if (srcWrap) { srcWrap.removeEventListener('scroll', onWrapScroll); srcWrap = null; }
+    srcThead = null;
+  }
+
+  window.addEventListener('scroll', update, {passive:true});
+  window.addEventListener('resize', () => { destroy(); update(); }, {passive:true});
+
+  return { update, destroy };
+})();
 </script>
 </body>
 </html>
