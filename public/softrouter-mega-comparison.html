@@ -504,7 +504,7 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td><span class="b bg">✓</span></td><td><span class="b ba">有限</span></td>
   <td><span class="b bg">✓</span></td><td><span class="b bg">✓</span></td><td><span class="b ba">有限</span></td>
   <td><span class="b bg">✓</span></td>
-  <td><span class="b ba">MC撸猫</span></td><td><span class="b br">ARMv7崩溃</span></td>
+  <td><span class="b ba">MC撸猫</span></td><td><span class="b br">ARMv7 GC崩溃</span><br><span style="font-size:10px;color:var(--text3)">定时重启可缓解</span></td>
 </tr>
 <tr>
   <td class="cl">Mihomo 适配</td>
@@ -515,7 +515,8 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td>
   <td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td><td><span class="b bg">arm64</span></td>
   <td><span class="b bg">arm64</span></td>
-  <td><span class="b bg">arm64</span></td><td><span class="b br">armv7</span></td>
+  <td><span class="b bg">arm64</span></td>
+  <td><span class="b br">armv7</span><br><span style="font-size:10px;color:var(--text3)">Go GC crash<br>换arm64解决</span></td>
 </tr>
 <tr class="sr"><td colspan="18">社区 / 稳定性</td></tr>
 <tr>
@@ -1253,7 +1254,7 @@ th.x86c{background:rgba(79,142,247,.07)}
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">R2S · AX82U · H29K · H69K</div>
     <div style="font-size:12px;color:var(--text2);line-height:1.6">
       <b style="color:#f06060">R2S</b>：USB 转网口共享总线，TF 卡无 eMMC，7×24h 稳定性差，仅适合低流量测试机。<br>
-      <b style="color:#f06060">AX82U</b>：ARMv7 32-bit，Mihomo/Nikki 崩溃，代理场景不推荐，仅适合纯无线路由。<br>
+      <b style="color:#f06060">AX82U</b>：ARMv7 32-bit，Mihomo 必崩。<b style="color:var(--text)">根因</b>：Go runtime GC 在 ARMv7 32-bit 上指针位图扫描出现 <code style="font-size:10px;background:var(--bg3);padding:1px 4px;border-radius:3px">found bad pointer in Go heap</code>，与 Mihomo 版本无关，换版本无效。<b style="color:#f5a623">下策</b>：cron 凌晨 4–5 点定时重启 <code style="font-size:10px;background:var(--bg3);padding:1px 4px;border-radius:3px">service restart_mc2</code> 缓解（治标）。<b style="color:#3dd68c">根本解决</b>：换 ARM64 设备（RAX80 / R5C 等）。<br>
       <b style="color:#f06060">H29K / H69K</b>：价格虚高，5G 模块驱动不稳，固件生态差，性价比极低。
     </div>
   </div>
