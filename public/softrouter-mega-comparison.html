@@ -29,11 +29,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin-top:.5rem}
 table{width:100%;border-collapse:collapse}
 th,td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;text-align:left;font-size:11.5px;line-height:1.4;white-space:nowrap}
-th{font-size:11px;font-weight:600;color:var(--text2);background:var(--bg3)}
+th{font-size:11px;font-weight:600;color:var(--text2);background:var(--bg3);position:sticky;top:52px;z-index:4}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(255,255,255,.015)}
 .cl{width:80px;font-size:11px;color:var(--text2);background:var(--bg3);font-weight:500;position:sticky;left:0;z-index:2;white-space:normal}
-th.cl{z-index:3}
+th.cl{z-index:5}
+.grp-row th{position:sticky;top:52px;z-index:4}
 .sr td{background:var(--bg2);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px}
 .dn{font-size:11.5px;font-weight:600;color:var(--text)}
 .ds{font-size:10px;color:var(--text2);margin-top:1px;font-weight:400}
