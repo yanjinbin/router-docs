@@ -545,6 +545,140 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td><span class="b bg">无共享 ✓</span></td>
   <td><span class="b bg">无共享 ✓</span></td>
 </tr>
+
+<tr class="sr"><td colspan="10">网卡芯片 · 原生度与特性</td></tr>
+<tr>
+  <td class="cl">网卡芯片</td>
+  <td><b>Intel i226-V</b><br><span style="font-size:10px;color:var(--text2)">×2 独立 PCIe</span></td>
+  <td><b>Intel i226-V</b><br><span style="font-size:10px;color:var(--text2)">×2 独立 PCIe</span></td>
+  <td><b>RTL8211E</b><br><span style="font-size:10px;color:var(--text2)">WAN口 GMAC直连</span><br><b>RTL8153B</b><br><span style="font-size:10px;color:var(--text2)">LAN口 USB3.0转网</span></td>
+  <td><b>RTL8211E ×2</b><br><span style="font-size:10px;color:var(--text2)">GMAC 直连<br>PCIe 2.1 挂载</span></td>
+  <td><b>RTL8125BG ×2</b><br><span style="font-size:10px;color:var(--text2)">2.5G PCIe 3.0</span><br><b>RTL8211F</b><br><span style="font-size:10px;color:var(--text2)">1G GMAC 直连</span></td>
+  <td><b>RTL8125BG ×2</b><br><span style="font-size:10px;color:var(--text2)">2.5G PCIe 3.0</span></td>
+  <td><b>RTL8125BG ×2</b><br><span style="font-size:10px;color:var(--text2)">2.5G 独立PCIe3.0</span><br><b>RTL8211F</b><br><span style="font-size:10px;color:var(--text2)">1G GMAC</span></td>
+  <td><b>RTL8125BG ×2</b><br><span style="font-size:10px;color:var(--text2)">2.5G PCIe 2.1</span></td>
+  <td><b>RTL8125BG ×2</b><br><span style="font-size:10px;color:var(--text2)">2.5G PCIe 3.0</span><br><b>RTL8211F ×2</b><br><span style="font-size:10px;color:var(--text2)">1G GMAC 直连</span></td>
+</tr>
+<tr>
+  <td class="cl">内核主线<br><span style="font-size:10px">驱动模块</span></td>
+  <td class="good">igc<br>5.13+ 完整</td>
+  <td class="good">igc<br>5.13+ 完整</td>
+  <td class="warn">r8169 (RTL8211E)<br>r8152 (RTL8153B)<br><span style="font-size:10px">r8152偶有兼容问题</span></td>
+  <td class="good">r8169<br>主线稳定</td>
+  <td class="good">r8125 / r8169<br>主线完整</td>
+  <td class="good">r8125 / r8169<br>主线完整</td>
+  <td class="good">r8125 / r8169<br>主线完整</td>
+  <td class="good">r8125<br>主线完整</td>
+  <td class="good">r8125 / r8169<br>主线完整</td>
+</tr>
+<tr>
+  <td class="cl">原生度<br><span style="font-size:10px">无需私有驱动</span></td>
+  <td><span class="b bg">原生 ★★★★★</span><br><span style="font-size:10px;color:var(--text2)">Intel 完全开源</span></td>
+  <td><span class="b bg">原生 ★★★★★</span></td>
+  <td><span class="b ba">★★★</span><br><span style="font-size:10px;color:var(--text2)">RTL8153B偶需补丁</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b bg">★★★★</span><br><span style="font-size:10px;color:var(--text2)">r8125需BSP或较新内核</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td>
+</tr>
+<tr>
+  <td class="cl">校验和卸载<br><span style="font-size:10px">TX/RX Checksum</span></td>
+  <td class="good">TX+RX ✓</td>
+  <td class="good">TX+RX ✓</td>
+  <td class="warn">RTL8211E TX+RX<br>RTL8153B TX only<br><span style="font-size:10px">RX软件计算</span></td>
+  <td class="good">TX+RX ✓</td>
+  <td class="good">TX+RX ✓</td>
+  <td class="good">TX+RX ✓</td>
+  <td class="good">TX+RX ✓</td>
+  <td class="good">TX+RX ✓</td>
+  <td class="good">TX+RX ✓</td>
+</tr>
+<tr>
+  <td class="cl">分段卸载<br><span style="font-size:10px">TSO / GSO</span></td>
+  <td class="good">TSO ✓<br>GSO ✓<br>GRO ✓</td>
+  <td class="good">TSO / GSO<br>GRO ✓</td>
+  <td class="warn">RTL8211E TSO ✓<br>RTL8153B TSO ✗<br><span style="font-size:10px">USB 协议限制</span></td>
+  <td>TSO ✓<br>GRO ✓</td>
+  <td class="good">TSO ✓<br>GRO ✓</td>
+  <td class="good">TSO ✓<br>GRO ✓</td>
+  <td class="good">TSO ✓<br>GRO ✓</td>
+  <td class="good">TSO ✓<br>GRO ✓</td>
+  <td class="good">TSO ✓<br>GRO ✓</td>
+</tr>
+<tr>
+  <td class="cl">中断亲和<br><span style="font-size:10px">多队列 / MSI-X</span></td>
+  <td class="good">MSI-X 多队列<br>RSS / XPS 完整</td>
+  <td class="good">MSI-X 多队列<br>RSS / XPS</td>
+  <td class="bad">单队列<br>USB 无 MSI-X</td>
+  <td class="warn">单队列<br>MSI 基础</td>
+  <td>单队列<br>MSI</td>
+  <td>单队列<br>MSI</td>
+  <td>单队列<br>MSI</td>
+  <td>单队列<br>MSI</td>
+  <td>单队列<br>MSI</td>
+</tr>
+<tr>
+  <td class="cl">WoL 网络唤醒</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="bad">RTL8153B ✗</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+</tr>
+<tr>
+  <td class="cl">EEE 节能<br><span style="font-size:10px">802.3az</span></td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="warn">部分支持</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+</tr>
+<tr>
+  <td class="cl">Flow Control<br><span style="font-size:10px">802.3x 流控</span></td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="warn">RTL8153B 有限</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+  <td class="good">✓</td>
+</tr>
+<tr>
+  <td class="cl">XDP / eBPF<br><span style="font-size:10px">零拷贝加速</span></td>
+  <td class="good">XDP Native ✓<br><span style="font-size:10px">igc 完整支持</span></td>
+  <td class="good">XDP Native ✓</td>
+  <td class="bad">✗<br><span style="font-size:10px">USB 不支持 XDP</span></td>
+  <td class="warn">XDP Generic<br><span style="font-size:10px">非 native</span></td>
+  <td class="warn">XDP Generic</td>
+  <td class="warn">XDP Generic</td>
+  <td class="warn">XDP Generic</td>
+  <td class="warn">XDP Generic</td>
+  <td class="warn">XDP Generic</td>
+</tr>
+<tr>
+  <td class="cl">综合评级</td>
+  <td><span class="b bg">★★★★★</span><br><span style="font-size:10px;color:var(--text2)">网卡最优解</span></td>
+  <td><span class="b bg">★★★★★</span></td>
+  <td><span class="b br">★★</span><br><span style="font-size:10px;color:var(--text2)">LAN口USB转网先天缺陷</span></td>
+  <td><span class="b ba">★★★</span><br><span style="font-size:10px;color:var(--text2)">千兆够用，2.5G无</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td>
+  <td><span class="b bg">★★★★</span></td>
+</tr>
 </tbody>
 </table></div>
 </div>
