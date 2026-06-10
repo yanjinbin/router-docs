@@ -555,6 +555,125 @@
 
   <hr>
 
+  <!-- AIMESH -->
+  <div class="phase">
+    <div class="phase-hd">
+      <span class="phase-badge">阶段七</span>
+      <span class="phase-title">华硕 AiMesh 组网（AP 模式下）</span>
+      <span class="phase-sub">R5C 主路由 + RAX80 控制节点 + AX82U 卫星节点，全屋无缝漫游</span>
+    </div>
+
+    <div class="topo">光猫 WAN → R5C WAN口 → R5C LAN口 ──网线──→ RAX80 LAN口（AiMesh Router / AP）<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↕ 无线 Backhaul（或网线）<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AX82U（AiMesh Node）→ Wi-Fi → 设备</div>
+
+    <div style="background:var(--surface2,#1e2333);border-left:3px solid #4f8ef7;padding:10px 14px;border-radius:6px;font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.6">
+      <strong style="color:var(--text)">AiMesh 核心原理：</strong>华硕 AiMesh 让多台华硕路由器组成一个 SSID 的统一无线网络，设备移动时自动切换到信号最强的节点（802.11r/k/v 无缝漫游）。R5C 只负责路由/DHCP，AiMesh 网络完全由华硕路由器自管。
+    </div>
+
+    <p style="font-size:.875rem;font-weight:600;margin-bottom:.75rem">第一步：准备工作</p>
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-body">
+        <div class="step-title">RAX80 和 AX82U 全部恢复出厂设置</div>
+        <div class="step-desc">长按 Reset 键 5–10 秒，等待重启完成。确保两台设备都是"全新"状态再配对，避免旧配置干扰。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-body">
+        <div class="step-title">固件版本一致（推荐梅林 Merlin）</div>
+        <div class="step-desc">AiMesh 配对对固件版本敏感。两台都刷官方固件或同版本梅林，混搭不同版本可能配对失败。</div>
+      </div>
+    </div>
+
+    <p style="font-size:.875rem;font-weight:600;margin:.75rem 0">第二步：配置 RAX80 为 AiMesh Router（AP 模式）</p>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-body">
+        <div class="step-title">RAX80 通过网线连接 R5C 的 LAN 口（接 LAN，不接 WAN）</div>
+        <div class="step-desc">此时 RAX80 会从 R5C 的 DHCP 获取一个 IP，例如 <code>192.168.1.x</code>。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">4</div>
+      <div class="step-body">
+        <div class="step-title">进入 RAX80 后台，找到它的 IP</div>
+        <div class="step-desc">在 R5C OpenWrt 后台 → 网络 → DHCP/DNS → 活跃租约，找到 RAX80 分配到的 IP。也可用手机连 RAX80 发出的初始 Wi-Fi，访问 <code>192.168.50.1</code>。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">5</div>
+      <div class="step-body">
+        <div class="step-title">高级设置 → 无线路由器 → Operation Mode → 切换为 <strong>Access Point 模式</strong></div>
+        <div class="step-desc">切换后 RAX80 的 WAN 口和 DHCP 均停用，由 R5C 统一分配 IP。RAX80 重启后仍从 R5C DHCP 获取 IP。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">6</div>
+      <div class="step-body">
+        <div class="step-title">设置 RAX80 的无线 SSID 和密码</div>
+        <div class="step-desc">记住这组 SSID/密码，AX82U 加入 AiMesh 后会自动同步为相同的 SSID。</div>
+      </div>
+    </div>
+
+    <p style="font-size:.875rem;font-weight:600;margin:.75rem 0">第三步：将 AX82U 加入 AiMesh 作为 Node</p>
+    <div class="step">
+      <div class="step-n">7</div>
+      <div class="step-body">
+        <div class="step-title">AX82U 上电，放在离 RAX80 约 1–2 米处（配对阶段需要强信号）</div>
+        <div class="step-desc">AX82U 出厂 / 恢复出厂后会自动发出名为 <code>ASUS_AX82U_Setup</code> 的临时 Wi-Fi，等待被配对。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">8</div>
+      <div class="step-body">
+        <div class="step-title">进入 RAX80 后台 → AiMesh → 搜索新节点 → 选择 AX82U → 确认添加</div>
+        <div class="step-desc">RAX80 会自动推送 SSID/密码/配置到 AX82U，过程约 3–5 分钟，期间 AX82U 会重启。完成后两台共享同一 SSID。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">9</div>
+      <div class="step-body">
+        <div class="step-title">配对完成后将 AX82U 移至目标位置</div>
+        <div class="step-desc">放在与 RAX80 之间有一定重叠覆盖的位置（信号约 -65 dBm 以上）。Backhaul 默认走 5 GHz 无线；若拉一根网线给 AX82U 的 LAN 口，切换为<strong>有线 Backhaul</strong>，延迟和稳定性大幅提升。</div>
+      </div>
+    </div>
+
+    <p style="font-size:.875rem;font-weight:600;margin:.75rem 0">第四步：验证与调优</p>
+    <div class="step">
+      <div class="step-n">10</div>
+      <div class="step-body">
+        <div class="step-title">RAX80 后台 → AiMesh → 查看节点状态</div>
+        <div class="step-desc">AX82U 应显示为"已连接"绿色节点，以及 Backhaul 类型（无线/有线）和链路速率。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">11</div>
+      <div class="step-body">
+        <div class="step-title">开启 Smart Connect（可选）：自动将设备引导至最优频段</div>
+        <div class="step-desc">无线 → Smart Connect → 开启。2.4G / 5G 统一 SSID，路由器自动选频，适合混合设备家庭。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">12</div>
+      <div class="step-body">
+        <div class="step-title">开启 Roaming Assist（漫游辅助）</div>
+        <div class="step-desc">无线 → 专业设置 → Roaming Assist → 开启，设定 RSSI 阈值（建议 -70 dBm）。手机移动时，当前节点信号低于阈值会主动踢出设备，让其重新关联更近的节点。</div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface2,#1e2333);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 16px;margin-top:16px;font-size:.8rem;color:var(--muted);line-height:1.7">
+      <div style="font-weight:700;color:#f5c542;margin-bottom:6px">⚠️ 常见问题</div>
+      <div><strong style="color:var(--text)">找不到 AX82U 节点？</strong>确认 AX82U 已恢复出厂，且与 RAX80 在同一楼层，搜索时距离不超过 3 米。</div>
+      <div style="margin-top:4px"><strong style="color:var(--text)">配对后 SSID 消失？</strong>等待约 5 分钟，AX82U 完成固件同步重启后 SSID 恢复正常。</div>
+      <div style="margin-top:4px"><strong style="color:var(--text)">漫游切换慢？</strong>优先启用有线 Backhaul（网线接 AX82U 的 LAN 口），并开启 802.11r（快速 BSS 切换）。梅林固件路径：无线 → 专业设置 → Enable 802.11r。</div>
+      <div style="margin-top:4px"><strong style="color:var(--text)">RAX80 后台入口？</strong>AP 模式后默认访问 <code>http://router.asus.com</code> 或从 R5C DHCP 租约查到 RAX80 的 IP 直接访问。</div>
+    </div>
+  </div>
+
+  <hr>
+
   <!-- TF CARD -->
   <p style="font-size:.875rem;font-weight:600;margin-bottom:.65rem">TF 卡保留与重复使用</p>
   <div class="tf-box">

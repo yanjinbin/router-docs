@@ -168,7 +168,7 @@ th.x86c{background:rgba(79,142,247,.07)}
     <span class="b bg">紧凑全能</span><br>
     <span class="b bb">58×58mm</span><br>
     <span class="b bt">HDMI 2.0</span><br>
-    <span style="font-size:10px;color:var(--text2)">弱电箱必备<br>eMMC+NVMe 双存储</span>
+    <span style="font-size:10px;color:var(--text2)">弱电箱必备<br>M.2 Key-E 仅 WiFi 扩展</span>
   </td>
   <!-- R6S -->
   <td style="min-width:110px">
@@ -179,13 +179,13 @@ th.x86c{background:rgba(79,142,247,.07)}
   </td>
   <!-- R76S -->
   <td style="min-width:110px">
-    <span class="b bp">RK3576 新平台</span><br>
-    <span class="b bg">ARMv9</span><br>
-    <span style="font-size:10px;color:var(--text2)">8nm TSMC 制程<br>2025 新品观望</span>
+    <span class="b bb">RK3576 新平台</span><br>
+    <span class="b ba">ARMv8.0 A72+A53</span><br>
+    <span style="font-size:10px;color:var(--text2)">8nm 制程 非 ARMv9<br>2025 新品观望</span>
   </td>
   <!-- H28K -->
   <td style="min-width:110px">
-    <span class="b bg">¥180 入门价</span><br>
+    <span class="b bg">¥199 入门价</span><br>
     <span class="b bb">Wi-Fi 6 内置</span><br>
     <span style="font-size:10px;color:var(--text2)">超低功耗 ~4W<br>eMMC 稳定启动</span>
   </td>
@@ -252,7 +252,8 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td><span class="b bb">x86-64</span></td><td><span class="b bb">x86-64</span></td>
   <td><span class="b ba">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td>
   <td><span class="b bb">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td>
-  <td><span class="b bp">ARMv9 64</span></td><td><span class="b bp">ARMv9 64</span></td>
+  <td><span class="b bp">ARMv8.2 64</span><br><span style="font-size:10px;color:var(--text3)">RK3588S A76</span></td>
+  <td><span class="b bb">ARMv8.0 64</span><br><span style="font-size:10px;color:var(--text3)">RK3576 A72+A53</span></td>
   <td><span class="b ba">ARMv8 64</span></td><td><span class="b ba">ARMv8 64</span></td>
   <td><span class="b bb">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td><td><span class="b bb">ARMv8 64</span></td>
   <td><span class="b bb">ARMv8 64</span></td>
@@ -294,7 +295,8 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td class="cl">NVMe / SATA</td>
   <td class="good">PCIe 3×4</td><td class="good">PCIe 3×4</td>
   <td class="bad">无</td><td class="bad">无</td><td class="bad">无</td>
-  <td><span class="b bg">M.2 NVMe</span></td><td><span class="b bg">M.2 NVMe</span></td>
+  <td><span class="b bg">M.2 NVMe</span><br><span style="font-size:10px;color:var(--text3)">PCIe3 x2</span></td>
+  <td><span class="b ba">M.2 Key-E</span><br><span style="font-size:10px;color:var(--text3)">WiFi only 无NVMe</span></td>
   <td class="bad">无</td><td class="bad">无</td>
   <td class="bad">无</td><td class="bad">无</td><td class="bad">无</td><td class="bad">无</td><td class="bad">无</td>
   <td><span class="b bt">SATA 2.5"</span></td>
@@ -338,10 +340,11 @@ th.x86c{background:rgba(79,142,247,.07)}
 <tr>
   <td class="cl">USB</td>
   <td>多口独立</td><td>多口独立</td>
-  <td>1×3.0</td><td class="good">2×3.0</td><td class="good">2×3.0</td>
+  <td class="warn">1×2.0<br><span style="font-size:10px">USB3通道被LAN占用</span></td>
   <td class="good">2×3.0</td><td class="good">2×3.0</td>
-  <td class="good">2×3.0</td><td>1×3.2</td>
-  <td>1×3.0</td><td>1×3.0</td><td>1×3.0</td><td>1×3.0<br>2×2.0</td><td>1×2.0</td>
+  <td class="good">2×3.0</td><td class="good">2×3.0</td>
+  <td>1×3.0<br>+1×2.0</td><td>1×3.2</td>
+  <td class="warn">1×2.0</td><td>1×3.0</td><td>1×3.0</td><td>1×3.0<br>2×2.0</td><td>1×2.0</td>
   <td class="good">2×3.0</td>
   <td class="good">2×3.0</td><td>1×3.0</td>
 </tr>
@@ -350,7 +353,8 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td>有</td><td>有</td>
   <td><span class="b br">无</span></td><td><span class="b br">无</span></td><td><span class="b br">无</span></td>
   <td><span class="b bg">2.0</span></td><td><span class="b bg">2.0</span></td>
-  <td><span class="b bg">有</span></td><td><span class="b bg">有</span></td>
+  <td><span class="b bg">2.1</span><br><span style="font-size:10px;color:var(--text3)">8Kp60</span></td>
+  <td><span class="b bg">2.0</span><br><span style="font-size:10px;color:var(--text3)">4Kp60</span></td>
   <td><span class="b br">无</span></td><td><span class="b br">无</span></td>
   <td><span class="b bg">2.0</span></td><td><span class="b bg">2.0</span></td><td><span class="b bg">2.0</span></td>
   <td><span class="b br">无</span></td>
@@ -365,7 +369,7 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td>~10W</td><td>~8W</td>
   <td class="good">~4W</td><td class="good">~4W</td><td>~6W</td><td>~7W</td><td>~7W</td>
   <td>~7W</td>
-  <td class="bad">~15–20W</td><td class="good">~6.5W</td>
+  <td class="bad">~15–20W</td><td class="bad">~18–25W<br><span style="font-size:10px">实测，非官标</span></td>
 </tr>
 <tr>
   <td class="cl">散热</td>
@@ -378,14 +382,14 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td class="warn">主动风扇</td><td>铝壳被动</td>
 </tr>
 <tr>
-  <td class="cl">参考价</td>
-  <td>¥600+</td><td>¥700+</td>
-  <td>¥130</td><td>¥280</td><td>¥350</td>
-  <td>¥380</td><td>¥500</td>
-  <td>¥700+</td><td>¥500+</td>
-  <td class="good">¥180</td><td>¥400+</td><td>¥250</td><td>¥300</td><td>¥600+</td>
-  <td>¥350</td>
-  <td>¥500+</td><td>¥200–300</td>
+  <td class="cl">参考价<br><span style="font-size:10px;color:var(--text2)">2026 各平台</span></td>
+  <td>¥499+<br><span style="font-size:10px;color:var(--text2)">8G/256G整机</span></td><td>¥599+<br><span style="font-size:10px;color:var(--text2)">8G/256G整机</span></td>
+  <td>¥229</td><td>¥299</td><td>¥329</td>
+  <td>¥459</td><td class="good">¥399</td>
+  <td>¥869</td><td class="good">¥297</td>
+  <td class="good">¥199</td><td>¥399</td><td>¥299</td><td>¥379</td><td>¥499</td>
+  <td>¥399</td>
+  <td>¥500+</td><td>¥499</td>
 </tr>
 <tr>
   <td class="cl">定位</td>
@@ -628,7 +632,7 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td class="bad">无</td>
   <td class="bad">无</td>
   <td class="good">M.2 NVMe ✓</td>
-  <td class="good">M.2 NVMe ✓</td>
+  <td class="bad">无 NVMe<br><span style="font-size:10px">M.2 Key-E 仅WiFi</span></td>
   <td class="bad">无</td>
   <td class="bad">无 NVMe<br><span style="font-size:10px">M.2仅SDIO</span></td>
   <td class="bad">无</td>
@@ -831,7 +835,7 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td><span class="b bg">ARMv8 Crypto ✓</span></td>
   <td><span class="b bg">ARMv8 Crypto ✓</span></td>
   <td><span class="b bp">ARMv9 Crypto ✓</span></td>
-  <td><span class="b bp">ARMv9 Crypto ✓</span></td>
+  <td><span class="b bg">ARMv8 Crypto ✓</span><br><span style="font-size:10px;color:var(--text2)">A72 ARMv8.0</span></td>
   <td><span class="b bg">ARMv8 Crypto ✓</span></td>
   <td><span class="b bg">ARMv8 Crypto ✓</span></td>
 </tr>
@@ -855,7 +859,7 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td>ARMv8<br>SHA1/256</td>
   <td>ARMv8<br>SHA1/256</td>
   <td class="good">ARMv9 SHA3 ✓<br>SHA1/256/512</td>
-  <td class="good">ARMv9 SHA3 ✓</td>
+  <td>ARMv8<br>SHA1/256</td>
   <td>ARMv8<br>SHA1/256</td>
   <td>ARMv8<br>SHA1/256</td>
 </tr>
@@ -867,7 +871,7 @@ th.x86c{background:rgba(79,142,247,.07)}
   <td>PMULL ✓</td>
   <td>PMULL ✓</td>
   <td class="good">PMULL ✓<br>+ SVE2</td>
-  <td class="good">PMULL ✓<br>+ SVE2</td>
+  <td>PMULL ✓</td>
   <td>PMULL ✓</td>
   <td>PMULL ✓</td>
 </tr>
@@ -1203,9 +1207,9 @@ th.x86c{background:rgba(79,142,247,.07)}
     <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">💰 极致性价比</div>
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">H28K · R4S · R5S</div>
     <div style="font-size:12px;color:var(--text2);line-height:1.6">
-      <b style="color:#3dd68c">H28K ¥180</b>：入门首选，eMMC 稳定，Wi-Fi 6 备用，纯软路由够用。<br>
-      <b style="color:#3dd68c">R4S ¥280</b>：FriendlyELEC 生态最完整，社区资源最丰富，TF 卡需换 eMMC 扩展板。<br>
-      <b style="color:#3dd68c">R5S ¥380</b>：2.5G 双口 + NVMe，性价比最高的全能机，eMMC 仅 8G 建议加装 NVMe。
+      <b style="color:#3dd68c">H28K ¥199</b>：入门首选，eMMC 稳定，Wi-Fi 6 备用，纯软路由够用。<br>
+      <b style="color:#3dd68c">R4S ¥299</b>：FriendlyELEC 生态最完整，社区资源最丰富，TF 卡需换 eMMC 扩展板。<br>
+      <b style="color:#3dd68c">R5S ¥459</b>：2.5G 双口 + NVMe，性价比最高的全能机，eMMC 仅 8G 建议加装 NVMe。
     </div>
   </div>
 
@@ -1213,9 +1217,9 @@ th.x86c{background:rgba(79,142,247,.07)}
     <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#3dd68c;margin-bottom:8px">✅ 7×24h 代理首选</div>
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">R5C · R4SE · H68K</div>
     <div style="font-size:12px;color:var(--text2);line-height:1.6">
-      <b style="color:#3dd68c">R5C ¥500</b>：32G eMMC + NVMe + 2×2.5G，长期在线零烦恼，<b style="color:var(--text)">首选</b>。<br>
-      <b style="color:#3dd68c">R4SE ¥350</b>：RK3399 老将，驱动最成熟，eMMC 版稳定可靠。<br>
-      <b style="color:#3dd68c">H68K ¥300</b>：4口网卡（2×2.5G+2×GbE）适合多 VLAN/多口场景，HDMI 附送。
+      <b style="color:#3dd68c">R5C ¥399</b>：32G eMMC + 2×2.5G，长期在线零烦恼，<b style="color:var(--text)">首选</b>。M.2 Key-E 只扩 WiFi，无 NVMe。<br>
+      <b style="color:#3dd68c">R4SE ¥329</b>：RK3399 老将，驱动最成熟，eMMC 版稳定可靠。<br>
+      <b style="color:#3dd68c">H68K ¥379</b>：4口网卡（2×2.5G+2×GbE）适合多 VLAN/多口场景，HDMI 附送。
     </div>
   </div>
 
@@ -1223,9 +1227,9 @@ th.x86c{background:rgba(79,142,247,.07)}
     <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#c084fc;margin-bottom:8px">⚡ 高性能 / 大带宽</div>
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">N100 · N150 · R6S</div>
     <div style="font-size:12px;color:var(--text2);line-height:1.6">
-      <b style="color:#c084fc">N100 ¥600+</b>：x86 生态无死角，AES-NI ~2.5 GB/s，QAT 卸载，NVMe + PCIe 扩展，软路由 / NAS / 虚拟机一机搞定。<br>
-      <b style="color:#c084fc">N150 ¥700+</b>：同平台升频版，适合跑 WireGuard 全速 2.5G。<br>
-      <b style="color:#c084fc">R6S ¥700+</b>：ARMv9 A76，加解密最强 ARM，附 HDMI / 8G RAM，预算充裕首选。
+      <b style="color:#c084fc">N100 ¥499+</b>：x86 生态无死角，AES-NI ~2.5 GB/s，QAT 卸载，NVMe + PCIe 扩展，软路由 / NAS / 虚拟机一机搞定。<br>
+      <b style="color:#c084fc">N150 ¥599+</b>：同平台升频版，适合跑 WireGuard 全速 2.5G。<br>
+      <b style="color:#c084fc">R6S ¥869</b>：ARMv8.2 A76，加解密最强 ARM，附 HDMI / 8G RAM，预算充裕首选。
     </div>
   </div>
 
@@ -1233,8 +1237,8 @@ th.x86c{background:rgba(79,142,247,.07)}
     <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#2dd4bf;margin-bottom:8px">🗄 软路由 + NAS 兼顾</div>
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">M68S · R5S · R5C · N100</div>
     <div style="font-size:12px;color:var(--text2);line-height:1.6">
-      <b style="color:#2dd4bf">M68S ¥350</b>：RK3568 + SATA 2.5" 硬盘位，4-8G RAM，适合家用 NAS 兼软路由轻量场景。<br>
-      <b style="color:#2dd4bf">R5S / R5C</b>：M.2 NVMe，跑 OpenWrt + Docker + Samba 不在话下。<br>
+      <b style="color:#2dd4bf">M68S ¥399</b>：RK3568 + SATA 2.5" 硬盘位，4-8G RAM，适合家用 NAS 兼软路由轻量场景。<br>
+      <b style="color:#2dd4bf">R5S ¥459</b>：M.2 NVMe，跑 OpenWrt + Docker + Samba 不在话下。<br>
       <b style="color:#2dd4bf">N100</b>：PCIe 3.0×4 NVMe 直接上 Gen4 SSD，虚拟化/容器最自由。
     </div>
   </div>
