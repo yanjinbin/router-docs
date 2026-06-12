@@ -126,6 +126,7 @@ pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-hei
     <a href="#v2">方案二</a>
     <a href="#detail">差异详解</a>
     <a href="#recommend">选型建议</a>
+    <a href="#arch">架构要点</a>
   </div>
 </nav>
 
@@ -746,6 +747,124 @@ pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-hei
     <div>两套配置均在 ImmortalWrt 25.12.0 + Nikki 插件下验证可用。替换 Nikki 配置编辑器中的内容并重启 Nikki 即可生效。</div>
   </div>
 </div>
+
+<!-- ══ 架构要点 ══ -->
+<div class="section" id="arch">
+  <div class="section-header">
+    <span class="section-title">路由器透明代理架构要点</span>
+    <span class="badge badge-amber">下次配置直接套用</span>
+  </div>
+
+  <div class="alert alert-amber">
+    <span class="alert-icon">⚠️</span>
+    <div>以下四条结论专属于 <strong>路由器 + Nikki TUN + nftables 透明代理</strong> 拓扑，本机代理（macOS/Windows）行为不同，不可混用。</div>
+  </div>
+
+  <!-- 拓扑示意 -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:24px;font-size:12px">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px">网络拓扑</div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="background:rgba(79,142,247,.15);color:var(--accent);padding:3px 10px;border-radius:5px;font-weight:600;white-space:nowrap">LAN 设备</span>
+        <span style="color:var(--text3)">→ nftables 劫持全部流量 →</span>
+        <span style="background:rgba(61,214,140,.12);color:var(--green);padding:3px 10px;border-radius:5px;font-weight:600;white-space:nowrap">Mihomo TUN (nikki)</span>
+      </div>
+      <div style="padding-left:20px;color:var(--text3)">↓ rules 判断</div>
+      <div style="display:flex;align-items:center;gap:8px;padding-left:20px">
+        <span style="background:rgba(192,132,252,.12);color:var(--purple);padding:3px 10px;border-radius:5px;font-weight:600">代理节点</span>
+        <span style="color:var(--text3)">或</span>
+        <span style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:3px 10px;border-radius:5px;font-weight:600">DIRECT</span>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--text2);line-height:1.7">
+      关键：<strong style="color:var(--text)">nftables 兜底劫持所有出站流量</strong>，包括 Mihomo 自己发出的 DNS 查询，所以 Mihomo DNS 的"直连"实际上会再被 nftables 截回，走一遍 rules。
+    </div>
+  </div>
+
+  <!-- 四条结论 -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+
+    <!-- 1 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:16px 18px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:700;background:rgba(79,142,247,.2);color:var(--accent);padding:2px 8px;border-radius:4px">规则 1</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text)">respect-rules 路由器必须 false</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <code style="background:var(--bg3);padding:1px 6px;border-radius:4px">respect-rules: true</code> 意味着 Mihomo 自己发出的 DNS 查询也要先过 rules 才决定走哪个出口。路由器场景下这造成<strong style="color:var(--red)">循环依赖</strong>：rules 匹配域名需要 DNS，但 DNS 查询又在等 rules——死锁。<br>
+        <code style="background:var(--bg3);padding:1px 6px;border-radius:4px">false</code> 时 DNS 直接出网卡，不过 rules，由 nftables 兜底处理，不会死锁。<br>
+        <span style="color:var(--text3)">true 适用场景：macOS/Windows 本机代理，Mihomo 能区分自身 DNS 流量，不存在循环。</span>
+      </div>
+      <div style="margin-top:10px;background:var(--bg3);border-radius:6px;padding:10px 12px;font-size:12px">
+        <table style="width:100%;border-collapse:collapse">
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:4px 8px;color:var(--text3);font-size:11px;font-weight:600">设置</th>
+            <th style="text-align:left;padding:4px 8px;color:var(--text3);font-size:11px;font-weight:600">DNS 查询走规则</th>
+            <th style="text-align:left;padding:4px 8px;color:var(--text3);font-size:11px;font-weight:600">路由器透明代理</th>
+            <th style="text-align:left;padding:4px 8px;color:var(--text3);font-size:11px;font-weight:600">本机代理</th>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:5px 8px;font-family:var(--mono);color:var(--accent)">false</td>
+            <td style="padding:5px 8px;color:var(--text2)">❌ 直连（nftables 兜底）</td>
+            <td style="padding:5px 8px;color:var(--green)">✅ 必须用</td>
+            <td style="padding:5px 8px;color:var(--text2)">可用</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px;font-family:var(--mono);color:var(--red)">true</td>
+            <td style="padding:5px 8px;color:var(--text2)">✅ 过 rules</td>
+            <td style="padding:5px 8px;color:var(--red)">❌ 死锁</td>
+            <td style="padding:5px 8px;color:var(--green)">✅ 更精确</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:8px;padding:16px 18px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:700;background:rgba(61,214,140,.15);color:var(--green);padding:2px 8px;border-radius:4px">规则 2</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text)">8.8.8.8 DoH 天然走代理，不怕被封</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <code style="background:var(--bg3);padding:1px 6px;border-radius:4px">respect-rules: false</code> 下，Mihomo DNS 模块发出的 DoH 请求"直连"出网卡，但 <strong style="color:var(--text)">nftables 会把它劫持回 Mihomo</strong>，再走一遍 rules。<br>
+        <code style="background:var(--bg3);padding:1px 6px;border-radius:4px">8.8.8.8</code> 命中 GEOIP,US → 走代理出去。实际路径：
+      </div>
+      <div style="margin-top:10px;font-family:var(--mono);font-size:11.5px;background:var(--bg3);border-radius:6px;padding:10px 14px;color:var(--text2);line-height:1.9">
+        Mihomo DNS → <span style="color:var(--accent)">直连出网卡</span> → <span style="color:var(--amber)">nftables 劫持</span> → <span style="color:var(--green)">回 Mihomo rules</span> → <span style="color:var(--purple)">代理节点</span> → 8.8.8.8
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text2);line-height:1.7">
+        因此 <code style="background:var(--bg3);padding:1px 6px;border-radius:4px">https://8.8.8.8/dns-query</code> 实际从代理隧道发出，国内运营商看不到，不存在被封问题。<code>#RULES</code> 只是 Mihomo 本地标签，不出现在网络请求里。
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:8px;padding:16px 18px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:700;background:rgba(245,166,35,.12);color:var(--amber);padding:2px 8px;border-radius:4px">规则 3</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text)">nameserver-policy 分流：cn/private 国内，gfw 代理 DoH</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        分流 key 用 <code style="background:var(--bg3);padding:1px 6px;border-radius:4px">"geosite:gfw"</code>，<strong style="color:var(--red)">不加 tld-!cn</strong>。<br>
+        加了 tld-!cn 会把所有境外 TLD（.io/.dev/.app 等）都打进代理 DoH，覆盖范围过大，可能导致部分合规境外域名解析绕路。<br>
+        geosite:gfw 列表本身已覆盖主流被墙域名，配合 sniffer 兜底，足够用。
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:8px;padding:16px 18px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:700;background:rgba(192,132,252,.12);color:var(--purple);padding:2px 8px;border-radius:4px">规则 4</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text)">proxy-server-nameserver 用 DoH，防节点域名污染</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <code style="background:var(--bg3);padding:1px 6px;border-radius:4px">proxy-server-nameserver</code> 专门用来解析代理节点的域名（如 <code>hk4.example.com</code>）。<br>
+        必须用 DoH 或可信 DNS（<code>223.5.5.5</code> + <code>https://sh.dns44.cn:44443/dns-query</code>），否则节点域名被运营商 DNS 污染，代理连接全部失败。<br>
+        <span style="color:var(--text3)">这是代理能不能建立连接的前提，优先级高于其他 DNS 配置。</span>
+      </div>
+    </div>
+
+  </div><!-- /四条结论 -->
+</div><!-- /架构要点 -->
 
 </div><!-- /wrap -->
 
