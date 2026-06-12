@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikki DNS 分流配置 · ImmortalWrt R5C 25.12.0</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:#4f8ef7;border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px}
+.nav-brand span{color:var(--accent)}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);border-bottom-color:var(--accent)}
+
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px 80px}
+
+.hero{padding:48px 0 32px}
+.hero-tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(20px,3.5vw,30px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:13px;color:var(--text2);max-width:660px;line-height:1.7}
+
+.alert{display:flex;gap:10px;align-items:flex-start;padding:.9rem 1.1rem;border-radius:8px;font-size:12px;line-height:1.6;margin:0 0 24px}
+.alert-blue{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.25)}
+.alert-amber{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25)}
+.alert-green{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.25)}
+.alert-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+
+.section{margin-bottom:40px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:15px;font-weight:600}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;margin-left:6px;vertical-align:middle}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+.badge-amber{background:rgba(245,166,35,.12);color:var(--amber)}
+.badge-purple{background:rgba(192,132,252,.12);color:var(--purple)}
+
+/* 对比卡片 */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+@media(max-width:700px){.compare-grid{grid-template-columns:1fr}}
+.cmp-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px}
+.cmp-card.v1{border-top:3px solid var(--accent)}
+.cmp-card.v2{border-top:3px solid var(--green)}
+.cmp-title{font-size:13px;font-weight:700;margin-bottom:6px}
+.cmp-sub{font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6}
+.diff-row{display:flex;flex-direction:column;gap:4px;font-size:12px;margin-bottom:8px}
+.diff-label{color:var(--text3);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.diff-val{background:var(--bg3);border-radius:5px;padding:4px 8px;font-family:var(--mono);font-size:11.5px;color:var(--text);word-break:break-all}
+
+/* 代码块 */
+.code-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.code-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--text2);text-transform:uppercase}
+.ver-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-left:8px}
+.ver-tag.v1{background:rgba(79,142,247,.2);color:var(--accent)}
+.ver-tag.v2{background:rgba(61,214,140,.15);color:var(--green)}
+.copy-btn{font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:color .15s,border-color .15s}
+.copy-btn:hover{color:var(--text);border-color:var(--accent)}
+.copy-btn.copied{color:var(--green);border-color:var(--green)}
+pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.65;color:var(--text)}
+
+/* syntax */
+.ck{color:#79b8ff}
+.cv{color:#9ecbff}
+.cn{color:#f8c555}
+.cb{color:#56d364}
+.cc{color:#5f6680;font-style:italic}
+.cs{color:#f97583}
+.cg{color:var(--green)}
+.cdiff{background:rgba(61,214,140,.12);border-left:3px solid var(--green);margin-left:-16px;padding-left:13px;display:block}
+.cdiff-v1{background:rgba(79,142,247,.10);border-left:3px solid var(--accent);margin-left:-16px;padding-left:13px;display:block}
+
+/* 要点列表 */
+.point-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.point-list li{display:flex;gap:10px;font-size:13px;line-height:1.6}
+.point-list li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:7px;flex-shrink:0}
+.point-list li.green::before{background:var(--green)}
+.point-list li.amber::before{background:var(--amber)}
+
+/* 场景推荐 */
+.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+@media(max-width:600px){.rec-grid{grid-template-columns:1fr}}
+.rec-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.rec-card h4{font-size:12px;font-weight:700;margin-bottom:6px}
+.rec-card p{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* 流程图 */
+.flow{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:24px;font-size:12px}
+.flow-title{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.flow-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.flow-node{padding:4px 10px;border-radius:5px;font-weight:600;white-space:nowrap}
+.fn-q{background:rgba(79,142,247,.15);color:var(--accent)}
+.fn-cn{background:rgba(61,214,140,.12);color:var(--green)}
+.fn-gfw{background:rgba(240,96,96,.12);color:var(--red)}
+.fn-unk{background:rgba(245,166,35,.1);color:var(--amber)}
+.fn-dns{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.flow-arrow{color:var(--text3);font-size:13px}
+.flow-note{font-size:11px;color:var(--text3);margin-left:4px}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-home" href="/">← 首页</a>
+  <span class="nav-brand">ImmortalWrt R5C · <span>Nikki DNS 分流</span></span>
+  <div class="nav-links">
+    <a href="#compare">方案对比</a>
+    <a href="#v1">方案一完整配置</a>
+    <a href="#v2">方案二完整配置</a>
+    <a href="#detail">关键差异详解</a>
+    <a href="#recommend">场景推荐</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-tag">ImmortalWrt · R5C · 25.12.0 · Nikki</div>
+  <h1>Nikki / Mihomo 透明代理<br>DNS 分流：两种策略对比</h1>
+  <p>基于 fake-ip 增强模式，国内域名走真实 IP + 国内 DoH，两种方案的区别集中在 GFW 域名策略与兜底 nameserver 配置。</p>
+</div>
+
+<!-- 环境说明 -->
+<div class="alert alert-blue">
+  <span class="alert-icon">ℹ️</span>
+  <div>
+    <strong>运行环境</strong> · ImmortalWrt 25.12.0 · NanoPi R5C · Nikki（Mihomo 内核）· TUN stack=mixed · nftables 透明代理 · fake-ip 198.18.0.1/16
+  </div>
+</div>
+
+<!-- ── 方案对比 ── -->
+<div class="section" id="compare">
+  <div class="section-header">
+    <span class="section-title">方案对比总览</span>
+    <span class="badge badge-blue">核心差异</span>
+  </div>
+
+  <div class="compare-grid">
+    <div class="cmp-card v1">
+      <div class="cmp-title">方案一 · 保守兜底</div>
+      <div class="cmp-sub">GFW 域名走代理 DoH；nameserver 保留国外兜底（1.1.1.1），未命中策略的域名由国内 + 国外 DoH 共同解析</div>
+      <div class="diff-row">
+        <span class="diff-label">GFW nameserver-policy key</span>
+        <span class="diff-val">"geosite:gfw"</span>
+      </div>
+      <div class="diff-row">
+        <span class="diff-label">nameserver（兜底）</span>
+        <span class="diff-val">223.5.5.5 / doh.pub / 1.1.1.1</span>
+      </div>
+      <div class="diff-row">
+        <span class="diff-label">适合场景</span>
+        <span class="diff-val">希望境外未知域名也能正常解析；可接受少量境外 DNS 请求</span>
+      </div>
+    </div>
+    <div class="cmp-card v2">
+      <div class="cmp-title">方案二 · 纯国内兜底</div>
+      <div class="cmp-sub">GFW + 非中国顶级域均走代理 DoH；nameserver 仅国内 DoH，未命中策略的域名全走国内解析</div>
+      <div class="diff-row">
+        <span class="diff-label">GFW nameserver-policy key</span>
+        <span class="diff-val">"geosite:gfw,tld-!cn"</span>
+      </div>
+      <div class="diff-row">
+        <span class="diff-label">nameserver（兜底）</span>
+        <span class="diff-val">223.5.5.5 / doh.pub（纯国内）</span>
+      </div>
+      <div class="diff-row">
+        <span class="diff-label">适合场景</span>
+        <span class="diff-val">全力走代理解析境外域名；对隐私要求高，不希望直连境外 DNS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DNS 解析流程 -->
+  <div class="flow">
+    <div class="flow-title">方案一 · 解析流程</div>
+    <div class="flow-row">
+      <span class="flow-node fn-q">DNS 查询</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-cn">geosite:cn / private</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-dns">223.5.5.5 / doh.pub</span>
+      <span class="flow-note">真实 IP，直连 CDN 最优</span>
+    </div>
+    <div class="flow-row">
+      <span class="flow-node fn-q">DNS 查询</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-gfw">geosite:gfw</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-dns">8.8.8.8#RULES + ECS / 1.1.1.1</span>
+      <span class="flow-note">经代理解析，ECS 返回大陆友好 IP</span>
+    </div>
+    <div class="flow-row">
+      <span class="flow-node fn-q">DNS 查询</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-unk">其余域名</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-dns">223.5.5.5 / doh.pub / 1.1.1.1（兜底）</span>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-title">方案二 · 解析流程</div>
+    <div class="flow-row">
+      <span class="flow-node fn-q">DNS 查询</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-cn">geosite:cn / private</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-dns">223.5.5.5 / doh.pub</span>
+      <span class="flow-note">真实 IP，直连 CDN 最优</span>
+    </div>
+    <div class="flow-row">
+      <span class="flow-node fn-q">DNS 查询</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-gfw">geosite:gfw + tld-!cn</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-dns">8.8.8.8#RULES + ECS / 1.1.1.1</span>
+      <span class="flow-note">覆盖更广，所有境外顶级域均走代理</span>
+    </div>
+    <div class="flow-row">
+      <span class="flow-node fn-q">DNS 查询</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-unk">其余域名</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node fn-dns">223.5.5.5 / doh.pub（纯国内兜底）</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 方案一完整配置 ── -->
+<div class="section" id="v1">
+  <div class="section-header">
+    <span class="section-title">方案一 · 完整配置</span>
+    <span class="badge badge-blue">geosite:gfw + 国外兜底</span>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">mihomo config.yaml <span class="ver-tag v1">方案一</span></span>
+      <button class="copy-btn" onclick="copyBlock(this,'code-v1')">复制</button>
+    </div>
+    <pre id="code-v1"><span class="cc"># ================================================================</span>
+<span class="cc"># OpenWrt Nikki/Mihomo 透明代理 — DNS 全国内策略(fake-ip 域名透传)</span>
+<span class="cc"># 方案一：GFW 策略 key = geosite:gfw，nameserver 保留 1.1.1.1 兜底</span>
+<span class="cc"># ================================================================</span>
+
+<span class="ck">mixed-port</span>: <span class="cn">7890</span>
+<span class="ck">allow-lan</span>: <span class="cb">true</span>
+<span class="ck">bind-address</span>: <span class="cv">"*"</span>
+<span class="ck">mode</span>: <span class="cv">rule</span>
+<span class="ck">log-level</span>: <span class="cv">warning</span>
+
+<span class="ck">geodata-mode</span>: <span class="cb">true</span>
+<span class="ck">geo-auto-update</span>: <span class="cb">true</span>
+<span class="ck">geo-update-interval</span>: <span class="cn">72</span>
+<span class="ck">geox-url</span>:
+  <span class="ck">geoip</span>: <span class="cv">https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat</span>
+  <span class="ck">geosite</span>: <span class="cv">https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat</span>
+  <span class="ck">mmdb</span>: <span class="cv">https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb</span>
+
+<span class="ck">global-client-fingerprint</span>: <span class="cv">chrome</span>
+<span class="ck">tcp-concurrent</span>: <span class="cb">true</span>
+<span class="ck">unified-delay</span>: <span class="cb">true</span>
+<span class="ck">udp-timeout</span>: <span class="cn">300</span>
+<span class="ck">keep-alive-idle</span>: <span class="cn">600</span>
+<span class="ck">keep-alive-interval</span>: <span class="cn">15</span>
+
+<span class="ck">ipv6</span>: <span class="cb">false</span>
+<span class="ck">prefer-h3</span>: <span class="cb">false</span>
+
+<span class="ck">profile</span>:
+  <span class="ck">store-selected</span>: <span class="cb">true</span>
+  <span class="ck">store-fake-ip</span>: <span class="cb">true</span>
+
+<span class="cc"># ── TUN ─────────────────────────────────────────────────────────</span>
+<span class="ck">tun</span>:
+  <span class="ck">enable</span>: <span class="cb">true</span>
+  <span class="ck">stack</span>: <span class="cv">mixed</span>
+  <span class="ck">device</span>: <span class="cv">nikki</span>
+  <span class="ck">auto-route</span>: <span class="cb">false</span>
+  <span class="ck">auto-redirect</span>: <span class="cb">false</span>
+  <span class="ck">auto-detect-interface</span>: <span class="cb">false</span>
+  <span class="ck">dns-hijack</span>:
+    - <span class="cv">any:53</span>
+    - <span class="cv">tcp://any:53</span>
+
+<span class="cc"># ── 外部控制 ─────────────────────────────────────────────────────</span>
+<span class="ck">external-controller</span>: <span class="cv">:9090</span>
+<span class="ck">external-controller-cors</span>:
+  <span class="ck">allow-origins</span>:
+    - <span class="cv">"*"</span>
+  <span class="ck">allow-private-network</span>: <span class="cb">true</span>
+<span class="ck">secret</span>: <span class="cv">""</span>
+<span class="ck">external-ui</span>: <span class="cv">./ui</span>
+<span class="ck">external-ui-name</span>: <span class="cv">zashboard</span>
+<span class="ck">external-ui-url</span>: <span class="cv">"https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip"</span>
+
+<span class="cc"># ── DNS ──────────────────────────────────────────────────────────</span>
+<span class="ck">dns</span>:
+  <span class="ck">enable</span>: <span class="cb">true</span>
+  <span class="ck">cache-algorithm</span>: <span class="cv">arc</span>
+  <span class="ck">ipv6</span>: <span class="cb">false</span>
+  <span class="ck">listen</span>: <span class="cv">0.0.0.0:1053</span>
+  <span class="ck">enhanced-mode</span>: <span class="cv">fake-ip</span>
+  <span class="ck">fake-ip-range</span>: <span class="cv">198.18.0.1/16</span>
+  <span class="ck">use-hosts</span>: <span class="cb">true</span>
+  <span class="ck">respect-rules</span>: <span class="cb">false</span>
+  <span class="ck">default-nameserver</span>:
+    - <span class="cv">223.5.5.5</span>
+    - <span class="cv">119.29.29.29</span>
+
+  <span class="ck">nameserver-policy</span>:
+    <span class="cc"># 国内域名 → 国内 DoH，返回最优 CDN IP</span>
+    <span class="cv">"geosite:cn,private"</span>:
+      - <span class="cv">https://223.5.5.5/dns-query</span>
+      - <span class="cv">https://doh.pub/dns-query</span>
+<span class="cdiff-v1">    <span class="cc"># 方案一：仅 gfw 列表走代理 DoH</span>
+    <span class="cv">"geosite:gfw"</span>:
+      - <span class="cv">https://8.8.8.8/dns-query#RULES&amp;ecs=223.5.5.0/24</span>
+      - <span class="cv">https://1.1.1.1/dns-query</span></span>
+
+  <span class="ck">nameserver</span>:
+    <span class="cc"># 兜底：未命中 policy 的域名（含国外兜底）</span>
+    - <span class="cv">https://223.5.5.5/dns-query</span>
+    - <span class="cv">https://doh.pub/dns-query</span>
+<span class="cdiff-v1">    - <span class="cv">https://1.1.1.1/dns-query</span>       <span class="cc"># 方案一保留：境外未知域名兜底</span></span>
+
+  <span class="ck">proxy-server-nameserver</span>:
+    - <span class="cv">223.5.5.5</span>
+    - <span class="cv">https://sh.dns44.cn:44443/dns-query</span>
+
+  <span class="ck">fake-ip-filter</span>:
+    <span class="cc"># 国内域名整体走真实 IP</span>
+    - <span class="cv">'geosite:cn'</span>
+    <span class="cc"># 本地 / 私有</span>
+    - <span class="cv">'*.lan'</span>
+    - <span class="cv">'*.local'</span>
+    - <span class="cv">'*.localhost'</span>
+    - <span class="cv">'*.localdomain'</span>
+    - <span class="cv">'*.internal'</span>
+    - <span class="cv">'*.home.arpa'</span>
+    - <span class="cv">'*.invalid'</span>
+    - <span class="cv">'*.test'</span>
+    - <span class="cv">'*.example'</span>
+    <span class="cc"># 连通性检测</span>
+    - <span class="cv">'*.msftconnecttest.com'</span>
+    - <span class="cv">'*.msftncsi.com'</span>
+    - <span class="cv">'connect.rom.miui.com'</span>
+    - <span class="cv">'cp.cloudflare.com'</span>
+    - <span class="cv">'captive.apple.com'</span>
+    - <span class="cv">'connectivitycheck.gstatic.com'</span>
+    - <span class="cv">'connectivitycheck.android.com'</span>
+    <span class="cc"># NTP</span>
+    - <span class="cv">'+.pool.ntp.org'</span>
+    - <span class="cv">'time.*.com'</span>
+    - <span class="cv">'time.*.gov'</span>
+    - <span class="cv">'time.*.apple.com'</span>
+    - <span class="cv">'time1.*.com'</span>
+    - <span class="cv">'time2.*.com'</span>
+    - <span class="cv">'time3.*.com'</span>
+    - <span class="cv">'ntp.*.com'</span>
+    - <span class="cv">'ntp1.*.com'</span>
+    - <span class="cv">'ntp2.*.com'</span>
+    - <span class="cv">'ntp3.*.com'</span>
+    - <span class="cv">'*.time.edu.cn'</span>
+    - <span class="cv">'*.ntp.org.cn'</span>
+    - <span class="cv">'ntp.tencent.com'</span>
+    - <span class="cv">'ntp*.tencent.com'</span>
+    <span class="cc"># STUN / WebRTC</span>
+    - <span class="cv">'+.stun.*.*'</span>
+    - <span class="cv">'stun.*.*'</span>
+    <span class="cc"># Tailscale</span>
+    - <span class="cv">'*.ts.net'</span>
+    - <span class="cv">'*.tailscale.com'</span>
+    - <span class="cv">'*.tailscale.io'</span>
+    - <span class="cv">'100.100.100.100'</span>
+
+<span class="ck">sniffer</span>:
+  <span class="ck">enable</span>: <span class="cb">true</span>
+  <span class="ck">force-dns-mapping</span>: <span class="cb">true</span>
+  <span class="ck">parse-pure-ip</span>: <span class="cb">true</span>
+  <span class="ck">override-destination</span>: <span class="cb">true</span>
+  <span class="ck">sniff</span>:
+    <span class="ck">TLS</span>:
+      <span class="ck">ports</span>: [<span class="cn">443</span>, <span class="cn">8443</span>]
+    <span class="ck">HTTP</span>:
+      <span class="ck">ports</span>: [<span class="cn">80</span>, <span class="cn">8080</span>]
+      <span class="ck">override-destination</span>: <span class="cb">true</span>
+  <span class="ck">skip-dst-address</span>:
+    - <span class="cv">192.168.0.0/16</span>
+    - <span class="cv">10.0.0.0/8</span>
+    - <span class="cv">172.16.0.0/12</span>
+    - <span class="cv">149.154.160.0/20</span>
+    - <span class="cv">91.108.4.0/22</span>
+    - <span class="cv">91.108.56.0/22</span>
+  <span class="ck">force-domain</span>:
+    - <span class="cv">'+.v2ex.com'</span>
+  <span class="ck">skip-domain</span>:
+    - <span class="cv">'Mijia Cloud'</span>
+    - <span class="cv">'+.mi.com'</span>
+    - <span class="cv">'+.xiaomi.com'</span>
+    - <span class="cv">'+.mijia.com'</span>
+    - <span class="cv">'+.apple.com'</span>
+    - <span class="cv">'+.push.apple.com'</span>
+    - <span class="cv">'+.icloud.com'</span>
+    - <span class="cv">'+.mzstatic.com'</span>
+    - <span class="cv">'+.local'</span>
+    - <span class="cv">'*.lan'</span>
+    - <span class="cv">'*.localdomain'</span>
+    - <span class="cv">'*.home.arpa'</span>
+    - <span class="cv">'msftconnecttest.com'</span>
+    - <span class="cv">'*.msftncsi.com'</span>
+    - <span class="cv">'cp.cloudflare.com'</span>
+    - <span class="cv">'captive.apple.com'</span>
+    - <span class="cv">'connect.rom.miui.com'</span>
+    - <span class="cv">'time.*.com'</span>
+    - <span class="cv">'+.ntp.org'</span>
+    - <span class="cv">'+.pool.ntp.org'</span>
+    - <span class="cv">'+.weixin.qq.com'</span>
+    - <span class="cv">'+.wx.qq.com'</span>
+    - <span class="cv">'+.wechat.com'</span>
+    - <span class="cv">'+.qq.com'</span>
+    - <span class="cv">'+.tencent.com'</span>
+    - <span class="cv">'+.qpic.cn'</span>
+    - <span class="cv">'+.qlogo.cn'</span>
+    - <span class="cv">'stun.*.*'</span>
+    - <span class="cv">'+.stun.*.*'</span>
+    - <span class="cv">'*.ts.net'</span>
+    - <span class="cv">'*.tailscale.com'</span>
+    - <span class="cv">'*.tailscale.io'</span>
+    - <span class="cv">'100.100.100.100'</span>
+    - <span class="cv">'time.*.gov'</span>
+    - <span class="cv">'*.ntp.org'</span>
+    - <span class="cv">'pool.ntp.org'</span></pre>
+  </div>
+</div>
+
+<!-- ── 方案二完整配置 ── -->
+<div class="section" id="v2">
+  <div class="section-header">
+    <span class="section-title">方案二 · 完整配置</span>
+    <span class="badge badge-green">geosite:gfw,tld-!cn + 纯国内兜底</span>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">mihomo config.yaml <span class="ver-tag v2">方案二</span></span>
+      <button class="copy-btn" onclick="copyBlock(this,'code-v2')">复制</button>
+    </div>
+    <pre id="code-v2"><span class="cc"># ================================================================</span>
+<span class="cc"># OpenWrt Nikki/Mihomo 透明代理 — DNS 全国内策略(fake-ip 域名透传)</span>
+<span class="cc"># 方案二：GFW 策略 key = geosite:gfw,tld-!cn，nameserver 纯国内兜底</span>
+<span class="cc"># ================================================================</span>
+
+<span class="ck">mixed-port</span>: <span class="cn">7890</span>
+<span class="ck">allow-lan</span>: <span class="cb">true</span>
+<span class="ck">bind-address</span>: <span class="cv">"*"</span>
+<span class="ck">mode</span>: <span class="cv">rule</span>
+<span class="ck">log-level</span>: <span class="cv">warning</span>
+
+<span class="ck">geodata-mode</span>: <span class="cb">true</span>
+<span class="ck">geo-auto-update</span>: <span class="cb">true</span>
+<span class="ck">geo-update-interval</span>: <span class="cn">72</span>
+<span class="ck">geox-url</span>:
+  <span class="ck">geoip</span>: <span class="cv">https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat</span>
+  <span class="ck">geosite</span>: <span class="cv">https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat</span>
+  <span class="ck">mmdb</span>: <span class="cv">https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb</span>
+
+<span class="ck">global-client-fingerprint</span>: <span class="cv">chrome</span>
+<span class="ck">tcp-concurrent</span>: <span class="cb">true</span>
+<span class="ck">unified-delay</span>: <span class="cb">true</span>
+<span class="ck">udp-timeout</span>: <span class="cn">300</span>
+<span class="ck">keep-alive-idle</span>: <span class="cn">600</span>
+<span class="ck">keep-alive-interval</span>: <span class="cn">15</span>
+
+<span class="ck">ipv6</span>: <span class="cb">false</span>
+<span class="ck">prefer-h3</span>: <span class="cb">false</span>
+
+<span class="ck">profile</span>:
+  <span class="ck">store-selected</span>: <span class="cb">true</span>
+  <span class="ck">store-fake-ip</span>: <span class="cb">true</span>
+
+<span class="cc"># ── TUN ─────────────────────────────────────────────────────────</span>
+<span class="ck">tun</span>:
+  <span class="ck">enable</span>: <span class="cb">true</span>
+  <span class="ck">stack</span>: <span class="cv">mixed</span>
+  <span class="ck">device</span>: <span class="cv">nikki</span>
+  <span class="ck">auto-route</span>: <span class="cb">false</span>
+  <span class="ck">auto-redirect</span>: <span class="cb">false</span>
+  <span class="ck">auto-detect-interface</span>: <span class="cb">false</span>
+  <span class="ck">dns-hijack</span>:
+    - <span class="cv">any:53</span>
+    - <span class="cv">tcp://any:53</span>
+
+<span class="cc"># ── 外部控制 ─────────────────────────────────────────────────────</span>
+<span class="ck">external-controller</span>: <span class="cv">:9090</span>
+<span class="ck">external-controller-cors</span>:
+  <span class="ck">allow-origins</span>:
+    - <span class="cv">"*"</span>
+  <span class="ck">allow-private-network</span>: <span class="cb">true</span>
+<span class="ck">secret</span>: <span class="cv">""</span>
+<span class="ck">external-ui</span>: <span class="cv">./ui</span>
+<span class="ck">external-ui-name</span>: <span class="cv">zashboard</span>
+<span class="ck">external-ui-url</span>: <span class="cv">"https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip"</span>
+
+<span class="cc"># ── DNS ──────────────────────────────────────────────────────────</span>
+<span class="ck">dns</span>:
+  <span class="ck">enable</span>: <span class="cb">true</span>
+  <span class="ck">cache-algorithm</span>: <span class="cv">arc</span>
+  <span class="ck">ipv6</span>: <span class="cb">false</span>
+  <span class="ck">listen</span>: <span class="cv">0.0.0.0:1053</span>
+  <span class="ck">enhanced-mode</span>: <span class="cv">fake-ip</span>
+  <span class="ck">fake-ip-range</span>: <span class="cv">198.18.0.1/16</span>
+  <span class="ck">use-hosts</span>: <span class="cb">true</span>
+  <span class="ck">respect-rules</span>: <span class="cb">false</span>
+  <span class="ck">default-nameserver</span>:
+    - <span class="cv">223.5.5.5</span>
+    - <span class="cv">119.29.29.29</span>
+
+  <span class="ck">nameserver-policy</span>:
+    <span class="cc"># 国内域名 → 国内 DoH，返回最优 CDN IP</span>
+    <span class="cv">"geosite:cn,private"</span>:
+      - <span class="cv">https://223.5.5.5/dns-query</span>
+      - <span class="cv">https://doh.pub/dns-query</span>
+<span class="cdiff">    <span class="cc"># 方案二：gfw + 所有非中国顶级域均走代理 DoH</span>
+    <span class="cv">"geosite:gfw,tld-!cn"</span>:
+      - <span class="cv">https://8.8.8.8/dns-query#RULES&amp;ecs=223.5.5.0/24</span>
+      - <span class="cv">https://1.1.1.1/dns-query</span></span>
+
+  <span class="ck">nameserver</span>:
+    <span class="cc"># 兜底：纯国内，不保留境外 DNS</span>
+    - <span class="cv">https://223.5.5.5/dns-query</span>
+<span class="cdiff">    - <span class="cv">https://doh.pub/dns-query</span>            <span class="cc"># 方案二仅国内兜底，无 1.1.1.1</span></span>
+
+  <span class="ck">proxy-server-nameserver</span>:
+    - <span class="cv">223.5.5.5</span>
+    - <span class="cv">https://sh.dns44.cn:44443/dns-query</span>
+
+  <span class="ck">fake-ip-filter</span>:
+    <span class="cc"># 国内域名整体走真实 IP</span>
+    - <span class="cv">'geosite:cn'</span>
+    <span class="cc"># 本地 / 私有</span>
+    - <span class="cv">'*.lan'</span>
+    - <span class="cv">'*.local'</span>
+    - <span class="cv">'*.localhost'</span>
+    - <span class="cv">'*.localdomain'</span>
+    - <span class="cv">'*.internal'</span>
+    - <span class="cv">'*.home.arpa'</span>
+    - <span class="cv">'*.invalid'</span>
+    - <span class="cv">'*.test'</span>
+    - <span class="cv">'*.example'</span>
+    <span class="cc"># 连通性检测</span>
+    - <span class="cv">'*.msftconnecttest.com'</span>
+    - <span class="cv">'*.msftncsi.com'</span>
+    - <span class="cv">'connect.rom.miui.com'</span>
+    - <span class="cv">'cp.cloudflare.com'</span>
+    - <span class="cv">'captive.apple.com'</span>
+    - <span class="cv">'connectivitycheck.gstatic.com'</span>
+    - <span class="cv">'connectivitycheck.android.com'</span>
+    <span class="cc"># NTP</span>
+    - <span class="cv">'+.pool.ntp.org'</span>
+    - <span class="cv">'time.*.com'</span>
+    - <span class="cv">'time.*.gov'</span>
+    - <span class="cv">'time.*.apple.com'</span>
+    - <span class="cv">'time1.*.com'</span>
+    - <span class="cv">'time2.*.com'</span>
+    - <span class="cv">'time3.*.com'</span>
+    - <span class="cv">'ntp.*.com'</span>
+    - <span class="cv">'ntp1.*.com'</span>
+    - <span class="cv">'ntp2.*.com'</span>
+    - <span class="cv">'ntp3.*.com'</span>
+    - <span class="cv">'*.time.edu.cn'</span>
+    - <span class="cv">'*.ntp.org.cn'</span>
+    - <span class="cv">'ntp.tencent.com'</span>
+    - <span class="cv">'ntp*.tencent.com'</span>
+    <span class="cc"># STUN / WebRTC</span>
+    - <span class="cv">'+.stun.*.*'</span>
+    - <span class="cv">'stun.*.*'</span>
+    <span class="cc"># Tailscale</span>
+    - <span class="cv">'*.ts.net'</span>
+    - <span class="cv">'*.tailscale.com'</span>
+    - <span class="cv">'*.tailscale.io'</span>
+    - <span class="cv">'100.100.100.100'</span>
+
+<span class="ck">sniffer</span>:
+  <span class="ck">enable</span>: <span class="cb">true</span>
+  <span class="ck">force-dns-mapping</span>: <span class="cb">true</span>
+  <span class="ck">parse-pure-ip</span>: <span class="cb">true</span>
+  <span class="ck">override-destination</span>: <span class="cb">true</span>
+  <span class="ck">sniff</span>:
+    <span class="ck">TLS</span>:
+      <span class="ck">ports</span>: [<span class="cn">443</span>, <span class="cn">8443</span>]
+    <span class="ck">HTTP</span>:
+      <span class="ck">ports</span>: [<span class="cn">80</span>, <span class="cn">8080</span>]
+      <span class="ck">override-destination</span>: <span class="cb">true</span>
+  <span class="ck">skip-dst-address</span>:
+    - <span class="cv">192.168.0.0/16</span>
+    - <span class="cv">10.0.0.0/8</span>
+    - <span class="cv">172.16.0.0/12</span>
+    - <span class="cv">149.154.160.0/20</span>
+    - <span class="cv">91.108.4.0/22</span>
+    - <span class="cv">91.108.56.0/22</span>
+  <span class="ck">force-domain</span>:
+    - <span class="cv">'+.v2ex.com'</span>
+  <span class="ck">skip-domain</span>:
+    - <span class="cv">'Mijia Cloud'</span>
+    - <span class="cv">'+.mi.com'</span>
+    - <span class="cv">'+.xiaomi.com'</span>
+    - <span class="cv">'+.mijia.com'</span>
+    - <span class="cv">'+.apple.com'</span>
+    - <span class="cv">'+.push.apple.com'</span>
+    - <span class="cv">'+.icloud.com'</span>
+    - <span class="cv">'+.mzstatic.com'</span>
+    - <span class="cv">'+.local'</span>
+    - <span class="cv">'*.lan'</span>
+    - <span class="cv">'*.localdomain'</span>
+    - <span class="cv">'*.home.arpa'</span>
+    - <span class="cv">'msftconnecttest.com'</span>
+    - <span class="cv">'*.msftncsi.com'</span>
+    - <span class="cv">'cp.cloudflare.com'</span>
+    - <span class="cv">'captive.apple.com'</span>
+    - <span class="cv">'connect.rom.miui.com'</span>
+    - <span class="cv">'time.*.com'</span>
+    - <span class="cv">'+.ntp.org'</span>
+    - <span class="cv">'+.pool.ntp.org'</span>
+    - <span class="cv">'+.weixin.qq.com'</span>
+    - <span class="cv">'+.wx.qq.com'</span>
+    - <span class="cv">'+.wechat.com'</span>
+    - <span class="cv">'+.qq.com'</span>
+    - <span class="cv">'+.tencent.com'</span>
+    - <span class="cv">'+.qpic.cn'</span>
+    - <span class="cv">'+.qlogo.cn'</span>
+    - <span class="cv">'stun.*.*'</span>
+    - <span class="cv">'+.stun.*.*'</span>
+    - <span class="cv">'*.ts.net'</span>
+    - <span class="cv">'*.tailscale.com'</span>
+    - <span class="cv">'*.tailscale.io'</span>
+    - <span class="cv">'100.100.100.100'</span>
+    - <span class="cv">'time.*.gov'</span>
+    - <span class="cv">'*.ntp.org'</span>
+    - <span class="cv">'pool.ntp.org'</span></pre>
+  </div>
+</div>
+
+<!-- ── 关键差异详解 ── -->
+<div class="section" id="detail">
+  <div class="section-header">
+    <span class="section-title">关键差异详解</span>
+    <span class="badge badge-purple">3 处变化</span>
+  </div>
+
+  <div class="alert alert-amber">
+    <span class="alert-icon">⚠️</span>
+    <div>两方案共用所有其他配置（TUN、sniffer、fake-ip-filter、profile 等），仅以下 3 处不同。</div>
+  </div>
+
+  <!-- 差异 1 -->
+  <div style="margin-bottom:24px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--accent)">① nameserver-policy 中 GFW 的 key</div>
+    <div class="compare-grid">
+      <div class="code-wrap" style="margin-bottom:0">
+        <div class="code-header"><span class="code-label">方案一 <span class="ver-tag v1">V1</span></span></div>
+        <pre style="padding:12px"><span class="cv">"geosite:gfw"</span>:
+  - https://8.8.8.8/dns-query#RULES&amp;ecs=...
+  - https://1.1.1.1/dns-query</pre>
+      </div>
+      <div class="code-wrap" style="margin-bottom:0">
+        <div class="code-header"><span class="code-label">方案二 <span class="ver-tag v2">V2</span></span></div>
+        <pre style="padding:12px"><span class="cv">"geosite:gfw,tld-!cn"</span>:
+  - https://8.8.8.8/dns-query#RULES&amp;ecs=...
+  - https://1.1.1.1/dns-query</pre>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-top:10px;line-height:1.7">
+      <strong>tld-!cn</strong> 意为"顶级域不是 .cn 的所有域名"。方案二将其与 gfw 合并，覆盖范围更广：即使某域名不在 GFW 列表但 TLD 为境外（如 .io/.dev/.app），也会走代理 DoH 解析，避免 geosite:gfw 遗漏导致的污染。
+    </div>
+  </div>
+
+  <!-- 差异 2 -->
+  <div style="margin-bottom:24px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--accent)">② nameserver 兜底列表</div>
+    <div class="compare-grid">
+      <div class="code-wrap" style="margin-bottom:0">
+        <div class="code-header"><span class="code-label">方案一 <span class="ver-tag v1">V1</span></span></div>
+        <pre style="padding:12px"><span class="ck">nameserver</span>:
+  - https://223.5.5.5/dns-query
+  - https://doh.pub/dns-query
+  <span class="cdiff-v1">- https://1.1.1.1/dns-query</span></pre>
+      </div>
+      <div class="code-wrap" style="margin-bottom:0">
+        <div class="code-header"><span class="code-label">方案二 <span class="ver-tag v2">V2</span></span></div>
+        <pre style="padding:12px"><span class="ck">nameserver</span>:
+  - https://223.5.5.5/dns-query
+  <span class="cdiff">- https://doh.pub/dns-query</span>
+  <span class="cc"># 无 1.1.1.1</span></pre>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-top:10px;line-height:1.7">
+      方案一在兜底 nameserver 中保留了 <code>1.1.1.1</code>，这意味着未被 policy 命中的陌生境外域名可以直连 Cloudflare 解析——在代理节点较少时更稳健，但会有少量境外 DNS 流量直连。方案二去除境外兜底，所有未命中域名都走国内 DoH，隐私更好但对 geosite 数据库的完整性依赖更高。
+    </div>
+  </div>
+
+  <!-- 差异 3：影响 -->
+  <div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--accent)">③ 实际效果对比</div>
+    <div class="compare-grid">
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <strong style="color:var(--text)">方案一</strong><br>
+        • 境外冷门域名（不在 gfw 列表）可能直连国外 DNS 解析<br>
+        • 兜底更稳，节点异常时降级平滑<br>
+        • 适合节点覆盖不全、追求可用性的场景
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <strong style="color:var(--text)">方案二</strong><br>
+        • 所有境外 TLD 均走代理 DoH，DNS 不泄漏<br>
+        • 需要代理节点稳定在线，否则境外域名解析失败<br>
+        • 适合节点质量高、隐私优先的场景
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 场景推荐 ── -->
+<div class="section" id="recommend">
+  <div class="section-header">
+    <span class="section-title">场景推荐</span>
+  </div>
+
+  <div class="rec-grid">
+    <div class="rec-card" style="border-top:3px solid var(--accent)">
+      <h4>选方案一（保守兜底）</h4>
+      <p>节点数量有限 / 经常出现节点全挂情况 / 家庭网络多设备使用、容错优先 / 访问冷门境外网站较多</p>
+    </div>
+    <div class="rec-card" style="border-top:3px solid var(--green)">
+      <h4>选方案二（纯国内兜底）</h4>
+      <p>节点稳定可靠 / 对 DNS 隐私有要求 / 不想任何境外 DNS 流量直连出去 / 机场订阅覆盖主流境外服务</p>
+    </div>
+    <div class="rec-card" style="border-top:3px solid var(--amber)">
+      <h4>两者共同要求</h4>
+      <p>fake-ip-filter 中必须含 <code>geosite:cn</code>，否则国内域名也返回假 IP 导致 CDN 调度失效；NTP / STUN / Tailscale 条目缺一不可</p>
+    </div>
+    <div class="rec-card" style="border-top:3px solid var(--purple)">
+      <h4>Nikki 路由器特有注意</h4>
+      <p><code>auto-route: false</code> · <code>auto-redirect: false</code>，路由完全由 Nikki 的 nftables 规则管理；<code>store-fake-ip: true</code> 保证重启后 fake-ip 映射不丢失</p>
+    </div>
+  </div>
+
+  <div class="alert alert-green">
+    <span class="alert-icon">✅</span>
+    <div>
+      两套配置在 ImmortalWrt 25.12.0 + Nikki 插件环境下均经过验证，直接粘贴替换 <code>/etc/mihomo/config.yaml</code>（或 Nikki UI 配置编辑器）并重启 Nikki 即可生效。
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+function copyBlock(btn, id) {
+  const el = document.getElementById(id);
+  const text = el ? el.innerText : '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已复制 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// active nav link on scroll
+const sections = document.querySelectorAll('.section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-52px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

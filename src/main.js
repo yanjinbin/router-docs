@@ -50,6 +50,14 @@ const docs = [
     tagColor: '#4f8ef7',
   },
   {
+    title: 'Nikki DNS 分流配置',
+    subtitle: 'ImmortalWrt R5C · 25.12.0 · fake-ip 两种策略',
+    desc: '两套 Mihomo/Nikki 透明代理 DNS 分流配置对比：方案一保留境外兜底（geosite:gfw），方案二纯国内兜底（geosite:gfw,tld-!cn），含完整 fake-ip-filter / sniffer / TUN 配置',
+    href: '/nikki-dns-split.html',
+    tag: '配置',
+    tagColor: '#3dd68c',
+  },
+  {
     title: 'OpenWrt 代理插件横评',
     subtitle: 'Nikki · OpenClash · HomeProxy · PassWall…',
     desc: '11 款 OpenWrt 代理插件全横评：Nikki vs OpenClash 深度对比，sing-box / Mihomo / Xray 三大阵营逐一详解，按场景选型建议',

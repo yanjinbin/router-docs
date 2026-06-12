@@ -697,6 +697,203 @@
 
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════
+     系统性能优化 — sysctl + Nikki UCI
+     ══════════════════════════════════════════════════════════════ -->
+<div style="margin-top:40px;padding:0 24px 40px;font-family:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC',sans-serif">
+
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <span style="font-size:15px;font-weight:700;color:#e8eaf0">系统性能优化</span>
+    <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(61,214,140,.12);color:#3dd68c">sysctl · Nikki UCI</span>
+  </div>
+
+  <div style="font-size:12px;color:#9aa0b4;line-height:1.7;margin-bottom:20px;background:rgba(79,142,247,.07);border:1px solid rgba(79,142,247,.2);border-radius:8px;padding:12px 16px">
+    以下两组优化适用于 <strong style="color:#e8eaf0">ImmortalWrt 25.12.0 + Nikki</strong>，在 NanoPi R5C（192.168.1.1，SSH 别名 R5C）上经过验证。每次大版本升级固件后需重新确认 sysctl 参数是否保留。
+  </div>
+
+  <!-- ── Part 1: sysctl ── -->
+  <div style="margin-bottom:28px">
+    <div style="font-size:13px;font-weight:700;color:#e8eaf0;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#4f8ef7;font-size:11px;color:#fff;font-weight:700;flex-shrink:0">1</span>
+      内核参数优化（/etc/sysctl.conf）
+    </div>
+
+    <div style="font-size:12px;color:#9aa0b4;line-height:1.7;margin-bottom:12px">
+      写入后执行 <code style="background:#1e2333;padding:1px 6px;border-radius:4px;font-size:11px">sysctl -p</code> 立即生效，无需重启。
+    </div>
+
+    <!-- 参数说明表 -->
+    <div style="overflow-x:auto;margin-bottom:14px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+            <th style="text-align:left;padding:8px 10px;color:#5f6680;font-weight:600;white-space:nowrap">参数</th>
+            <th style="text-align:left;padding:8px 10px;color:#5f6680;font-weight:600">值</th>
+            <th style="text-align:left;padding:8px 10px;color:#5f6680;font-weight:600">说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">net.core.rmem_max</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">16777216</td>
+            <td style="padding:8px 10px;color:#9aa0b4">Socket 接收缓冲区上限 16 MB，改善大带宽/高延迟场景吞吐</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">net.core.wmem_max</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">16777216</td>
+            <td style="padding:8px 10px;color:#9aa0b4">Socket 发送缓冲区上限 16 MB</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">net.ipv4.tcp_rmem</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">4096 87380 16777216</td>
+            <td style="padding:8px 10px;color:#9aa0b4">TCP 接收缓冲区：min / default / max，max = 16 MB</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">net.ipv4.tcp_wmem</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">4096 65536 16777216</td>
+            <td style="padding:8px 10px;color:#9aa0b4">TCP 发送缓冲区：min / default / max，max = 16 MB</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">net.ipv4.tcp_mtu_probing</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">1</td>
+            <td style="padding:8px 10px;color:#9aa0b4">开启 MTU 探测，避免 ICMP 黑洞导致连接卡死</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">net.netfilter.nf_conntrack_max</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">131072</td>
+            <td style="padding:8px 10px;color:#9aa0b4">conntrack 表最大连接数 128 K，防止 NAT 表满后丢包</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">net.ipv4.tcp_fastopen</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">3</td>
+            <td style="padding:8px 10px;color:#9aa0b4">同时开启客户端 + 服务端 TFO，减少握手 RTT</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- sysctl 命令 -->
+    <div style="background:#181c25;border:1px solid rgba(255,255,255,0.08);border-radius:10px;overflow:hidden;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.06);background:#1e2333">
+        <span style="font-size:11px;font-weight:600;letter-spacing:.04em;color:#9aa0b4;text-transform:uppercase">写入 /etc/sysctl.conf 并立即生效</span>
+        <button onclick="copyCmd(this,this.nextElementSibling.innerText)" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:#9aa0b4;cursor:pointer">复制</button>
+        <span style="display:none">cat >> /etc/sysctl.conf << 'EOF'
+net.core.rmem_max=16777216
+net.core.wmem_max=16777216
+net.ipv4.tcp_rmem=4096 87380 16777216
+net.ipv4.tcp_wmem=4096 65536 16777216
+net.ipv4.tcp_mtu_probing=1
+net.netfilter.nf_conntrack_max=131072
+net.ipv4.tcp_fastopen=3
+EOF
+sysctl -p</span>
+      </div>
+      <pre style="padding:14px;overflow-x:auto;font-family:'JetBrains Mono','Fira Code',monospace;font-size:12px;line-height:1.65;color:#e8eaf0;margin:0"><span style="color:#56d364">cat</span> >> /etc/sysctl.conf &lt;&lt; <span style="color:#9ecbff">'EOF'</span>
+<span style="color:#79b8ff">net.core.rmem_max</span>=<span style="color:#f8c555">16777216</span>
+<span style="color:#79b8ff">net.core.wmem_max</span>=<span style="color:#f8c555">16777216</span>
+<span style="color:#79b8ff">net.ipv4.tcp_rmem</span>=<span style="color:#f8c555">4096 87380 16777216</span>
+<span style="color:#79b8ff">net.ipv4.tcp_wmem</span>=<span style="color:#f8c555">4096 65536 16777216</span>
+<span style="color:#79b8ff">net.ipv4.tcp_mtu_probing</span>=<span style="color:#f8c555">1</span>
+<span style="color:#79b8ff">net.netfilter.nf_conntrack_max</span>=<span style="color:#f8c555">131072</span>
+<span style="color:#79b8ff">net.ipv4.tcp_fastopen</span>=<span style="color:#f8c555">3</span>
+<span style="color:#9ecbff">EOF</span>
+<span style="color:#56d364">sysctl</span> -p</pre>
+    </div>
+
+    <!-- 验证命令 -->
+    <div style="background:#181c25;border:1px solid rgba(255,255,255,0.08);border-radius:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.06);background:#1e2333">
+        <span style="font-size:11px;font-weight:600;letter-spacing:.04em;color:#9aa0b4;text-transform:uppercase">验证参数是否生效</span>
+        <button onclick="copyCmd(this,this.nextElementSibling.innerText)" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:#9aa0b4;cursor:pointer">复制</button>
+        <span style="display:none">sysctl net.core.rmem_max net.core.wmem_max net.ipv4.tcp_mtu_probing net.netfilter.nf_conntrack_max net.ipv4.tcp_fastopen && sysctl net.ipv4.tcp_rmem net.ipv4.tcp_wmem</span>
+      </div>
+      <pre style="padding:14px;overflow-x:auto;font-family:'JetBrains Mono','Fira Code',monospace;font-size:12px;line-height:1.65;color:#e8eaf0;margin:0"><span style="color:#56d364">sysctl</span> net.core.rmem_max net.core.wmem_max \
+      net.ipv4.tcp_mtu_probing net.netfilter.nf_conntrack_max \
+      net.ipv4.tcp_fastopen
+<span style="color:#56d364">sysctl</span> net.ipv4.tcp_rmem net.ipv4.tcp_wmem</pre>
+    </div>
+  </div>
+
+  <!-- ── Part 2: Nikki UCI ── -->
+  <div>
+    <div style="font-size:13px;font-weight:700;color:#e8eaf0;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#3dd68c;font-size:11px;color:#0f1117;font-weight:700;flex-shrink:0">2</span>
+      Nikki UCI 配置优化
+    </div>
+
+    <div style="font-size:12px;color:#9aa0b4;line-height:1.7;margin-bottom:12px">
+      通过 UCI 调整三处参数：<strong style="color:#e8eaf0">日志级别降噪</strong>、<strong style="color:#e8eaf0">清理 Cron 频率</strong>（30 分钟一次）、<strong style="color:#e8eaf0">清理阈值</strong>（5 MB），commit 后重启 Nikki 生效。
+    </div>
+
+    <!-- UCI 参数说明 -->
+    <div style="overflow-x:auto;margin-bottom:14px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+            <th style="text-align:left;padding:8px 10px;color:#5f6680;font-weight:600">UCI 键</th>
+            <th style="text-align:left;padding:8px 10px;color:#5f6680;font-weight:600">值</th>
+            <th style="text-align:left;padding:8px 10px;color:#5f6680;font-weight:600">说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">nikki.config.log_level</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">error</td>
+            <td style="padding:8px 10px;color:#9aa0b4">仅记录 error 级别，减少 eMMC 写入，降低 logread 噪音</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">nikki.config.cron_clean</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">*/30 * * * *</td>
+            <td style="padding:8px 10px;color:#9aa0b4">每 30 分钟清理一次临时文件，默认值通常更频繁或更稀少</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#79b8ff;white-space:nowrap">nikki.config.clean_threshold</td>
+            <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;color:#f8c555">5</td>
+            <td style="padding:8px 10px;color:#9aa0b4">临时目录超过 5 MB 才触发清理（单位 MB）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- UCI 命令 -->
+    <div style="background:#181c25;border:1px solid rgba(255,255,255,0.08);border-radius:10px;overflow:hidden;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.06);background:#1e2333">
+        <span style="font-size:11px;font-weight:600;letter-spacing:.04em;color:#9aa0b4;text-transform:uppercase">UCI 写入 + commit + 重启 Nikki</span>
+        <button onclick="copyCmd(this,this.nextElementSibling.innerText)" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:#9aa0b4;cursor:pointer">复制</button>
+        <span style="display:none">uci set nikki.config.log_level='error'
+uci set nikki.config.cron_clean='*/30 * * * *'
+uci set nikki.config.clean_threshold='5'
+uci commit nikki
+service nikki restart</span>
+      </div>
+      <pre style="padding:14px;overflow-x:auto;font-family:'JetBrains Mono','Fira Code',monospace;font-size:12px;line-height:1.65;color:#e8eaf0;margin:0"><span style="color:#56d364">uci</span> set nikki.config.log_level=<span style="color:#9ecbff">'error'</span>
+<span style="color:#56d364">uci</span> set nikki.config.cron_clean=<span style="color:#9ecbff">'*/30 * * * *'</span>
+<span style="color:#56d364">uci</span> set nikki.config.clean_threshold=<span style="color:#9ecbff">'5'</span>
+<span style="color:#56d364">uci</span> commit nikki
+<span style="color:#56d364">service</span> nikki restart</pre>
+    </div>
+
+    <!-- 验证命令 -->
+    <div style="background:#181c25;border:1px solid rgba(255,255,255,0.08);border-radius:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.06);background:#1e2333">
+        <span style="font-size:11px;font-weight:600;letter-spacing:.04em;color:#9aa0b4;text-transform:uppercase">验证 UCI 参数</span>
+        <button onclick="copyCmd(this,this.nextElementSibling.innerText)" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:#9aa0b4;cursor:pointer">复制</button>
+        <span style="display:none">uci show nikki.config.log_level nikki.config.cron_clean nikki.config.clean_threshold</span>
+      </div>
+      <pre style="padding:14px;overflow-x:auto;font-family:'JetBrains Mono','Fira Code',monospace;font-size:12px;line-height:1.65;color:#e8eaf0;margin:0"><span style="color:#56d364">uci</span> show nikki.config.log_level \
+         nikki.config.cron_clean \
+         nikki.config.clean_threshold
+
+<span style="color:#5f6680;font-style:italic"># 期望输出：</span>
+<span style="color:#5f6680;font-style:italic"># nikki.config.log_level='error'</span>
+<span style="color:#5f6680;font-style:italic"># nikki.config.cron_clean='*/30 * * * *'</span>
+<span style="color:#5f6680;font-style:italic"># nikki.config.clean_threshold='5'</span></pre>
+    </div>
+  </div>
+
+</div>
+<!-- ══ end 系统性能优化 ══ -->
+
 <div style="margin-top:40px;padding:24px;background:#0d1117;border-top:1px solid rgba(255,255,255,0.08)">
   <p style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px">参考视频</p>
   <div style="display:flex;flex-direction:column;gap:12px">
