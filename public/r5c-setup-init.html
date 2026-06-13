@@ -375,7 +375,22 @@ Host R5C
   </div>
 
   <div class="kv">
-    <strong>Step 1 · 安装 Nikki：</strong>从 <strong>nikkinikki-org/OpenWrt-nikki</strong> 仓库按 R5C 架构（rockchip/armv8 → <code>aarch64</code>）下载对应 <code>nikki</code> + <code>luci-app-nikki</code> ipk/apk，或加 feed 后安装。装完在 LuCI 左侧应能看到 <strong>「Nikki」</strong> 菜单。
+    <strong>Step 1 · 安装 Nikki：</strong>登录 R5C shell（SSH 或 LuCI 的 <strong>ttyd 终端</strong>），先加 Nikki feed（<strong>一次性</strong>，用 gh-proxy 加速），再用 apk 安装内核 + LuCI 应用 + 中文翻译。装完在 LuCI 左侧应能看到 <strong>「Nikki」</strong> 菜单。
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">R5C shell / ttyd 执行 <span class="tag-shell">shell</span></span>
+      <button class="copy-btn" onclick="copyBlock(this,'sh-nikki')">复制</button>
+    </div>
+    <pre id="sh-nikki"><span class="cc"># 加 Nikki feed —— 只需运行一次（gh-proxy 加速 GitHub）</span>
+wget -O - https://gh-proxy.com/https://github.com/nikkinikki-org/OpenWrt-nikki/raw/refs/heads/main/feed.sh | ash
+
+<span class="cc"># for apk</span>
+apk update
+apk add nikki
+apk add luci-app-nikki
+apk add luci-i18n-nikki-zh-cn</pre>
   </div>
 
   <div class="kv">
