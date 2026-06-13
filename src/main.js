@@ -85,9 +85,9 @@ document.querySelector('#app').innerHTML = `
       </svg>
       友善 R5C ARM软路由 & 华硕梅林固件指南
     </div>
-    <span class="status-badge">
-      <span class="dot"></span>AX82U 稳定运行中
-    </span>
+    <a class="status-badge" href="https://www.ilanzou.com/s/QOIXYvaw" target="_blank" rel="noopener" title="访问密码：小区门牌号">
+      <span class="dot"></span>固件 + Mihomo 文件 ↗
+    </a>
   </div>
 </header>
 
@@ -95,6 +95,7 @@ document.querySelector('#app').innerHTML = `
   <div class="hero">
     <h1>友善 R5C ARM软路由 & 华硕梅林固件指南</h1>
     <p>NanoPi R5C · 华硕 AX82U / RAX80 · ImmortalWrt · 梅林固件 · 设备选型</p>
+    <p class="hero-note">📦 配套资料：<a href="https://www.ilanzou.com/s/QOIXYvaw" target="_blank" rel="noopener">固件 + Mihomo 配置下载</a> · 访问密码为小区门牌号 🙂</p>
   </div>
 
   <div class="grid">
