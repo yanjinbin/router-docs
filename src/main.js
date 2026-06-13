@@ -85,7 +85,7 @@ document.querySelector('#app').innerHTML = `
       </svg>
       友善 R5C ARM软路由 & 华硕梅林固件指南
     </div>
-    <a class="status-badge" href="https://www.ilanzou.com/s/QOIXYvaw" target="_blank" rel="noopener" title="访问密码：小区门牌号">
+    <a class="status-badge" href="https://www.ilanzou.com/s/QOIXYvaw" target="_blank" rel="noopener" data-tip="访问密码：小区门牌号">
       <span class="dot"></span>固件 + Mihomo 文件 ↗
     </a>
   </div>
