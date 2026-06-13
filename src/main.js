@@ -26,6 +26,14 @@ const docs = [
     tagColor: '#3dd68c',
   },
   {
+    title: 'NanoPi R5C 初始化 Setup',
+    subtitle: '刷机 → PPPoE → SSH → Claude 分步实施',
+    desc: 'R5C 开荒全链路：ImmortalWrt 25.12.0 刷机、WAN PPPoE 拨号、id_r5c 密钥 + R5C 别名，再把 5 段复现套装提示词交给 Claude 完成装包/extroot/优化/365天免密登录/备份，标注人工与 Claude 分工',
+    href: '/r5c-setup-init.html',
+    tag: '教程',
+    tagColor: '#c084fc',
+  },
+  {
     title: '软路由终极横评 · 17 款全对比',
     subtitle: 'x86 · FriendlyELEC · HINLINK · 无线路由',
     desc: '17 款设备 5 维度一页查完：硬件参数、固件生态、网口总线 & PCIe、加解密 & 性能、综合评分。含 N100/N150/R2S~R76S/H28K~H69K/M68S/RAX80/AX82U',

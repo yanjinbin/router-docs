@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NanoPi R5C 初始化 Setup · 刷机 → PPPoE → SSH → Claude 分步实施</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:#4f8ef7;border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-brand span{color:var(--accent)}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto;flex-shrink:0}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);border-bottom-color:var(--accent)}
+
+.wrap{max-width:1020px;margin:0 auto;padding:0 24px 80px}
+
+.hero{padding:48px 0 32px}
+.hero-tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(20px,3.5vw,30px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:13px;color:var(--text2);max-width:720px;line-height:1.7}
+
+.alert{display:flex;gap:10px;align-items:flex-start;padding:.9rem 1.1rem;border-radius:8px;font-size:12px;line-height:1.6;margin:0 0 24px}
+.alert-blue{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.25)}
+.alert-amber{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25)}
+.alert-green{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.25)}
+.alert-red{background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.25)}
+.alert-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+.alert code{background:var(--bg3);padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:11.5px}
+
+.section{margin-bottom:44px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-num{flex-shrink:0;width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(79,142,247,.15);color:var(--accent)}
+.section-title{font-size:15px;font-weight:600}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;margin-left:6px;vertical-align:middle}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+.badge-amber{background:rgba(245,166,35,.12);color:var(--amber)}
+.badge-red{background:rgba(240,96,96,.12);color:var(--red)}
+.badge-purple{background:rgba(192,132,252,.12);color:var(--purple)}
+
+/* 流程图 */
+.flow{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.flow-title{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.flow-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;font-size:12px}
+.flow-row:last-child{margin-bottom:0}
+.fn{padding:4px 10px;border-radius:5px;font-weight:600;white-space:nowrap;font-size:11.5px}
+.fn-q{background:rgba(79,142,247,.15);color:var(--accent)}
+.fn-cn{background:rgba(61,214,140,.12);color:var(--green)}
+.fn-gfw{background:rgba(240,96,96,.12);color:var(--red)}
+.fn-unk{background:rgba(245,166,35,.1);color:var(--amber)}
+.fn-dns{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.flow-arrow{color:var(--text3)}
+.flow-note{font-size:11px;color:var(--text3)}
+
+/* 依赖表 */
+.dep-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.dep-table th{text-align:left;padding:9px 12px;color:var(--text3);font-size:11px;font-weight:600;background:var(--bg3);border-bottom:1px solid var(--border)}
+.dep-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+.dep-table tr:last-child td{border-bottom:none}
+.dep-table td strong{color:var(--text)}
+
+/* 代码块 */
+.code-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.code-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--text2);text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.tag-prompt{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(192,132,252,.18);color:var(--purple)}
+.tag-shell{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(61,214,140,.15);color:var(--green)}
+.copy-btn{font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:color .15s,border-color .15s;flex-shrink:0}
+.copy-btn:hover{color:var(--text);border-color:var(--accent)}
+.copy-btn.copied{color:var(--green);border-color:var(--green)}
+pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--text);margin:0;white-space:pre-wrap;word-break:break-word}
+pre.nowrap{white-space:pre;word-break:normal}
+
+/* syntax */
+.ck{color:#79b8ff}
+.cv{color:#9ecbff}
+.cn{color:#f8c555}
+.cb{color:#56d364}
+.cc{color:#5f6680;font-style:italic}
+.cs{color:#f97583}
+
+/* prompt card (Claude 提示词卡片) */
+.prompt-card{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.prompt-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.prompt-head .pt{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:var(--text)}
+.prompt-head .pn{flex-shrink:0;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:rgba(192,132,252,.18);color:var(--purple)}
+.prompt-body{padding:14px 16px}
+.prompt-text{font-size:12.5px;line-height:1.85;color:var(--text);white-space:pre-wrap;font-family:var(--mono)}
+.prompt-notes{margin-top:12px;border-top:1px dashed var(--border);padding-top:12px;display:flex;flex-direction:column;gap:7px}
+.pnote{display:flex;gap:8px;font-size:11.5px;line-height:1.6;color:var(--text2)}
+.pnote .pi{flex-shrink:0}
+.pnote code{background:var(--bg3);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--text)}
+
+/* steps inline list */
+.kv{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:12.5px;line-height:1.8;color:var(--text2)}
+.kv strong{color:var(--text)}
+.kv code{background:var(--bg3);padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:11.5px;color:var(--text)}
+
+.fw-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:700px){.fw-grid{grid-template-columns:1fr}}
+.fw-cell{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.fw-cell .l{font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.fw-cell .v{font-family:var(--mono);font-size:12px;color:var(--text);word-break:break-all}
+
+/* checklist */
+.chk{display:flex;flex-direction:column;gap:8px}
+.chk-item{display:flex;gap:10px;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-size:12.5px;line-height:1.6;color:var(--text2)}
+.chk-item .ci{flex-shrink:0;width:18px;height:18px;border-radius:5px;background:rgba(61,214,140,.12);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px}
+.chk-item code{background:var(--bg3);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:11.5px;color:var(--text)}
+
+/* site-nav */
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:var(--sans)}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-home" href="/">← 首页</a>
+  <span class="nav-brand">NanoPi R5C · <span>初始化 Setup</span></span>
+  <div class="nav-links">
+    <a href="#flow">总览</a>
+    <a href="#firmware">① 刷机</a>
+    <a href="#pppoe">② PPPoE</a>
+    <a href="#sshkey">③ SSH 密钥</a>
+    <a href="#claude">④ Claude 接管</a>
+    <a href="#checklist">⑤ 自检</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-tag">ImmortalWrt 25.12.0 · rockchip/armv8 · friendlyarm_nanopi-r5c</div>
+  <h1>NanoPi R5C 初始化 Setup<br>刷机 → PPPoE → SSH → Claude 分步实施</h1>
+  <p>
+    一条完整的开荒链路：先刷 ImmortalWrt 25.12.0 固件，配好 WAN PPPoE 拨号联网，生成专用 SSH 密钥并建立 <code style="font-family:var(--mono)">R5C</code> 别名，
+    最后把<strong style="color:var(--purple)">复现套装提示词</strong>逐段交给 Claude Code 自动完成装包、extroot 扩容、网络优化、登录魔改与备份。
+  </p>
+</div>
+
+<div class="alert alert-blue">
+  <span class="alert-icon">ℹ️</span>
+  <div>设备：<strong>ImmortalWrt FriendlyARM NanoPi R5C</strong>｜SSH 别名 <code>R5C</code>｜密钥 <code>~/.ssh/id_r5c</code>。刷机后路由 host key 会变，重连时 Claude 会自动清旧 key 再连，无需手动处理。完整 TF→eMMC 安装细节见底部「NanoPi R5C 软路由指南」。</div>
+</div>
+
+<!-- ══ 总览 ══ -->
+<div class="section" id="flow">
+  <div class="section-header">
+    <span class="section-title">执行总览与依赖顺序</span>
+    <span class="badge badge-blue">先读这里</span>
+  </div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;font-size:12px">
+    <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:14px;border-radius:4px;background:rgba(61,214,140,.5);display:inline-block"></span>👤 人工介入（你在电脑 / 路由器上操作）</span>
+    <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:14px;border-radius:4px;background:rgba(192,132,252,.5);display:inline-block"></span>🐙 Claude 实施（发提示词，自动执行）</span>
+  </div>
+
+  <div class="flow">
+    <div class="flow-title">五段链路 · 颜色区分谁来做</div>
+    <div class="flow-row">
+      <span class="fn fn-cn">👤 ① 刷固件</span>
+      <span class="flow-arrow">→</span>
+      <span class="fn fn-cn">👤 ② WAN PPPoE</span>
+      <span class="flow-arrow">→</span>
+      <span class="fn fn-cn">👤 ③ SSH 密钥 + 别名</span>
+      <span class="flow-arrow">→</span>
+      <span class="fn" style="background:rgba(192,132,252,.15);color:var(--purple)">🐙 ④ Claude 接管 ①~⑤</span>
+      <span class="flow-arrow">→</span>
+      <span class="fn" style="background:rgba(192,132,252,.15);color:var(--purple)">🐙 ⑤ 自检</span>
+    </div>
+    <div class="flow-note" style="margin-top:4px">前三段必须人工（涉及物理刷机、宽带凭据、本机密钥）；第四、五段全程交给 Claude，你只需逐段复制提示词。</div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-title">④ Claude 套装内部依赖（必须按序）</div>
+    <div class="flow-row">
+      <span class="fn fn-dns">①装包</span>
+      <span class="flow-arrow">┐</span>
+    </div>
+    <div class="flow-row">
+      <span class="flow-arrow">└→</span>
+      <span class="fn fn-dns">②extroot 扩容</span>
+      <span class="flow-arrow">→</span>
+      <span class="fn fn-dns">③sysctl / nikki</span>
+      <span class="flow-arrow">→</span>
+      <span class="fn fn-dns">④登录魔改</span>
+      <span class="flow-arrow">→</span>
+      <span class="fn fn-dns">⑤纳入备份</span>
+      <span class="flow-note">· 先扩容空间才够 ③；⑤依赖 ④ 的文件</span>
+    </div>
+  </div>
+
+  <table class="dep-table">
+    <tr><th>段</th><th>是否必须</th><th>依赖</th><th>性质</th></tr>
+    <tr><td><strong>① 装包</strong></td><td>推荐</td><td>网络</td><td>联网 apk</td></tr>
+    <tr><td><strong>② extroot</strong></td><td>看需求</td><td>mmcblk1p3 存在</td><td style="color:var(--red)">高风险 · 人工核对</td></tr>
+    <tr><td><strong>③ sysctl/nikki</strong></td><td>推荐</td><td>nikki 装好（③后半）</td><td>写配置</td></tr>
+    <tr><td><strong>④ 登录魔改</strong></td><td>看需求</td><td>无</td><td>改系统文件</td></tr>
+    <tr><td><strong>⑤ 纳入备份</strong></td><td>配套 ④</td><td>④ 已完成</td><td>写 sysupgrade.conf</td></tr>
+  </table>
+
+  <div class="alert alert-amber">
+    <span class="alert-icon">⚠️</span>
+    <div>① 和 ② 可互换，但若 loop overlay 快满，<strong>务必先做 ②</strong> 再装包，否则空间不足装包会失败。</div>
+  </div>
+</div>
+
+<!-- ══ ① 刷机 ══ -->
+<div class="section" id="firmware">
+  <div class="section-header">
+    <span class="section-num">1</span>
+    <span class="section-title">刷 ImmortalWrt 25.12.0 固件</span>
+    <span class="badge badge-green">👤 人工介入</span>
+  </div>
+
+  <div class="kv">
+    打开 <strong>ImmortalWrt Firmware Selector</strong>，按下表参数选好后下载 <strong>Factory / sysupgrade 镜像</strong>，再用 TF 卡引导写入 eMMC（完整 TF→eMMC 流程见底部 R5C 指南）。
+  </div>
+
+  <div class="fw-grid">
+    <div class="fw-cell"><div class="l">Version</div><div class="v">25.12.0</div></div>
+    <div class="fw-cell"><div class="l">Target</div><div class="v">rockchip / armv8</div></div>
+    <div class="fw-cell"><div class="l">Device ID</div><div class="v">friendlyarm_nanopi-r5c</div></div>
+    <div class="fw-cell"><div class="l">默认管理地址</div><div class="v">192.168.1.1</div></div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">固件选择器链接 <span class="tag-shell">URL</span></span>
+      <button class="copy-btn" onclick="copyBlock(this,'url-fw')">复制</button>
+    </div>
+    <pre id="url-fw">https://firmware-selector.immortalwrt.org/?version=25.12.0&target=rockchip%2Farmv8&id=friendlyarm_nanopi-r5c</pre>
+  </div>
+
+  <div class="alert alert-amber">
+    <span class="alert-icon">⚠️</span>
+    <div>首刷请走 <strong>TF 卡万能引导</strong>，确认所有功能正常后再 <code>sysupgrade</code> 写入 eMMC，避免直接写 eMMC 翻车后无法回滚。</div>
+  </div>
+</div>
+
+<!-- ══ ② PPPoE ══ -->
+<div class="section" id="pppoe">
+  <div class="section-header">
+    <span class="section-num">2</span>
+    <span class="section-title">配置 WAN PPPoE 拨号</span>
+    <span class="badge badge-green">👤 人工介入</span>
+  </div>
+
+  <div class="kv">
+    刷完默认 WAN 是 DHCP，光猫桥接 / 拨号上网需改成 <strong>PPPoE</strong>。两种方式任选其一：LuCI 网页改，或 SSH 进去用 UCI 改（更快，可直接贴给 Claude 但建议刷完先手动联网）。
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">方式 A · LuCI 网页</span>
+    </div>
+    <pre>网络 → 接口 → WAN → 编辑
+  协议 (Protocol)        改为  PPPoE
+  PAP/CHAP 用户名         填    宽带账号
+  PAP/CHAP 密码          填    宽带密码
+保存并应用 → 等待拨号，WAN 拿到公网 IP 即成功</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">方式 B · SSH + UCI（更快） <span class="tag-shell">shell</span></span>
+      <button class="copy-btn" onclick="copyBlock(this,'sh-pppoe')">复制</button>
+    </div>
+    <pre id="sh-pppoe"><span class="cc"># 在路由器 shell 执行，把账号密码替换成自己的宽带凭据</span>
+uci set network.wan.proto=<span class="cv">'pppoe'</span>
+uci set network.wan.username=<span class="cv">'你的宽带账号'</span>
+uci set network.wan.password=<span class="cv">'你的宽带密码'</span>
+uci commit network
+/etc/init.d/network restart
+
+<span class="cc"># 验证：看 WAN 是否拿到公网 IP（非 192.168/100.64 段）</span>
+ifstatus wan | grep -E <span class="cv">'"address"|"up"'</span></pre>
+  </div>
+
+  <div class="alert alert-blue">
+    <span class="alert-icon">ℹ️</span>
+    <div>电信 / 联通常见账号格式 <code>手机号@pppoe</code> 或纯宽带号；移动多为纯账号。拨号失败先核对账号格式、确认光猫已是桥接（Bridge）模式。</div>
+  </div>
+</div>
+
+<!-- ══ ③ SSH 密钥 ══ -->
+<div class="section" id="sshkey">
+  <div class="section-header">
+    <span class="section-num">3</span>
+    <span class="section-title">生成 SSH 密钥并建立 R5C 别名</span>
+    <span class="badge badge-green">👤 人工介入 · 在你的电脑</span>
+  </div>
+
+  <div class="kv">
+    给 R5C 单独生成一对 RSA 密钥（不复用日常 key），公钥灌进路由器实现免密登录，再在 <code>~/.ssh/config</code> 配 <code>R5C</code> 别名——之后 Claude 直接 <code>ssh R5C</code> 接管。
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">Step 1 · 生成密钥对 <span class="tag-shell">本机 shell</span></span>
+      <button class="copy-btn" onclick="copyBlock(this,'sh-keygen')">复制</button>
+    </div>
+    <pre id="sh-keygen"><span class="cc"># 在 ~/.ssh 下生成 id_r5c / id_r5c.pub（一路回车，可不设密码短语）</span>
+ssh-keygen -t rsa -C <span class="cv">"yanjinbin@gmail.com"</span> -f <span class="cv">~/.ssh/id_r5c</span></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">Step 2 · 公钥灌入路由器 <span class="tag-shell">本机 shell</span></span>
+      <button class="copy-btn" onclick="copyBlock(this,'sh-copyid')">复制</button>
+    </div>
+    <pre id="sh-copyid"><span class="cc"># 默认地址 192.168.1.1，按提示输入 root 密码一次</span>
+ssh-copy-id -i <span class="cv">~/.ssh/id_r5c.pub</span> root@192.168.1.1
+
+<span class="cc"># 若没有 ssh-copy-id，手动追加：</span>
+cat <span class="cv">~/.ssh/id_r5c.pub</span> | ssh root@192.168.1.1 <span class="cv">"cat >> /etc/dropbear/authorized_keys"</span></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">Step 3 · 配置 ~/.ssh/config 别名 <span class="tag-shell">本机</span></span>
+      <button class="copy-btn" onclick="copyBlock(this,'sh-config')">复制</button>
+    </div>
+    <pre id="sh-config"><span class="cc"># 追加到 ~/.ssh/config —— 之后 `ssh R5C` 即免密登录</span>
+Host R5C
+    HostName 192.168.1.1
+    User root
+    IdentityFile ~/.ssh/id_r5c
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null</pre>
+  </div>
+
+  <div class="alert alert-green">
+    <span class="alert-icon">✅</span>
+    <div>验证：执行 <code>ssh R5C</code> 应免密直接进入路由器。<code>StrictHostKeyChecking no</code> + <code>UserKnownHostsFile /dev/null</code> 让刷机后 host key 变更时不报错、不阻塞 Claude 自动重连。</div>
+  </div>
+</div>
+
+<!-- ══ ④ Claude 接管 ══ -->
+<div class="section" id="claude">
+  <div class="section-header">
+    <span class="section-num">4</span>
+    <span class="section-title">Claude Code 接管 · 复现套装逐段实施</span>
+    <span class="badge badge-purple">🐙 Claude 实施 · 5 段提示词</span>
+  </div>
+
+  <div class="alert alert-blue">
+    <span class="alert-icon">🐙</span>
+    <div>在能 <code>ssh R5C</code> 的电脑上启动 Claude Code，<strong>逐段</strong>复制下面提示词发给它（不要一次全发）。每段都内置了「先确认再执行」「逐项验证」逻辑，按 ①→②→③→④→⑤ 顺序即可。</div>
+  </div>
+
+  <!-- 提示词 ① -->
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="pt"><span class="pn">1</span>装回官方软件包（主题 + 中文翻译）</div>
+      <button class="copy-btn" onclick="copyBlock(this,'p1')">复制提示词</button>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="p1">帮 R5C 装回官方软件包：先 apk update（必须成功，否则索引旧了会静默漏装），再 apk add luci-theme-openwrt luci-i18n-base-zh-cn luci-i18n-dashboard-zh-cn luci-i18n-eqos-zh-cn luci-i18n-homeproxy-zh-cn luci-i18n-package-manager-zh-cn luci-i18n-statistics-zh-cn luci-i18n-ttyd-zh-cn 不要装 cpufreq。装完逐个验证已安装。</div>
+      <div class="prompt-notes">
+        <div class="pnote"><span class="pi">⚠️</span><div><code>apk update</code> 必须先成功，否则索引旧 → 静默漏装（实测漏过包）</div></div>
+        <div class="pnote"><span class="pi">❌</span><div>不装 <code>cpufreq</code>（用户明确不要）</div></div>
+        <div class="pnote"><span class="pi">🔗</span><div>装 i18n 翻译会自动带对应 <code>luci-app-*</code> 依赖</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提示词 ② -->
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="pt"><span class="pn">2</span>eMMC extroot 扩容（overlay 迁到 56G）<span class="badge badge-red" style="margin-left:2px">🐙+👤 需人工核对重启</span></div>
+      <button class="copy-btn" onclick="copyBlock(this,'p2')">复制提示词</button>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="p2">帮 R5C 做 eMMC extroot 扩容，把系统 overlay 从小 loop 设备迁到 56G 的 /dev/mmcblk1p3。
+步骤：
+1. 先 df -h / mount / uci show fstab / block info 确认现状，报告 /overlay/upper 大小；
+2. 清空 /mnt/mmcblk1p3 旧 upper/work（保留 lost+found）并重建空目录；
+3. cp -a /overlay/upper/. /mnt/mmcblk1p3/upper/ 复制当前运行系统可写层，复制后对比两边大小一致；
+4. 改 fstab：target='/overlay' 那条 mount 的 uuid 指向 mmcblk1p3 的 UUID（现查不写死）且 enabled='1'，单独挂 /mnt/mmcblk1p3 那条设 enabled='0'，uci commit fstab；
+5. reboot，回来后 df -h 验证 /overlay 来源是 /dev/mmcblk1p3、可用 ~53G。
+全程每步先确认再执行，复制完成、UUID 对上之前绝不改 fstab。</div>
+      <div class="prompt-notes">
+        <div class="pnote"><span class="pi">🔴</span><div>高风险：迁移运行中的系统，需人工核对后重启</div></div>
+        <div class="pnote"><span class="pi">🔑</span><div>UUID <strong>现查不写死</strong>（固件重置后会变）</div></div>
+        <div class="pnote"><span class="pi">🧹</span><div>先清空再复制：mmcblk1p3 可能有旧 extroot 残留，不清会新旧混合</div></div>
+        <div class="pnote"><span class="pi">❌</span><div>不能进 uci-defaults：这是一次性迁移，不是声明式配置</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提示词 ③ -->
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="pt"><span class="pn">3</span>sysctl 网络优化 + nikki 调优</div>
+      <button class="copy-btn" onclick="copyBlock(this,'p3')">复制提示词</button>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="p3">帮 R5C 执行优化：
+1. 写入 /etc/sysctl.conf 并立即生效（写入前去重防堆叠）：rmem_max/wmem_max=16MB，tcp_rmem/tcp_wmem max=16MB，tcp_mtu_probing=1，nf_conntrack_max=131072，tcp_fastopen=3
+2. 若 nikki 已安装，UCI 设置：log_level=error，清理 cron 改 */30 * * * *，清理阈值 5MB，commit 后重启 nikki。
+执行完验证所有参数是否生效。</div>
+      <div class="prompt-notes">
+        <div class="pnote"><span class="pi">📊</span><div>sysctl：<code>rmem/wmem_max=16MB</code>、<code>tcp_rmem/wmem max=16MB</code>、<code>tcp_mtu_probing=1</code>、<code>nf_conntrack_max=131072</code>、<code>tcp_fastopen=3</code></div></div>
+        <div class="pnote"><span class="pi">⚙️</span><div>nikki：<code>log_level=error</code>、清理 cron <code>*/30 * * * *</code>、清理阈值 5MB</div></div>
+        <div class="pnote"><span class="pi">🛡️</span><div>nikki 是第三方 feed 包，没装回则后半自动跳过（脚本有 <code>uci -q get nikki.mixin</code> 守卫）</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提示词 ④ -->
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="pt"><span class="pn">4</span>LuCI 365 天免密登录（cookie + localStorage 双保险）</div>
+      <button class="copy-btn" onclick="copyBlock(this,'p4')">复制提示词</button>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="p4">帮 R5C 实现 LuCI 后台 365 天免密登录，cookie + localStorage 双保险，支持所有主题。
+
+【架构铁律】用独立 uci 键 luci.sauth.cookie_days（默认365）控制 cookie 时长；sessiontime 固定为 604800（7天）绝不设大——设大会让 rpcd 会话堆积、正确密码也间歇性 403。
+
+第一层（cookie，与主题无关）：改 /usr/share/ucode/luci/dispatcher.uc 的 Set-Cookie 行，max-age 用 (+(uci.get('luci','sauth','cookie_days') ?? 365))*86400；并设 cookie_days=365、sessiontime=604800。
+
+第二层（localStorage，覆盖所有主题）：把脚本注入通用 /usr/share/ucode/luci/template/sysauth.ut 和全部 themes/*/sysauth.ut（活动主题决定渲染哪个，OpenWrt 主题会回退通用模板）。脚本逻辑：
+- 模块级 autoLogging 标记，自动登录期间禁止 save 回写（防旧密码复活）；
+- submit 事件 + prototype.submit 双拦截存 base64 凭据（365天过期）；
+- 加载时读 localStorage 未过期则自动填充提交；
+- fuser（密码错误）时清 localStorage 并"设置"lr_tried 锁死本会话防死循环。
+注意：通用模板原生 &lt;input type=submit&gt; 提交不触发 prototype.submit，靠 submit 事件；bootstrap 主题 sysauth.js 程序化 form.submit() 不触发 submit 事件，靠 prototype.submit。
+
+第三层（登录时长字段）：改 /www/luci-static/resources/view/system/password.js，在 admin/system/admin 页加"登录时长（天）"输入框，默认365，读写 luci.sauth.cookie_days（绝不写 sessiontime）。
+
+每改一个模板用 curl -s http://127.0.0.1/cgi-bin/luci/admin/system/admin 验证渲染输出；改完 rm -f /tmp/luci-indexcache*.json &amp;&amp; /etc/init.d/uhttpd restart，再让我退出重登测试。</div>
+      <div class="prompt-notes">
+        <div class="pnote"><span class="pi">🔴</span><div><code>sessiontime</code> 固定 <strong>604800（7天）绝不设大</strong>，否则日志记 accepted 但响应 403、rpcd 会话堆积</div></div>
+        <div class="pnote"><span class="pi">📅</span><div>真正长期免密靠 <code>luci.sauth.cookie_days=365</code> + localStorage（模板写死 365 天过期）</div></div>
+        <div class="pnote"><span class="pi">🎯</span><div>OpenWrt 主题回退<strong>通用模板</strong>（不是 bootstrap）→ 用 curl 抓渲染确认改对了文件</div></div>
+        <div class="pnote"><span class="pi">🆘</span><div>应急登不进：<code>/etc/init.d/rpcd restart</code> 清积压会话</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提示词 ⑤ -->
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="pt"><span class="pn">5</span>把魔改纳入备份（扛过备份 / 恢复）</div>
+      <button class="copy-btn" onclick="copyBlock(this,'p5')">复制提示词</button>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="p5">帮 R5C 把 LuCI 登录魔改纳入备份：往 /etc/sysupgrade.conf 追加这 4 个路径并去重——
+/usr/share/ucode/luci/dispatcher.uc
+/usr/share/ucode/luci/template/sysauth.ut
+/usr/share/ucode/luci/template/themes/bootstrap/sysauth.ut
+/www/luci-static/resources/view/system/password.js
+然后用 sysupgrade -l 验证这 4 个文件已进备份清单。</div>
+      <div class="prompt-notes">
+        <div class="pnote"><span class="pi">✅</span><div>默认就在备份：<code>/etc/config/*</code>、<code>/etc/sysctl.conf</code>、密码 / 密钥</div></div>
+        <div class="pnote"><span class="pi">❌</span><div>需手动加：上面 4 个 <code>/usr/share/</code> 和 <code>/www/</code> 魔改文件</div></div>
+        <div class="pnote"><span class="pi">⚠️</span><div>仅恢复到<strong>相同固件版本</strong>安全；跨版本应重跑 ④ 而非还原旧文件。全盘重刷时 extroot 数据需重做 ② 的复制步骤</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ⑤ 自检 ══ -->
+<div class="section" id="checklist">
+  <div class="section-header">
+    <span class="section-num">5</span>
+    <span class="section-title">收尾自检清单</span>
+    <span class="badge badge-purple">🐙 Claude 实施</span>
+    <span class="badge badge-amber">人工逐项核对</span>
+  </div>
+
+  <div class="prompt-card" style="border-left-color:var(--amber)">
+    <div class="prompt-head">
+      <div class="pt"><span class="pn" style="background:rgba(245,166,35,.15);color:var(--amber)">✓</span>一键交给 Claude 自检</div>
+      <button class="copy-btn" onclick="copyBlock(this,'p6')">复制提示词</button>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="p6">帮 R5C 做收尾自检：验证
+1. sysctl 全部参数生效；
+2. nikki 三项 UCI 生效（若装了）；
+3. /overlay 来源是 /dev/mmcblk1p3、可用 ~53G；
+4. cookie_days=365、sessiontime=604800；
+5. curl 测 web 登录返回 302 且 cookie max-age≈365天；
+6. sysupgrade -l 含 4 个魔改文件。
+逐项报告。</div>
+    </div>
+  </div>
+
+  <div class="chk">
+    <div class="chk-item"><span class="ci">1</span><div>sysctl 全部参数生效（<code>sysctl -a</code> 比对 16MB / mtu_probing / conntrack / fastopen）</div></div>
+    <div class="chk-item"><span class="ci">2</span><div>nikki 三项 UCI 生效（若装了 nikki）</div></div>
+    <div class="chk-item"><span class="ci">3</span><div><code>/overlay</code> 来源是 <code>/dev/mmcblk1p3</code>、可用 ~53G</div></div>
+    <div class="chk-item"><span class="ci">4</span><div><code>cookie_days=365</code>、<code>sessiontime=604800</code></div></div>
+    <div class="chk-item"><span class="ci">5</span><div>curl 测 web 登录返回 <code>302</code> 且 cookie <code>max-age≈365天</code></div></div>
+    <div class="chk-item"><span class="ci">6</span><div><code>sysupgrade -l</code> 含 4 个魔改文件</div></div>
+  </div>
+
+  <div class="alert alert-green" style="margin-top:20px">
+    <span class="alert-icon">🎉</span>
+    <div>六项全绿即开荒完成：固件 + PPPoE 联网 + SSH 免密 + 软件包 + 56G extroot + 网络优化 + 365 天免密登录，且全部纳入备份，重刷可快速复现。</div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+    <a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C · 软路由指南</span><span class="__site-nav-sub">TF 卡引导 → eMMC 安装全流程</span></a>
+    <a class="__site-nav-link" href="/nikki-dns-compare.html"><span class="__site-nav-title">Nikki DNS 分流配置对比</span><span class="__site-nav-sub">纯国内 vs GFW 分流</span></a>
+    <a class="__site-nav-link" href="/openwrt-proxy-plugins.html"><span class="__site-nav-title">OpenWrt 代理插件横评</span><span class="__site-nav-sub">Nikki · OpenClash · HomeProxy…</span></a>
+    <a class="__site-nav-link" href="/merlin-setup-guide.html"><span class="__site-nav-title">梅林固件设置指南</span><span class="__site-nav-sub">AX82U & RAX80</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+
+<script>
+function copyBlock(btn, id) {
+  const el = document.getElementById(id);
+  const text = el ? el.innerText : '';
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '已复制 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  });
+}
+const sections = document.querySelectorAll('.section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+  });
+}, { rootMargin: '-52px 0px -60% 0px' });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
