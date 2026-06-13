@@ -28,7 +28,7 @@ const docs = [
   {
     title: 'NanoPi R5C 初始化 Setup',
     subtitle: '刷机 → PPPoE → SSH → Claude 分步实施',
-    desc: 'R5C 开荒全链路：ImmortalWrt 25.12.0 刷机、WAN PPPoE 拨号、id_r5c 密钥 + R5C 别名，再把 5 段复现套装提示词交给 Claude 完成装包/extroot/优化/365天免密登录/备份，标注人工与 Claude 分工',
+    desc: 'R5C 开荒全链路：ImmortalWrt 25.12.0 刷机、WAN PPPoE 拨号、id_r5c 密钥 + R5C 别名、手动装 Nikki 贴 mihomo 配置，再把 5 段复现套装提示词交给 Claude 完成装包/extroot/优化/365天免密登录/备份，标注人工与 Claude 分工',
     href: '/r5c-setup-init.html',
     tag: '教程',
     tagColor: '#c084fc',

@@ -144,8 +144,9 @@ pre.nowrap{white-space:pre;word-break:normal}
     <a href="#firmware">① 刷机</a>
     <a href="#pppoe">② PPPoE</a>
     <a href="#sshkey">③ SSH 密钥</a>
-    <a href="#claude">④ Claude 接管</a>
-    <a href="#checklist">⑤ 自检</a>
+    <a href="#nikki">④ 装 Nikki</a>
+    <a href="#claude">⑤ Claude 接管</a>
+    <a href="#checklist">⑥ 自检</a>
   </div>
 </nav>
 
@@ -178,7 +179,7 @@ pre.nowrap{white-space:pre;word-break:normal}
   </div>
 
   <div class="flow">
-    <div class="flow-title">五段链路 · 颜色区分谁来做</div>
+    <div class="flow-title">六段链路 · 颜色区分谁来做</div>
     <div class="flow-row">
       <span class="fn fn-cn">👤 ① 刷固件</span>
       <span class="flow-arrow">→</span>
@@ -186,11 +187,13 @@ pre.nowrap{white-space:pre;word-break:normal}
       <span class="flow-arrow">→</span>
       <span class="fn fn-cn">👤 ③ SSH 密钥 + 别名</span>
       <span class="flow-arrow">→</span>
-      <span class="fn" style="background:rgba(192,132,252,.15);color:var(--purple)">🐙 ④ Claude 接管 ①~⑤</span>
+      <span class="fn fn-cn">👤 ④ 手动装 Nikki + 贴 mihomo 配置</span>
       <span class="flow-arrow">→</span>
-      <span class="fn" style="background:rgba(192,132,252,.15);color:var(--purple)">🐙 ⑤ 自检</span>
+      <span class="fn" style="background:rgba(192,132,252,.15);color:var(--purple)">🐙 ⑤ Claude 接管 ①~⑤</span>
+      <span class="flow-arrow">→</span>
+      <span class="fn" style="background:rgba(192,132,252,.15);color:var(--purple)">🐙 ⑥ 自检</span>
     </div>
-    <div class="flow-note" style="margin-top:4px">前三段必须人工（涉及物理刷机、宽带凭据、本机密钥）；第四、五段全程交给 Claude，你只需逐段复制提示词。</div>
+    <div class="flow-note" style="margin-top:4px">前四段必须人工（物理刷机、宽带凭据、本机密钥、Nikki 是第三方 feed 需手动装）；Nikki 装好并贴好 mihomo 配置后，再把套装逐段交给 Claude。</div>
   </div>
 
   <div class="flow">
@@ -358,10 +361,46 @@ Host R5C
   </div>
 </div>
 
-<!-- ══ ④ Claude 接管 ══ -->
-<div class="section" id="claude">
+<!-- ══ ④ 手动安装 Nikki ══ -->
+<div class="section" id="nikki">
   <div class="section-header">
     <span class="section-num">4</span>
+    <span class="section-title">手动安装 Nikki + 贴 mihomo 配置</span>
+    <span class="badge badge-green">👤 人工介入</span>
+  </div>
+
+  <div class="alert alert-amber">
+    <span class="alert-icon">⚠️</span>
+    <div>Nikki 是<strong>第三方 feed 包</strong>，官方源里没有，必须先手动装好；不装的话第 ⑤ 段套装里 sysctl 后半的 nikki 调优会被脚本守卫自动跳过。装完 Nikki 再贴 mihomo yaml 配置，才算具备 Claude 接管的前提。</div>
+  </div>
+
+  <div class="kv">
+    <strong>Step 1 · 安装 Nikki：</strong>从 <strong>nikkinikki-org/OpenWrt-nikki</strong> 仓库按 R5C 架构（rockchip/armv8 → <code>aarch64</code>）下载对应 <code>nikki</code> + <code>luci-app-nikki</code> ipk/apk，或加 feed 后安装。装完在 LuCI 左侧应能看到 <strong>「Nikki」</strong> 菜单。
+  </div>
+
+  <div class="kv">
+    <strong>Step 2 · 贴 mihomo 配置：</strong>进入 Nikki 的配置编辑器，把 <strong>mihomo config.yaml</strong> 粘进去并重启 Nikki。DNS / nameserver-policy 完整配置参考下面腾讯文档，两套方案（纯国内 vs GFW 分流）的逐行差异另见本站「Nikki DNS 分流配置对比」。
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">mihomo yaml · nameserver-policy 配置参考 <span class="tag-prompt">腾讯文档</span></span>
+      <button class="copy-btn" onclick="copyBlock(this,'url-doc')">复制</button>
+    </div>
+    <pre id="url-doc">【腾讯文档】nameserver-policy-20260612-🐟☁️💰🌀
+https://docs.qq.com/document/DUm9oZWJMQ0JvZXNM</pre>
+  </div>
+
+  <div class="alert alert-blue">
+    <span class="alert-icon">🔗</span>
+    <div>站内对照：<a href="/nikki-dns-compare.html" style="color:var(--accent)">Nikki DNS 分流配置对比</a>（纯国内 DoH vs 国内+GFW 分流，含 fake-ip-filter / sniffer / TUN 完整配置与 respect-rules、8.8.8.8 DoH 走代理等架构要点）。</div>
+  </div>
+</div>
+
+<!-- ══ ⑤ Claude 接管 ══ -->
+<div class="section" id="claude">
+  <div class="section-header">
+    <span class="section-num">5</span>
     <span class="section-title">Claude Code 接管 · 复现套装逐段实施</span>
     <span class="badge badge-purple">🐙 Claude 实施 · 5 段提示词</span>
   </div>
@@ -487,7 +526,7 @@ Host R5C
 <!-- ══ ⑤ 自检 ══ -->
 <div class="section" id="checklist">
   <div class="section-header">
-    <span class="section-num">5</span>
+    <span class="section-num">6</span>
     <span class="section-title">收尾自检清单</span>
     <span class="badge badge-purple">🐙 Claude 实施</span>
     <span class="badge badge-amber">人工逐项核对</span>
