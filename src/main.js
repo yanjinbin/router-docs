@@ -73,6 +73,14 @@ const docs = [
     tag: '对比',
     tagColor: '#c084fc',
   },
+  {
+    title: 'immortalwrt v25.12 必装插件',
+    subtitle: 'Nikki · Bandix · eqos · Theme OpenWrt',
+    desc: 'ImmortalWrt 25.12 必备插件安装指南：Nikki 透明代理、Bandix 面板、eqos 流量控制及官方主题',
+    href: '/immortalwrt-plugins.html',
+    tag: '插件',
+    tagColor: '#3dd68c',
+  },
 ]
 
 document.querySelector('#app').innerHTML = `

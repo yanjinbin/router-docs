@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>immortalwrt v25.12 必装插件 · Nikki / Bandix / eqos</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:#4f8ef7;border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover{color:var(--text);border-bottom-color:var(--accent)}
+
+/* LAYOUT */
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px 80px}
+
+/* HERO */
+.hero{padding:48px 0 32px}
+.hero-tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:13px;color:var(--text2);max-width:680px;line-height:1.7}
+
+/* SECTION */
+.section{margin-bottom:48px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:32px;}
+.section-header{display:flex;align-items:baseline;gap:10px;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:18px;font-weight:700; color:var(--text)}
+.section-sub{font-size:13px;color:var(--text3)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;vertical-align:middle;white-space:nowrap}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+
+/* TABLE */
+.full-table-wrap{overflow-x:auto; margin-bottom: 32px;}
+.full-table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+.full-table th{text-align:left;font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--text3);padding:12px 14px;border-bottom:1px solid var(--border2);background:var(--bg3);white-space:nowrap}
+.full-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;color:var(--text2)}
+.full-table td:first-child{font-weight:600;color:var(--text)}
+.full-table tr:last-child td{border-bottom:none}
+.full-table tr:hover td{background:rgba(255,255,255,.018)}
+.full-table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+
+/* CONTENT */
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+pre {
+  background: var(--bg3);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #c9d1d9;
+  border: 1px solid var(--border);
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+code {
+  font-family: var(--mono);
+}
+
+.plugin-links {
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.plugin-links li {
+  margin-bottom: 6px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.plugin-links li::before {
+  content: '🔗';
+  font-size: 12px;
+}
+
+h3 {
+  font-size: 15px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+p {
+  color: var(--text2);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+@media(max-width:700px){
+  nav{padding:0 16px}
+  .wrap{padding:0 16px 64px}
+  .section{padding: 20px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-home">← 返回首页</a>
+  <div class="nav-brand">immortalwrt v25.12 必装插件</div>
+  <div class="nav-links">
+    <a href="#nikki">Nikki</a>
+    <a href="#bandix">Bandix</a>
+    <a href="#eqos">eqos</a>
+    <a href="#theme">Theme OpenWrt</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-tag">OpenWrt · ImmortalWrt 25.12</div>
+  <h1>immortalwrt v25.12 必装插件</h1>
+  <p>为 ImmortalWrt v25.12 推荐的必装插件与主题，包含 Nikki 透明代理、Bandix 面板、eqos 流量控制及经典的 OpenWrt 官方主题。</p>
+</div>
+
+<div class="full-table-wrap">
+  <table class="full-table">
+    <thead>
+      <tr>
+        <th>插件名称</th>
+        <th>功能描述</th>
+        <th>获取方式</th>
+        <th>推荐度</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Nikki <span class="badge badge-blue" style="margin-left:4px">Mihomo</span></td>
+        <td>强大的透明代理客户端</td>
+        <td>第三方软件源 (GitHub)</td>
+        <td><span style="color:var(--green);font-weight:600">必装</span></td>
+      </tr>
+      <tr>
+        <td>Bandix</td>
+        <td>轻量级网络流量监控面板</td>
+        <td>GitHub Release 下载</td>
+        <td><span style="color:var(--green);font-weight:600">必装</span></td>
+      </tr>
+      <tr>
+        <td>eqos</td>
+        <td>简单易用的宽带流量控制</td>
+        <td>官方软件源</td>
+        <td><span style="color:var(--green);font-weight:600">必装</span></td>
+      </tr>
+      <tr>
+        <td>luci-theme-openwrt</td>
+        <td>经典美观的官方主题</td>
+        <td>官方软件源</td>
+        <td><span style="color:var(--green);font-weight:600">必装</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="nikki" class="section">
+  <div class="section-header">
+    <div class="section-title">Nikki</div>
+    <div class="section-sub">透明代理客户端 <span class="badge badge-blue">Mihomo 核心</span></div>
+  </div>
+  
+  <ul class="plugin-links">
+    <li>GitHub 仓库: <a href="https://github.com/nikkinikki-org/OpenWrt-nikki" target="_blank">nikkinikki-org/OpenWrt-nikki</a></li>
+    <li>中文说明: <a href="https://github.com/nikkinikki-org/OpenWrt-nikki/blob/main/README.zh.md" target="_blank">README.zh.md</a></li>
+  </ul>
+
+  <h3>1. 添加软件源（只需运行一次）</h3>
+  <pre><code>wget -O - https://gh-proxy.com/https://github.com/nikkinikki-org/OpenWrt-nikki/raw/refs/heads/main/feed.sh | ash</code></pre>
+
+  <h3>2. 安装</h3>
+  <p>你可以从 shell 执行命令安装或者从 LuCI 的<code>软件包</code>菜单安装。</p>
+  
+  <p><strong>对于 opkg 系统：</strong></p>
+  <pre><code>opkg install nikki
+opkg install luci-app-nikki
+opkg install luci-i18n-nikki-zh-cn</code></pre>
+
+  <p><strong>对于 apk 系统（新版 ImmortalWrt）：</strong></p>
+  <pre><code>apk add nikki
+apk add luci-app-nikki
+apk add luci-i18n-nikki-zh-cn</code></pre>
+</div>
+
+<div id="bandix" class="section">
+  <div class="section-header">
+    <div class="section-title">Bandix</div>
+    <div class="section-sub">轻量级网络流量监控面板</div>
+  </div>
+  <ul class="plugin-links">
+    <li>官方文档: <a href="https://github.com/timsaya/luci-app-bandix/blob/main/README.zh.md" target="_blank">README.zh.md</a></li>
+  </ul>
+  
+  <p>Bandix 安装需要分别下载后端和前端，建议直接将下面的提示词发送给你的 AI 助手（如 Claude 或其他 Agent），让它帮你通过 SSH 全自动安装：</p>
+  
+  <div style="position: relative;">
+    <pre style="white-space: pre-wrap; margin-bottom: 8px;"><code>请 SSH 登录我的 R5C，帮我安装 Bandix 网络流量监控应用。安装步骤如下：
+1. 通过 GitHub API 从 `timsaya/openwrt-bandix` 的最新 Release 中提取适合 aarch64_generic 架构的 apk 格式安装包下载链接。
+2. 从 `timsaya/luci-app-bandix` 的最新 Release 中提取 all.apk 格式的前端包下载链接。
+3. 使用 `wget` 或 `curl` 将这两个安装包下载到路由器的 `/tmp` 目录下。
+4. 使用 `apk add --allow-untrusted <包名>` 命令先安装后端（bandix），再安装前端（luci-app-bandix）。
+5. 检查并确保相关依赖（curl, luci-lib-jsonc, jsonfilter, jshn）已安装。
+6. 安装完成后清理 `/tmp` 中的安装包，并提醒我去 LuCI 的“网络 - Bandix”设置中勾选“启用”并绑定 LAN 接口。同时提醒我前往防火墙设置关闭“硬件流量卸载”及“Turbo ACC”。</code></pre>
+  </div>
+</div>
+
+<div id="eqos" class="section">
+  <div class="section-header">
+    <div class="section-title">eqos</div>
+    <div class="section-sub">简单易用的宽带流量控制 <span class="badge badge-green">官方源提供</span></div>
+  </div>
+  <p><strong>安装方式：</strong> 直接在官方软件源下载安装。</p>
+</div>
+
+<div id="theme" class="section">
+  <div class="section-header">
+    <div class="section-title">OpenWrt 官方主题</div>
+    <div class="section-sub">luci-theme-openwrt <span class="badge badge-green">官方源提供</span></div>
+  </div>
+  <p><strong>安装方式：</strong> 直接在官方软件源下载安装。</p>
+</div>
+
+</div><!-- /wrap -->
+
+<style id="__site-nav-css">
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC',sans-serif}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+</style>
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+<a class="__site-nav-link" href="/yunyufen-config.html"><span class="__site-nav-title">多机场订阅组合</span><span class="__site-nav-sub">良心云 · 渔舍 · 赔钱 · 极风</span></a>
+<a class="__site-nav-link" href="/merlin-setup-guide.html"><span class="__site-nav-title">梅林固件设置指南</span><span class="__site-nav-sub">AX82U & RAX80</span></a>
+<a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C 刷机教程</span><span class="__site-nav-sub">ImmortalWrt 完整流程</span></a>
+<a class="__site-nav-link" href="/r5c-setup-init.html"><span class="__site-nav-title">NanoPi R5C 初始化 Setup</span><span class="__site-nav-sub">刷机 → PPPoE → SSH → Claude 分步实施</span></a>
+<a class="__site-nav-link" href="/softrouter-mega-comparison.html"><span class="__site-nav-title">软路由终极横评</span><span class="__site-nav-sub">17 款全对比</span></a>
+<a class="__site-nav-link" href="/apple-giftcard-guide.html"><span class="__site-nav-title">苹果礼品卡购买指南</span><span class="__site-nav-sub">土耳其区 · 尼日利亚区</span></a>
+<a class="__site-nav-link" href="/esim-card-guide.html"><span class="__site-nav-title">eSIM 实体卡选购指南</span><span class="__site-nav-sub">BeeSIM · eSTK · 9eSIM · xeSIM</span></a>
+<a class="__site-nav-link" href="/nikki-dns-compare.html"><span class="__site-nav-title">Nikki DNS 分流配置对比</span><span class="__site-nav-sub">ImmortalWrt R5C · 25.12.0</span></a>
+<a class="__site-nav-link" href="/openwrt-proxy-plugins.html"><span class="__site-nav-title">OpenWrt 代理插件横评</span><span class="__site-nav-sub">Nikki · OpenClash · HomeProxy · PassWall…</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+
+</body>
+</html>
