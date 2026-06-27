@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mihomo 完整流量路径图解 · 五层架构 & 决策流程 · ImmortalWrt R5C</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:#4f8ef7;border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-brand span{color:var(--accent)}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto;flex-shrink:0}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);border-bottom-color:var(--accent)}
+
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px 80px}
+
+.hero{padding:48px 0 32px}
+.hero-tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(20px,3.5vw,30px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:13px;color:var(--text2);max-width:720px;line-height:1.7}
+
+.alert{display:flex;gap:10px;align-items:flex-start;padding:.9rem 1.1rem;border-radius:8px;font-size:12px;line-height:1.6;margin:0 0 24px}
+.alert-blue{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.25)}
+.alert-amber{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25)}
+.alert-green{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.25)}
+.alert-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+
+.section{margin-bottom:52px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:15px;font-weight:600}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;margin-left:6px;vertical-align:middle}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+.badge-amber{background:rgba(245,166,35,.12);color:var(--amber)}
+.badge-purple{background:rgba(192,132,252,.12);color:var(--purple)}
+
+/* SVG diagram container */
+.diagram-wrap{background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:20px;overflow-x:auto;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,0.18)}
+.diagram-wrap img{display:block;width:100%;max-width:680px;margin:0 auto;height:auto}
+.diagram-wrap img.wide{max-width:720px}
+.diagram-caption{text-align:center;font-size:11px;color:var(--text3);margin-top:10px}
+
+/* key points */
+.kp-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.kp-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.kp-num{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px}
+.kp-num.blue{background:rgba(79,142,247,.2);color:var(--accent)}
+.kp-num.green{background:rgba(61,214,140,.15);color:var(--green)}
+.kp-num.amber{background:rgba(245,166,35,.12);color:var(--amber)}
+.kp-num.purple{background:rgba(192,132,252,.12);color:var(--purple)}
+.kp-num.red{background:rgba(240,96,96,.12);color:var(--red)}
+.kp-body{}
+.kp-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.kp-desc{font-size:12px;color:var(--text2);line-height:1.7}
+code{font-family:var(--mono);background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:11.5px}
+
+/* layer legend */
+.layer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+.layer-card{border-radius:8px;padding:12px 14px;border:1px solid transparent}
+.layer-card h4{font-size:12px;font-weight:700;margin-bottom:4px}
+.layer-card p{font-size:11px;line-height:1.6}
+.lc-phys{background:#f1efe8;border-color:#c8c6bc;color:#444}
+.lc-phys h4{color:#444}
+.lc-phys p{color:#666}
+.lc-kern{background:#e6f1fb;border-color:#185fa5;color:#0c447c}
+.lc-kern h4{color:#0c447c}
+.lc-kern p{color:#185fa5}
+.lc-fw{background:#faeeda;border-color:#854f0b;color:#633806}
+.lc-fw h4{color:#633806}
+.lc-fw p{color:#854f0b}
+.lc-app{background:#eeedfe;border-color:#534ab7;color:#3c3489}
+.lc-app h4{color:#3c3489}
+.lc-app p{color:#534ab7}
+.lc-exit{background:#f1efe8;border-color:#5f5e5a;color:#444}
+.lc-exit h4{color:#444}
+.lc-exit p{color:#666}
+
+/* flow compare */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:680px){.two-col{grid-template-columns:1fr}}
+.fc-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.fc-card h4{font-size:13px;font-weight:700;margin-bottom:8px}
+.fc-item{font-size:12px;color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border);line-height:1.6}
+.fc-item:last-child{border-bottom:none}
+.fc-item strong{color:var(--text)}
+
+/* site-nav */
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:var(--sans)}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-home" href="/">← 首页</a>
+  <span class="nav-brand">ImmortalWrt R5C · <span>Mihomo 流量路径图解</span></span>
+  <div class="nav-links">
+    <a href="#arch">五层架构图</a>
+    <a href="#decision">决策流程图</a>
+    <a href="#key-points">关键要点</a>
+    <a href="#flow-paths">三条路径</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-tag">ImmortalWrt · R5C · Nikki / Mihomo · nftables · TPROXY</div>
+  <h1>Mihomo 完整流量路径图解<br>五层架构 & 决策流程</h1>
+  <p>
+    从下游设备发出请求，到 ISP 骨干网落地目标服务器，途经<strong style="color:var(--text)">物理网卡 → Linux 内核 netfilter → fw4/Nikki nftables → Mihomo 应用层 → ppp0 出口</strong>的完整五层路径。<br>
+    两张图互补：<strong style="color:var(--accent)">架构图</strong>展示各层组件并列关系，<strong style="color:var(--green)">决策图</strong>追踪每一包从入站到出境的完整判断逻辑。
+  </p>
+</div>
+
+<div class="alert alert-blue">
+  <span class="alert-icon">ℹ️</span>
+  <div>运行环境：<strong>ImmortalWrt 25.12.0 · NanoPi R5C · Nikki</strong>（Mihomo 内核）· TUN stack=mixed · nftables 透明代理 · fake-ip 198.18.0.1/16 · PPPoE WAN（华数 / CQBN · MTU 1492）。</div>
+</div>
+
+<!-- ══ 五层架构图 ══ -->
+<div class="section" id="arch">
+  <div class="section-header">
+    <span class="section-title">五层架构图</span>
+    <span class="badge badge-blue">总览</span>
+  </div>
+
+  <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.7">
+    按层切割整个流量链路，每一层独立负责一组职责。纵向箭头表示数据流方向，左侧竖排标签标注所属层次。<br>
+    右侧虚线箭头表示<strong style="color:var(--text)">响应原路返回</strong>：服务器响应沿相同链路逆向回到下游设备。
+  </p>
+
+  <div class="diagram-wrap">
+    <img src="/mihomo_traffic_flow_updated.svg" alt="Mihomo 完整流量路径架构图 · 五层">
+    <div class="diagram-caption">图1 · Mihomo 完整流量路径架构图 — 物理层 / 内核层 / 防火墙层 / 应用层 / 出口层</div>
+  </div>
+
+  <!-- 五层说明 -->
+  <div class="layer-grid">
+    <div class="layer-card lc-phys">
+      <h4>物理层</h4>
+      <p>eth0（LAN 入口）· tun0（Mihomo 虚拟网卡）· ppp0（PPPoE WAN 出口）三块网卡并列，流量入口与出口明确分离</p>
+    </div>
+    <div class="layer-card lc-kern">
+      <h4>内核层</h4>
+      <p>Linux netfilter 四个 hook：PREROUTING（TPROXY + DNS 劫持）· FORWARD · OUTPUT（跳过自身）· POSTROUTING（MASQUERADE）</p>
+    </div>
+    <div class="layer-card lc-fw">
+      <h4>防火墙层</h4>
+      <p>fw4 读取 UCI <code>/etc/config/firewall</code> 生成 table fw4；Nikki 在 <code>/etc/nftables.d/</code> 追加独立 chain，互不干扰</p>
+    </div>
+    <div class="layer-card lc-app">
+      <h4>应用层</h4>
+      <p>Mihomo 进程（用户态）三大模块：DNS :1053（fake-ip）· 规则匹配 :7893 · 代理组选节点（fallback / url-test）</p>
+    </div>
+    <div class="layer-card lc-exit">
+      <h4>出口层</h4>
+      <p>三条并列路径汇聚到 ppp0：强制绕行 DIRECT · GEOIP CN 直连 · 代理出境（VLESS/Hy2 + 住宅 IP 中转）</p>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="fc-card">
+      <h4 style="color:var(--accent)">eth0 → tun0 · 入站路径</h4>
+      <div class="fc-item"><strong>1. 下游设备</strong>发包，网关指向路由器 192.168.1.1</div>
+      <div class="fc-item"><strong>2. eth0</strong> 接收，进入内核 PREROUTING</div>
+      <div class="fc-item"><strong>3. DNS 查询</strong>被劫持到 :53 → :1053（Mihomo）</div>
+      <div class="fc-item"><strong>4. 普通流量</strong>被 TPROXY mark 0x1 → ip rule → tun0</div>
+      <div class="fc-item"><strong>5. tun0</strong> 将流量送入 Mihomo 规则引擎</div>
+    </div>
+    <div class="fc-card">
+      <h4 style="color:var(--green)">Mihomo → ppp0 · 出站路径</h4>
+      <div class="fc-item"><strong>规则匹配</strong>后决定 DIRECT 或代理</div>
+      <div class="fc-item"><strong>DIRECT</strong> 流量经内核 POSTROUTING MASQUERADE → ppp0</div>
+      <div class="fc-item"><strong>代理</strong>流量封装成 VLESS/Hy2，经代理节点落地</div>
+      <div class="fc-item"><strong>住宅 IP 中转</strong> dialer-proxy 用于 AI 服务防封</div>
+      <div class="fc-item"><strong>响应包</strong>原路返回，解包后交回下游设备</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 决策流程图 ══ -->
+<div class="section" id="decision">
+  <div class="section-header">
+    <span class="section-title">完整决策流程图 v2</span>
+    <span class="badge badge-green">决策链</span>
+  </div>
+
+  <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.7">
+    将架构图中每一层的<strong style="color:var(--text)">判断逻辑串联成决策链</strong>，追踪一个 DNS 查询和一次真实连接请求的完整生命周期。<br>
+    虚线箭头（---►）表示"重新入栈"：设备拿到 fake-ip 后重新发起 TCP/UDP 连接，流量再次经过 PREROUTING 被 TPROXY 劫持送入规则引擎。
+  </p>
+
+  <div class="diagram-wrap">
+    <img src="/mihomo_full_decision_flow_v2.svg" alt="Mihomo 完整流量路径决策图 v2" class="wide">
+    <div class="diagram-caption">图2 · Mihomo 完整流量路径决策图 v2 — DNS 分流 + fake-ip + 规则匹配 + 三路出口</div>
+  </div>
+
+  <div class="kp-list">
+    <div class="kp-item">
+      <div class="kp-num blue">1</div>
+      <div class="kp-body">
+        <div class="kp-title">PREROUTING · 三步拦截</div>
+        <div class="kp-desc">
+          Nikki chain 在 PREROUTING 注入三条规则，按优先级顺序执行：<br>
+          ① <strong>IPv6 防泄漏</strong>：<code>::/0 REJECT</code>，最高优先，防止 IPv6 流量绕过代理直接出境；<br>
+          ② <strong>DNS 劫持</strong>：UDP/TCP <code>:53</code> → <code>127.0.0.1:1053</code>，强制所有 DNS 查询走 Mihomo；<br>
+          ③ <strong>TPROXY</strong>：TCP/UDP 普通流量打 <code>mark 0x1</code>，ip rule table 100 将其路由到 tun0 虚拟网卡。
+        </div>
+      </div>
+    </div>
+
+    <div class="kp-item">
+      <div class="kp-num amber">2</div>
+      <div class="kp-body">
+        <div class="kp-title">fw4 与 Nikki · 独立共存</div>
+        <div class="kp-desc">
+          fw4 读取 <code>/etc/config/firewall</code>（UCI）生成 <code>table fw4</code>，管理 zone/forward/NAT 策略。<br>
+          Nikki 将规则写入 <code>/etc/nftables.d/</code> 目录，fw4 重启时通过 include 机制加载，<strong>不会被覆盖</strong>。<br>
+          两者在不同 chain 运行，TPROXY mark、DNS 劫持、IPv6 block 均由 Nikki chain 负责，fw4 不感知代理逻辑。
+        </div>
+      </div>
+    </div>
+
+    <div class="kp-item">
+      <div class="kp-num purple">3</div>
+      <div class="kp-body">
+        <div class="kp-title">fake-ip · DNS 分流逻辑</div>
+        <div class="kp-desc">
+          Mihomo DNS 模块监听 <code>:1053</code>，以 fake-ip 模式响应所有查询：<br>
+          · <strong>CN 域名</strong>（geosite:cn）→ 国内 DoH（阿里 <code>223.5.5.5</code> / 腾讯 <code>doh.pub</code>）解析，返回真实 IP 或 fake-ip；<br>
+          · <strong>GFW 域名</strong>（geosite:gfw）→ <code>8.8.8.8#RULES</code> 走代理 DoH + ECS，返回 <code>198.18.x.x</code> fake-ip；<br>
+          · 设备拿到 fake-ip 后发起真实连接，流量再次入栈被 TPROXY 劫持送入规则引擎。
+        </div>
+      </div>
+    </div>
+
+    <div class="kp-item">
+      <div class="kp-num green">4</div>
+      <div class="kp-body">
+        <div class="kp-title">规则匹配 · 三级优先链</div>
+        <div class="kp-desc">
+          Mihomo 规则链按优先级依次命中：<br>
+          ① <strong>bypass 强制绕行</strong>：B站、抖音、淘宝、微博、小米、爱奇艺等国内大厂域名 → DIRECT，跳过代理组；<br>
+          ② <strong>DOMAIN-SUFFIX / GEOIP CN</strong>：目标 IP 属国内 → DIRECT，无需代理节点；<br>
+          ③ <strong>MATCH</strong>：兜底规则，命中代理组 → 选节点出境。<br>
+          bypass 先于 GEOIP CN，确保明确标注的国内应用不会被误代理。
+        </div>
+      </div>
+    </div>
+
+    <div class="kp-item">
+      <div class="kp-num red">5</div>
+      <div class="kp-body">
+        <div class="kp-title">代理出境 · 住宅 IP 中转</div>
+        <div class="kp-desc">
+          代理节点支持 <strong>VLESS · Hy2（Hysteria2）· AnyTLS</strong> 协议，fallback / url-test 自动选优。<br>
+          对 AI 服务（ChatGPT、Claude 等）启用 <code>dialer-proxy</code>：流量先到 VPS 节点，再通过 SOCKS5 住宅 IP（San Jose / Tokyo）落地，<br>
+          防止数据中心 IP 被风控封号。
+        </div>
+      </div>
+    </div>
+
+    <div class="kp-item">
+      <div class="kp-num blue">6</div>
+      <div class="kp-body">
+        <div class="kp-title">POSTROUTING · 统一 NAT 出境</div>
+        <div class="kp-desc">
+          三路出口（bypass DIRECT · GEOIP CN · 代理）最终汇聚后，经内核 POSTROUTING 的 <code>NAT MASQUERADE</code>，<br>
+          将源地址伪装为路由器 ppp0 IP（华数/CQBN 拨号地址），再由 ppp0（PPPoE · MTU 1492）发往 ISP 骨干网。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 关键要点 ══ -->
+<div class="section" id="key-points">
+  <div class="section-header">
+    <span class="section-title">关键机制要点</span>
+    <span class="badge badge-purple">深度</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px">
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:16px 18px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">TPROXY vs 传统 redirect：透明代理不改写目标 IP</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        传统 iptables REDIRECT 把目标 IP 改写为 127.0.0.1，Mihomo 无法获知原始目标。<br>
+        TPROXY 保留原始目标 IP/Port，Mihomo 通过 <code>SO_ORIGINAL_DST</code> 或 <code>TUN</code> 接口直接读取目标地址，用于 DOMAIN-SUFFIX、GEOIP 等规则精确匹配。<br>
+        <code>mark 0x1 → ip rule table 100 → tun0</code> 是 TPROXY 策略路由的标准三段式。
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:8px;padding:16px 18px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">fake-ip 与 sniffer 的协作</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        fake-ip 让 Mihomo 在 DNS 解析阶段即可建立域名→连接的映射，无需等待实际 IP。<br>
+        sniffer（TLS SNI / HTTP Host 探测）在连接建立后从握手包中还原真实域名，<br>
+        用于修正"纯国内 DNS 方案"中无 nameserver-policy 时 DOMAIN 规则无法命中的问题。
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:8px;padding:16px 18px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">OUTPUT hook · Mihomo 自身流量跳过 TPROXY</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        Mihomo 进程本身发出的流量（出向代理节点的连接）不能再被 TPROXY 拦截，否则死循环。<br>
+        Nikki 在 OUTPUT hook 通过 <code>meta skuid != mihomo</code> 或 cgroup/uid 匹配，跳过 Mihomo 进程的出站流量。<br>
+        这也是为什么代理节点的域名解析需要 <code>proxy-server-nameserver</code> 单独配置可信 DoH。
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:8px;padding:16px 18px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">IPv6 防泄漏 · 最高优先级的必要性</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        大多数代理协议不支持 IPv6 隧道，若不拦截则 IPv6 流量直接经 WAN 口出境，绕过代理暴露真实位置。<br>
+        Nikki chain 将 <code>::/0 REJECT</code> 置于最高优先级（优先于 DNS 劫持和 TPROXY），<br>
+        确保任何 IPv6 数据包在 PREROUTING 最早时机被丢弃，不进入后续规则处理。
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:8px;padding:16px 18px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">PPPoE · MTU 1492 与 MSS Clamp</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        PPPoE 在以太网 MTU 1500 之上增加 8 字节 header，可用 MTU 降为 1492。<br>
+        若不配置 MSS Clamp（<code>tcp-mss 1452</code>），TCP 握手协商的 MSS 可能超出 PPPoE 帧大小，导致大包传输失败（网页打开慢、下载卡顿）。<br>
+        OpenWrt/ImmortalWrt 通过 nftables 的 <code>tcp flags syn tcp option maxseg size set rt mtu</code> 自动处理。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ 三条出口路径 ══ -->
+<div class="section" id="flow-paths">
+  <div class="section-header">
+    <span class="section-title">三条出口路径对比</span>
+    <span class="badge badge-green">路径</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-top:3px solid #3B6D11;border-radius:10px;padding:16px">
+      <div style="font-size:13px;font-weight:700;color:#5cb82a;margin-bottom:8px">强制绕行 DIRECT</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <strong style="color:var(--text)">触发条件</strong>：bypass 规则命中（B站、抖音、淘宝、微博、小米、vivo、爱奇艺等）<br>
+        <strong style="color:var(--text)">路径</strong>：Mihomo → 内核 POSTROUTING → ppp0 → ISP<br>
+        <strong style="color:var(--text)">延迟</strong>：最低，无代理开销<br>
+        <strong style="color:var(--text)">用途</strong>：国内大厂应用防止代理导致的账号风控或 CDN 绕路变慢
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-top:3px solid #0F6E56;border-radius:10px;padding:16px">
+      <div style="font-size:13px;font-weight:700;color:#3dd68c;margin-bottom:8px">GEOIP CN 直连</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <strong style="color:var(--text)">触发条件</strong>：目标 IP 属 GEOIP CN 数据库<br>
+        <strong style="color:var(--text)">路径</strong>：Mihomo → 内核 POSTROUTING → ppp0 → ISP<br>
+        <strong style="color:var(--text)">延迟</strong>：低，国内骨干网直连<br>
+        <strong style="color:var(--text)">用途</strong>：覆盖 bypass 未列出的国内 IP 段，保证国内访问速度
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-top:3px solid #993C1D;border-radius:10px;padding:16px">
+      <div style="font-size:13px;font-weight:700;color:#f07040;margin-bottom:8px">代理出境</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <strong style="color:var(--text)">触发条件</strong>：MATCH 兜底 / GFW 域名命中<br>
+        <strong style="color:var(--text)">路径</strong>：Mihomo → VPS 节点（VLESS/Hy2）→ [住宅 IP SOCKS5] → 目标<br>
+        <strong style="color:var(--text)">延迟</strong>：+30~120ms（节点质量决定）<br>
+        <strong style="color:var(--text)">用途</strong>：GFW 封锁域名、AI 服务、境外流媒体
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+    <a class="__site-nav-link" href="/nikki-dns-compare.html"><span class="__site-nav-title">Nikki DNS 分流配置对比</span><span class="__site-nav-sub">纯国内 vs 国内+GFW 分流方案</span></a>
+    <a class="__site-nav-link" href="/r5c-setup-init.html"><span class="__site-nav-title">NanoPi R5C 初始化 Setup</span><span class="__site-nav-sub">刷机 → PPPoE → SSH → Claude</span></a>
+    <a class="__site-nav-link" href="/openwrt-proxy-plugins.html"><span class="__site-nav-title">OpenWrt 代理插件横评</span><span class="__site-nav-sub">Nikki · OpenClash · HomeProxy…</span></a>
+    <a class="__site-nav-link" href="/immortalwrt-plugins.html"><span class="__site-nav-title">immortalwrt v25.12 必装插件</span><span class="__site-nav-sub">Nikki · Bandix · eqos · Theme</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+
+<script>
+const sections = document.querySelectorAll('.section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+  });
+}, { rootMargin: '-52px 0px -60% 0px' });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

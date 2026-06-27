@@ -81,6 +81,14 @@ const docs = [
     tag: '插件',
     tagColor: '#3dd68c',
   },
+  {
+    title: 'Mihomo 完整流量路径图解',
+    subtitle: '五层架构 & 决策流程 · TPROXY · fake-ip · 三路出口',
+    desc: '两张图解析 Mihomo 全链路：架构图展示物理网卡→内核 netfilter→fw4/Nikki→应用层→ppp0 五层并列关系；决策图追踪 DNS 劫持→fake-ip→规则匹配→bypass/直连/代理三路出口的完整判断逻辑',
+    href: '/mihomo-traffic-flow.html',
+    tag: '图解',
+    tagColor: '#c084fc',
+  },
 ]
 
 document.querySelector('#app').innerHTML = `
