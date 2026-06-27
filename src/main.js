@@ -129,7 +129,7 @@ document.querySelector('#app').innerHTML = `
   </div>
 
   <footer>
-    <p>AX82U · Firmware 3004.388.10_2 · Mihomo v1.19.24 · 持续稳定运行</p>
+    <p>NanoPi R5C · ImmortalWrt 25.12 · Nikki（Mihomo）· 持续稳定运行</p>
   </footer>
 </main>
 `
