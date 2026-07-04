@@ -82,6 +82,14 @@ const docs = [
     tagColor: '#3dd68c',
   },
   {
+    title: 'RT-AX82U 无线优化记录',
+    subtitle: '5GHz 粘性客户端 · 漫游助手 · 信道扫描',
+    desc: 'MacBook 回主卧黏在 -72 dBm 的 5GHz 不漫游、速率跌到 72 Mbps：漫游助手 -68 dBm + 固定 5GHz 信道 149 + 2.4GHz 扫描选信道 6 三步解决，含三张实测截图、CSMA/CA 信道共享原理与 macOS 随机 MAC 的坑',
+    href: '/rt-ax82u-wifi-optimization.html',
+    tag: '实战',
+    tagColor: '#f06060',
+  },
+  {
     title: 'Mihomo 完整流量路径图解',
     subtitle: '五层架构 & 决策流程 · TPROXY · fake-ip · 三路出口',
     desc: '两张图解析 Mihomo 全链路：架构图展示物理网卡→内核 netfilter→fw4/Nikki→应用层→ppp0 五层并列关系；决策图追踪 DNS 劫持→fake-ip→规则匹配→bypass/直连/代理三路出口的完整判断逻辑',

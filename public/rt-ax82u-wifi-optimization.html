@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RT-AX82U 无线优化记录 · 5GHz 粘性客户端 & 漫游助手</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:#4f8ef7;border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover{color:var(--text);border-bottom-color:var(--accent)}
+
+/* LAYOUT */
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px 80px}
+
+/* HERO */
+.hero{padding:48px 0 32px}
+.hero-tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:13px;color:var(--text2);max-width:680px;line-height:1.7}
+
+/* SECTION */
+.section{margin-bottom:48px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:32px;}
+.section-header{display:flex;align-items:baseline;gap:10px;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:18px;font-weight:700; color:var(--text)}
+.section-sub{font-size:13px;color:var(--text3)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;vertical-align:middle;white-space:nowrap}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+.badge-red{background:rgba(240,96,96,.14);color:var(--red)}
+.badge-amber{background:rgba(245,166,35,.14);color:var(--amber)}
+
+/* TABLE */
+.full-table-wrap{overflow-x:auto;margin-bottom:24px;background:var(--bg2);border:1px solid var(--border);border-radius:12px}
+.section .full-table-wrap{background:var(--bg3);border-color:var(--border)}
+.full-table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+.full-table th{text-align:left;font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--text3);padding:12px 14px;border-bottom:1px solid var(--border2);background:var(--bg3);white-space:nowrap}
+.full-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;color:var(--text2)}
+.full-table td:first-child{font-weight:600;color:var(--text)}
+.full-table tr:last-child td{border-bottom:none}
+.full-table tr:hover td{background:rgba(255,255,255,.018)}
+
+/* CONTENT */
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:12.5px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:#c9d1d9}
+h3{font-size:15px;margin-top:24px;margin-bottom:12px;color:var(--text);font-weight:600}
+p{color:var(--text2);font-size:14px;margin-bottom:16px}
+ul.plain{margin:0 0 16px 18px;color:var(--text2);font-size:13.5px}
+ul.plain li{margin-bottom:8px}
+strong{color:var(--text)}
+.callout{border-left:3px solid var(--accent);background:var(--bg3);border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:20px;font-size:13.5px;color:var(--text2)}
+.callout.green{border-left-color:var(--green)}
+.callout.amber{border-left-color:var(--amber)}
+
+/* SCREENSHOTS */
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:8px 0 8px}
+.shot{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.shot img{display:block;width:100%;height:auto;background:#fff}
+.shot figcaption{padding:10px 14px;font-size:12px;color:var(--text2);border-top:1px solid var(--border);line-height:1.6}
+.shot figcaption b{color:var(--text);display:block;font-size:12.5px;margin-bottom:2px}
+
+@media(max-width:700px){
+  nav{padding:0 16px}
+  .wrap{padding:0 16px 64px}
+  .section{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-home">← 返回首页</a>
+  <div class="nav-brand">RT-AX82U 无线优化记录</div>
+  <div class="nav-links">
+    <a href="#diagnosis">问题诊断</a>
+    <a href="#shots">信号实测</a>
+    <a href="#changes">改动清单</a>
+    <a href="#scan">信道扫描</a>
+    <a href="#result">实施结果</a>
+    <a href="#ap-mode">AP 模式</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-tag">ASUS RT-AX82U · Merlin 386.7_2 · 2026-07</div>
+  <h1>RT-AX82U 无线优化记录：治好 MacBook 黏 5GHz 不切换</h1>
+  <p>MacBook 从客厅回主卧后死黏在 -72 dBm 的 5GHz 上不漫游，速率跌到 72 Mbps。用「漫游助手 -68 dBm + 固定 5GHz 信道 149 + 2.4GHz 扫描选信道 6」三步解决，含 macOS 随机 MAC 地址的坑与 AP 模式说明。</p>
+</div>
+
+<div id="diagnosis" class="section">
+  <div class="section-header">
+    <div class="section-title">问题诊断</div>
+    <div class="section-sub">粘性客户端（Sticky Client）</div>
+  </div>
+  <p>MacBook 从客厅回到主卧后<strong>黏在 5GHz 频段不切换</strong>：5GHz 穿墙衰减大，到主卧只剩 -72 dBm，但没差到断连，macOS 不会主动漫游，于是一直挂着低速连接。ping 网关 0% 丢包、5ms —— 连接没坏，只是带宽和稳定性差。</p>
+
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr><th>场景</th><th>频段 / BSSID</th><th>RSSI</th><th>Tx 速率</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>主卧正常</td>
+          <td>2.4GHz 信道10 / <code>...ea:88</code></td>
+          <td>-63 dBm</td>
+          <td>48 Mbps</td>
+        </tr>
+        <tr>
+          <td>客厅</td>
+          <td>5GHz 信道149 / <code>...ea:8c</code></td>
+          <td style="color:var(--green);font-weight:600">-40 dBm</td>
+          <td style="color:var(--green);font-weight:600">1134 Mbps</td>
+        </tr>
+        <tr>
+          <td>主卧异常时</td>
+          <td>5GHz 信道149 / <code>...ea:8c</code></td>
+          <td style="color:var(--red);font-weight:600">-72 dBm</td>
+          <td style="color:var(--red);font-weight:600">72 Mbps（MCS 1、单流）</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout amber"><strong>临时恢复方法</strong>：在主卧关开一次 Wi-Fi，重连时会自动选信号最强的 2.4GHz。</div>
+
+  <h3 id="shots">信号实测截图（MacBook · option 点 Wi-Fi 图标）</h3>
+  <div class="shots">
+    <figure class="shot">
+      <img src="/rt-ax82u/bedroom-2.4ghz-normal.png" alt="主卧 2.4GHz 正常连接" loading="lazy">
+      <figcaption><b>主卧 · 2.4GHz 正常</b>信道 10 / BSSID <code>...ea:88</code> · RSSI -63 dBm · Tx 48 Mbps</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="/rt-ax82u/livingroom-5ghz.png" alt="客厅 5GHz 连接" loading="lazy">
+      <figcaption><b>客厅 · 5GHz</b>信道 149 / BSSID <code>...ea:8c</code> · RSSI -40 dBm · Tx 1134 Mbps</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="/rt-ax82u/bedroom-5ghz-sticky-before.png" alt="未优化前主卧黏在 5GHz" loading="lazy">
+      <figcaption><b>未优化前 · 主卧黏 5GHz</b>信道 149 / BSSID <code>...ea:8c</code> · RSSI -73 dBm · Tx 72 Mbps（MCS 1、单流）</figcaption>
+    </figure>
+  </div>
+</div>
+
+<div id="changes" class="section">
+  <div class="section-header">
+    <div class="section-title">路由器改动清单</div>
+    <div class="section-sub">无线网络 → 一般设置 / 专业设置</div>
+  </div>
+
+  <h3 style="margin-top:0">必改 <span class="badge badge-red">3 项</span></h3>
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr><th>位置</th><th>设置项</th><th>改为</th><th>原因</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>专业设置 → 5GHz</td>
+          <td>漫游助手</td>
+          <td><strong style="color:var(--green)">启用，-68 dBm</strong></td>
+          <td>主动踢掉弱信号设备，逼其重连 2.4GHz。主卧实测 -71~-72，设 -70 在波动边缘会时灵时不灵，-68 留出余量</td>
+        </tr>
+        <tr>
+          <td>一般设置 → 5GHz</td>
+          <td>频道</td>
+          <td><strong style="color:var(--green)">固定 149</strong>，取消「包括 DFS 频道」</td>
+          <td>国内 149~165 是高功率段，36~64 是低功率段；「自动」选到 36 会削弱穿墙能力</td>
+        </tr>
+        <tr>
+          <td>一般设置 → 2.4GHz</td>
+          <td>频道</td>
+          <td><strong style="color:var(--green)">固定 1、6 或 11</strong>（选最空的）</td>
+          <td>当前自动落在信道 10，与 6、11 重叠互扰；1/6/11 是仅有的三个不重叠信道</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>保持不动 <span class="badge badge-green">6 项</span></h3>
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr><th>设置项</th><th>保持</th><th>原因</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2.4GHz 漫游助手</td><td>停用</td><td>2.4GHz 是覆盖兜底，无 Mesh 时踢掉后设备无处可去</td></tr>
+        <tr><td>2.4GHz MU-MIMO / OFDMA</td><td>停用</td><td>2.4GHz 客户端多为单天线 IoT 设备用不上，开了反而易致智能家居掉线</td></tr>
+        <tr><td>5GHz MU-MIMO / OFDMA</td><td>启用 / DL+UL</td><td>5GHz 客户端（MacBook、新手机）真正支持这些特性</td></tr>
+        <tr><td>Smart Connect</td><td>启用</td><td>负责新连接分频段，与漫游助手（踢粘性设备）互补</td></tr>
+        <tr><td>5GHz 160 MHz</td><td>不勾</td><td>需借用 DFS 信道，遇雷达检测强制切换断流</td></tr>
+        <tr><td>专业设置其余项</td><td>默认</td><td>已是调校好的默认值</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>可选（与漫游无关）</h3>
+  <ul class="plain">
+    <li><strong>换 WiFi 密码</strong>：现密码强度弱，建议换 12 位以上混合密码（所有设备需重连）。</li>
+    <li><strong>升级固件</strong>：386.7_2 为 2022 年版本，如不依赖 koolshare 插件可升级。</li>
+    <li><strong>备用调整</strong>：老设备频繁掉线 → 停用「通用 Beamforming」；5GHz 莫名卡顿 → OFDMA 改仅 DL。</li>
+  </ul>
+</div>
+
+<div id="scan" class="section">
+  <div class="section-header">
+    <div class="section-title">2.4GHz 信道扫描分析</div>
+    <div class="section-sub">2026-07-04 主卧实测 · <code>system_profiler SPAirPortDataType</code></div>
+  </div>
+  <p>从主卧扫描邻居网络，各信道占用情况：</p>
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead>
+        <tr><th>信道</th><th>邻居网络数</th><th>备注</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>3 个</td><td>其中一个是 40MHz 宽频，压到信道 5 附近，<strong style="color:var(--red)">最挤</strong></td></tr>
+        <tr><td>4</td><td>1 个</td><td>非标准信道，同时干扰 1 和 6</td></tr>
+        <tr><td>6（已选用）</td><td>1 个</td><td><strong style="color:var(--green)">最空 ✓</strong></td></tr>
+        <tr><td>11</td><td>2 个</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout green"><strong>结论：固定信道 6 是当前最优，不要换 1。</strong>邻居若用「自动」信道，分布会随时间变化；日后 2.4GHz 变卡可重新扫描对比（同一条命令，看 <code>Other Local Wi-Fi Networks</code> 部分）。</div>
+
+  <h3>为什么不能独占信道</h3>
+  <ul class="plain">
+    <li>2.4GHz 是免执照公共频段，总宽约 80MHz，只容得下 1/6/11 三个不重叠的 20MHz 信道，而信号穿墙可及十几户邻居，必然共享。</li>
+    <li>Wi-Fi 用 CSMA/CA「先听后发、轮流说话」：同信道网络分时共用，干扰代价取决于邻居<strong>有多忙</strong>而非存不存在 —— 所以信道 6 上有一个邻居影响很小。</li>
+    <li><strong>同信道共享 &gt; 部分重叠</strong>：同信道双方能互相监听协调；部分重叠（如信道 4 对 1/6）互相听不清、无法协调，只会变成纯噪声。这是只推荐 1/6/11 的原因。</li>
+    <li>想接近「独占」：5GHz 信道多且穿墙衰减大，邻居信号自然弱（客厅 5GHz 跑 1134 Mbps 即「事实独占」）；固定设备用网线是唯一真独占。</li>
+  </ul>
+</div>
+
+<div id="result" class="section">
+  <div class="section-header">
+    <div class="section-title">实施结果</div>
+    <div class="section-sub">2026-07-04 已验证 <span class="badge badge-green">✓ 解决</span></div>
+  </div>
+  <p>改完后主卧实测：连上 2.4GHz <code>...ea:88</code>，信道 6，RSSI <strong style="color:var(--green)">-61 dBm</strong>，Tx <strong style="color:var(--green)">68 Mbps</strong> —— 优于优化前的正常状态（信道 10 / -63 dBm / 48 Mbps），漫游问题解决。</p>
+  <div class="callout amber"><strong>macOS 随机 MAC 的坑</strong>：Mac 对该 SSID 使用 macOS「专用 Wi-Fi 地址」（随机化地址，与真实硬件地址不同）。在路由器上做 DHCP 绑定 / MAC 过滤 / 漫游阻止列表时要用当前随机地址，或在 Mac 的 Wi-Fi 网络设置中关闭「专用 Wi-Fi 地址」改用真实地址。</div>
+
+  <h3>验证方法</h3>
+  <ul class="plain">
+    <li>每页改完点「应用本页面设置」，无线重启、设备断线几秒属正常。</li>
+    <li>带 MacBook 到主卧等十几秒，看 Wi-Fi 详情：BSSID 应为 <code>...ea:88</code>（2.4GHz）。</li>
+    <li>若仍挂在 5GHz：检查「漫游阻止列表」里是否有 Mac 的 MAC 地址（在列表里则漫游助手对它不生效）。</li>
+  </ul>
+</div>
+
+<div id="ap-mode" class="section">
+  <div class="section-header">
+    <div class="section-title">关于切换 AP 模式</div>
+    <div class="section-sub">无线层设置全部保留</div>
+  </div>
+  <ul class="plain">
+    <li>无线层设置（漫游助手、固定频道、Smart Connect、专业设置）<strong>在 AP 模式下全部保留、照常生效</strong>。</li>
+    <li>失效的是路由功能：NAT、DHCP、防火墙、QoS、家长控制、AiProtection、VPN、端口转发等（交给上游路由器）。</li>
+    <li>注意：① 切换后重新核对一遍无线设置（部分固件会恢复默认）；② 管理 IP 会变，建议上游绑定固定 IP；③ koolshare 插件大多依赖路由模式，AP 下部分失效属正常。</li>
+    <li>双路由扩覆盖场景：两台 SSID 相同、信道错开，漫游助手负责把设备踢到近的那台。</li>
+  </ul>
+</div>
+
+</div><!-- /wrap -->
+
+<style id="__site-nav-css">
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC',sans-serif}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+</style>
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+<a class="__site-nav-link" href="/merlin-setup-guide.html"><span class="__site-nav-title">梅林固件设置指南</span><span class="__site-nav-sub">AX82U & RAX80</span></a>
+<a class="__site-nav-link" href="/yunyufen-config.html"><span class="__site-nav-title">多机场订阅组合</span><span class="__site-nav-sub">良心云 · 渔舍 · 赔钱 · 极风</span></a>
+<a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C 刷机教程</span><span class="__site-nav-sub">ImmortalWrt 完整流程</span></a>
+<a class="__site-nav-link" href="/r5c-setup-init.html"><span class="__site-nav-title">NanoPi R5C 初始化 Setup</span><span class="__site-nav-sub">刷机 → PPPoE → SSH → Claude 分步实施</span></a>
+<a class="__site-nav-link" href="/softrouter-mega-comparison.html"><span class="__site-nav-title">软路由终极横评</span><span class="__site-nav-sub">17 款全对比</span></a>
+<a class="__site-nav-link" href="/immortalwrt-plugins.html"><span class="__site-nav-title">immortalwrt v25.12 必装插件</span><span class="__site-nav-sub">Nikki · Bandix · eqos</span></a>
+<a class="__site-nav-link" href="/nikki-dns-compare.html"><span class="__site-nav-title">Nikki DNS 分流配置对比</span><span class="__site-nav-sub">ImmortalWrt R5C · 25.12.0</span></a>
+<a class="__site-nav-link" href="/mihomo-traffic-flow.html"><span class="__site-nav-title">Mihomo 完整流量路径图解</span><span class="__site-nav-sub">五层架构 & 决策流程</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+
+</body>
+</html>
