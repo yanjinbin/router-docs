@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikki 插件访问与 Mihomo YAML 上传 · R5C 软路由</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:4px;padding:1px 6px}
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:var(--accent);border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-brand span{color:var(--green)}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto;flex-shrink:0}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);border-bottom-color:var(--green)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px 80px}
+.hero{padding:48px 0 28px}
+.hero-tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+.hero h1{font-size:clamp(22px,3.5vw,34px);font-weight:750;line-height:1.22;margin-bottom:12px;letter-spacing:0}
+.hero p{font-size:13px;color:var(--text2);max-width:760px;line-height:1.75}
+.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:24px 0 28px}
+.quick-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.quick-label{font-size:11px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.quick-value{font-family:var(--mono);font-size:12px;color:var(--text);word-break:break-all}
+.quick-value a{color:var(--accent);text-decoration:none}
+.quick-value a:hover{text-decoration:underline}
+.section{margin-bottom:44px}
+.section-header{display:flex;align-items:baseline;gap:10px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:16px;font-weight:700}
+.section-sub{font-size:11px;color:var(--text3)}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.step{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;min-height:148px}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(61,214,140,.13);color:var(--green);font-weight:800;font-size:12px;margin-bottom:10px}
+.step h3{font-size:13px;margin-bottom:8px}
+.step p{font-size:12px;color:var(--text2);line-height:1.65}
+.shot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.shot{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.shot img{display:block;width:100%;height:auto;background:#0b0d12}
+.shot-caption{padding:12px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)}
+.callout{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.25);border-radius:8px;padding:14px 16px;margin:0 0 24px;font-size:12px;color:var(--text2);line-height:1.7}
+.callout strong{color:var(--text)}
+.callout-green{background:rgba(61,214,140,.08);border-color:rgba(61,214,140,.25)}
+.link-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.primary-link,.secondary-link{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;transition:opacity .15s,border-color .15s;background:var(--accent);color:#fff}
+.secondary-link{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.primary-link:hover,.secondary-link:hover{opacity:.86}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.check-row{display:grid;grid-template-columns:160px 1fr;gap:14px;padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px}
+.check-row:last-child{border-bottom:none}
+.check-key{font-weight:700;color:var(--text)}
+.check-val{color:var(--text2)}
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:var(--sans)}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:8px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+@media(max-width:860px){
+  .quick-grid,.steps,.shot-grid{grid-template-columns:1fr}
+  .check-row{grid-template-columns:1fr;gap:4px}
+}
+@media(max-width:640px){
+  nav{padding:0 16px}.wrap{padding:0 16px 64px}.hero{padding-top:36px}
+  .nav-brand{display:none}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-home" href="/">← 首页</a>
+  <div class="nav-brand">R5C · <span>Nikki YAML 上传</span></div>
+  <div class="nav-links">
+    <a href="#login">访问入口</a>
+    <a href="#upload">上传步骤</a>
+    <a href="#dashboard">控制面板</a>
+    <a href="#check">自检</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-tag">ImmortalWrt · Nikki · Mihomo</div>
+    <h1>Nikki 插件访问与 Mihomo YAML 上传</h1>
+    <p>这页记录软路由上 Nikki 插件的固定访问地址、登录账号、配置上传路径，以及配置启用后进入 Mihomo Dashboard 的地址。适用于 R5C 主路由上由 Nikki 托管的 Mihomo 透明代理。</p>
+  </div>
+
+  <div class="quick-grid" id="login">
+    <div class="quick-card">
+      <div class="quick-label">Nikki 插件页面</div>
+      <div class="quick-value"><a href="http://192.168.2.1/cgi-bin/luci/admin/services/nikki" target="_blank" rel="noopener">http://192.168.2.1/cgi-bin/luci/admin/services/nikki</a></div>
+    </div>
+    <div class="quick-card">
+      <div class="quick-label">登录账号</div>
+      <div class="quick-value">root / 666666</div>
+    </div>
+    <div class="quick-card">
+      <div class="quick-label">Dashboard</div>
+      <div class="quick-value"><a href="http://192.168.2.1:9090/ui/zashboard/?host=192.168.2.1&hostname=192.168.2.1&port=9090&secret=666666" target="_blank" rel="noopener">Zashboard 控制面板</a></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>访问前提：</strong>电脑或手机需要已经连到软路由所在网络，并且能访问 <code>192.168.2.1</code>。如果浏览器提示无法访问，先确认本机网关、Wi-Fi/有线连接和软路由 LAN 地址是否一致。
+  </div>
+
+  <div class="section" id="upload">
+    <div class="section-header">
+      <div class="section-title">上传与启用步骤</div>
+      <div class="section-sub">登录 LuCI 后在 Nikki 页面完成</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>打开 Nikki 页面</h3>
+        <p>进入 <code>服务 → Nikki</code>，或直接打开本页上方的 Nikki 插件页面链接。登录用户名为 <code>root</code>，密码为 <code>666666</code>。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>上传 YAML</h3>
+        <p>在配置文件区域上传准备好的 <code>config.yaml</code>。建议文件名保持短且稳定，避免后续选择时混淆。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>选择配置并重载</h3>
+        <p>在配置下拉框选择刚上传的 YAML，保存后执行重载，让 Nikki 读取新的 Mihomo 配置。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>启动并打开面板</h3>
+        <p>确认 Nikki 处于运行状态后，打开 <code>192.168.2.1:9090</code> 的 Zashboard 面板查看代理、连接和规则命中。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">页面示意图</div>
+      <div class="section-sub">上传、选择、重载、启动</div>
+    </div>
+    <div class="shot-grid">
+      <figure class="shot">
+        <img src="/assets/mihomo-yaml-上传示意图.png" alt="Nikki 页面上传 Mihomo YAML 配置示意图">
+        <figcaption class="shot-caption">在 Nikki 插件页面上传 Mihomo YAML 配置文件。</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="/assets/mihomo-yaml-选择-重载-启动示意图.png" alt="Nikki 页面选择配置重载并启动示意图">
+        <figcaption class="shot-caption">选择上传后的配置，保存、重载并启动 Nikki。</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="section" id="dashboard">
+    <div class="section-header">
+      <div class="section-title">打开 Mihomo Dashboard</div>
+      <div class="section-sub">Zashboard 外部控制面板</div>
+    </div>
+    <div class="callout callout-green">
+      Nikki 启动成功后，打开下面的地址进入控制面板。这个地址已经带上主机、端口和 secret 参数，适合直接收藏。
+      <div class="link-row">
+        <a class="primary-link" href="http://192.168.2.1:9090/ui/zashboard/?host=192.168.2.1&hostname=192.168.2.1&port=9090&secret=666666" target="_blank" rel="noopener">打开 Zashboard</a>
+        <a class="secondary-link" href="http://192.168.2.1/cgi-bin/luci/admin/services/nikki" target="_blank" rel="noopener">打开 Nikki 插件页</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="check">
+    <div class="section-header">
+      <div class="section-title">启用后自检</div>
+      <div class="section-sub">面板能打开不等于规则一定正确</div>
+    </div>
+    <div class="checklist">
+      <div class="check-row"><div class="check-key">Nikki 状态</div><div class="check-val">LuCI 页面显示运行中，重载后没有立即停止。</div></div>
+      <div class="check-row"><div class="check-key">Dashboard</div><div class="check-val">Zashboard 能看到代理组、连接、规则和日志。</div></div>
+      <div class="check-row"><div class="check-key">DNS</div><div class="check-val">国内网站打开正常，境外网站按规则进入代理组。</div></div>
+      <div class="check-row"><div class="check-key">配置来源</div><div class="check-val">确认当前选中的 YAML 就是刚上传的文件，避免还在使用旧配置。</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+    <a class="__site-nav-link" href="/mihomo-yaml-converter.html"><span class="__site-nav-title">Mihomo YAML 本地/软路由转换</span><span class="__site-nav-sub">Clash Party · Clash Verge · Nikki</span></a>
+    <a class="__site-nav-link" href="/nikki-dns-compare.html"><span class="__site-nav-title">Nikki DNS 分流配置对比</span><span class="__site-nav-sub">纯国内 vs GFW 分流</span></a>
+    <a class="__site-nav-link" href="/openwrt-proxy-plugins.html"><span class="__site-nav-title">OpenWrt 代理插件横评</span><span class="__site-nav-sub">Nikki · OpenClash · HomeProxy</span></a>
+    <a class="__site-nav-link" href="/r5c-setup-init.html"><span class="__site-nav-title">NanoPi R5C 初始化 Setup</span><span class="__site-nav-sub">刷机 → PPPoE → SSH</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+
+<script>
+const sections = document.querySelectorAll('.section[id], .quick-grid[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+    }
+  });
+}, { rootMargin: '-52px 0px -60% 0px' });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

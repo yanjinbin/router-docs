@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mihomo YAML 本地客户端与软路由 Nikki 转换工具</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;--bg4:#111520;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:4px;padding:1px 6px}
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:var(--accent);border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-brand span{color:var(--accent)}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto;flex-shrink:0}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);border-bottom-color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 80px}
+.hero{padding:48px 0 28px}
+.hero-tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(22px,3.5vw,34px);font-weight:750;line-height:1.22;margin-bottom:12px;letter-spacing:0}
+.hero p{font-size:13px;color:var(--text2);max-width:780px;line-height:1.75}
+.section{margin-bottom:46px}
+.section-header{display:flex;align-items:baseline;gap:10px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:16px;font-weight:700}
+.section-sub{font-size:11px;color:var(--text3)}
+.badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;white-space:nowrap}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+.badge-amber{background:rgba(245,166,35,.12);color:var(--amber)}
+.compare-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px}
+.compare-table th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border2)}
+.compare-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.65}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table td:first-child{font-weight:700;color:var(--text);width:170px}
+.compare-table .mono{font-family:var(--mono);font-size:11.5px;color:var(--text2)}
+.tool{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.tool-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.tool-title{font-size:13px;font-weight:800}
+.status{font-size:12px;color:var(--text2);min-height:20px;text-align:right}
+.status strong{color:var(--green)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.015)}
+.file-label,.btn,select{height:34px;border-radius:6px;border:1px solid var(--border2);background:var(--bg4);color:var(--text);font-size:12px;font-weight:700;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;transition:border-color .15s,opacity .15s}
+.file-label input{display:none}
+.btn.primary{background:var(--accent);border-color:rgba(79,142,247,.45);color:#fff}
+.btn.green{background:rgba(61,214,140,.13);border-color:rgba(61,214,140,.3);color:var(--green)}
+.btn:hover,.file-label:hover,select:hover{border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.pane{min-width:0;border-right:1px solid var(--border)}
+.pane:last-child{border-right:none}
+.pane-head{height:42px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.018)}
+.pane-label{font-size:12px;font-weight:800;color:var(--text)}
+.pane-meta{font-size:11px;color:var(--text3);white-space:nowrap}
+textarea{width:100%;height:520px;display:block;border:0;resize:vertical;background:#0b0f18;color:var(--text);font-family:var(--mono);font-size:12px;line-height:1.65;padding:14px;outline:none;tab-size:2}
+textarea::placeholder{color:#596074}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.note{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px}
+.note h3{font-size:13px;margin-bottom:6px}
+.note p{font-size:12px;color:var(--text2);line-height:1.65}
+.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.diff-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.diff-card h3{font-size:13px;padding:12px 14px;background:var(--bg3);border-bottom:1px solid var(--border)}
+pre{margin:0;padding:14px;overflow:auto;color:var(--text2);font-family:var(--mono);font-size:12px;line-height:1.65}
+.green-line{color:var(--green)}.blue-line{color:#9ecbff}.amber-line{color:var(--amber)}
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:var(--sans)}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:8px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+@media(max-width:920px){
+  .editor-grid,.diff-grid,.notes{grid-template-columns:1fr}
+  .pane{border-right:0;border-bottom:1px solid var(--border)}
+  .pane:last-child{border-bottom:0}
+  textarea{height:380px}
+}
+@media(max-width:640px){
+  nav{padding:0 16px}.wrap{padding:0 16px 64px}.hero{padding-top:36px}.nav-brand{display:none}
+  .tool-head{align-items:flex-start;flex-direction:column}.status{text-align:left}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-home" href="/">← 首页</a>
+  <div class="nav-brand">Mihomo YAML · <span>本地/软路由转换</span></div>
+  <div class="nav-links">
+    <a href="#diff">差异</a>
+    <a href="#tool">转换工具</a>
+    <a href="#rules">转换规则</a>
+    <a href="#snippets">关键片段</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-tag">Clash Party · Clash Verge · Mihomo · OpenWrt Nikki</div>
+    <h1>本地 Mihomo 客户端与软路由 Nikki 配置转换</h1>
+    <p>两类配置的大部分内容可以共用：代理节点、规则、DNS 分流、fake-ip-filter、sniffer 都应保留。真正需要切换的是运行环境相关项，尤其是 <code>find-process-mode</code> 与 <code>tun</code>。下面的工具支持上传 YAML、自动识别、互相转换和下载。</p>
+  </div>
+
+  <div class="section" id="diff">
+    <div class="section-header">
+      <div class="section-title">核心差异展示</div>
+      <div class="section-sub">只改运行环境，不动业务规则</div>
+    </div>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>项目</th>
+            <th>软路由 Nikki / OpenWrt</th>
+            <th>本地 Mihomo 客户端</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>典型客户端</td>
+            <td>OpenWrt LuCI Nikki 插件，Mihomo 由路由器托管。</td>
+            <td>Clash Party、Clash Verge、Mihomo Party、Clash Verge Rev 等本机客户端。</td>
+          </tr>
+          <tr>
+            <td>进程识别</td>
+            <td class="mono">find-process-mode: off</td>
+            <td class="mono">find-process-mode: strict</td>
+          </tr>
+          <tr>
+            <td>TUN 设备</td>
+            <td class="mono">device: nikki</td>
+            <td class="mono">不指定 device，由本地客户端/系统创建。</td>
+          </tr>
+          <tr>
+            <td>路由接管</td>
+            <td class="mono">auto-route: false<br>auto-redirect: false<br>auto-detect-interface: false</td>
+            <td class="mono">auto-route: true<br>auto-redirect: false<br>strict-route: true<br>auto-detect-interface: true</td>
+          </tr>
+          <tr>
+            <td>原因</td>
+            <td>Nikki 插件接管 OpenWrt 路由和 nftables 规则，Mihomo 只负责内核代理能力。</td>
+            <td>本地客户端需要自己接管系统路由、DNS 劫持和默认出口检测。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="tool">
+    <div class="section-header">
+      <div class="section-title">上传、互转、下载</div>
+      <div class="section-sub">浏览器本地处理，不上传到服务器</div>
+    </div>
+    <div class="tool">
+      <div class="tool-head">
+        <div class="tool-title">Mihomo YAML 转换工具</div>
+        <div class="status" id="status">等待输入 YAML。</div>
+      </div>
+      <div class="toolbar">
+        <label class="file-label">上传 YAML
+          <input id="fileInput" type="file" accept=".yaml,.yml,text/yaml,text/plain">
+        </label>
+        <button class="btn primary" id="toRouterBtn" type="button">转为软路由 Nikki</button>
+        <button class="btn primary" id="toLocalBtn" type="button">转为本地客户端</button>
+        <button class="btn" id="autoBtn" type="button">自动判断并转换</button>
+        <button class="btn" id="swapBtn" type="button">结果放回左侧</button>
+        <button class="btn green" id="downloadBtn" type="button">下载结果</button>
+        <button class="btn" id="clearBtn" type="button">清空</button>
+      </div>
+      <div class="editor-grid">
+        <div class="pane">
+          <div class="pane-head">
+            <div class="pane-label">源 YAML</div>
+            <div class="pane-meta" id="sourceMeta">未识别</div>
+          </div>
+          <textarea id="sourceText" spellcheck="false" placeholder="上传 .yaml/.yml 文件，或把本地客户端 / 软路由 Nikki 的 config.yaml 粘贴到这里。"></textarea>
+        </div>
+        <div class="pane">
+          <div class="pane-head">
+            <div class="pane-label">转换结果</div>
+            <div class="pane-meta" id="resultMeta">尚未转换</div>
+          </div>
+          <textarea id="resultText" spellcheck="false" placeholder="点击转换后生成结果。"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes" id="rules">
+      <div class="note">
+        <h3>保留内容</h3>
+        <p>代理节点、proxy-groups、rules、rule-providers、DNS 策略、fake-ip-filter、sniffer 和外部控制配置默认原样保留。</p>
+      </div>
+      <div class="note">
+        <h3>修改内容</h3>
+        <p>转换器会替换 <code>tun</code> 顶层块，并把 <code>find-process-mode</code> 改成目标环境需要的值。</p>
+      </div>
+      <div class="note">
+        <h3>使用建议</h3>
+        <p>转换后先保存为新文件，不要覆盖原始 YAML。上传到 Nikki 后按页面提示选择、重载、启动，再去 Dashboard 看日志。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="snippets">
+    <div class="section-header">
+      <div class="section-title">关键片段对照</div>
+      <div class="section-sub">转换器主要替换这两段</div>
+    </div>
+    <div class="diff-grid">
+      <div class="diff-card">
+        <h3>软路由 Nikki / OpenWrt</h3>
+        <pre><span class="green-line">find-process-mode: off</span>
+
+# TUN（Nikki 托管模式）
+tun:
+  enable: true
+  stack: mixed
+  device: nikki
+  auto-route: false
+  auto-redirect: false
+  auto-detect-interface: false
+  dns-hijack:
+    - any:53
+    - tcp://any:53</pre>
+      </div>
+      <div class="diff-card">
+        <h3>本地 Mihomo 客户端</h3>
+        <pre><span class="blue-line">find-process-mode: strict</span>
+
+# TUN（本地客户端配置）
+tun:
+  enable: true
+  stack: mixed
+  auto-route: true
+  auto-redirect: false
+  strict-route: true
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+    - tcp://any:53</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+    <a class="__site-nav-link" href="/nikki-yaml-upload-guide.html"><span class="__site-nav-title">Nikki 插件访问与 YAML 上传</span><span class="__site-nav-sub">LuCI 登录 · 重载 · Zashboard</span></a>
+    <a class="__site-nav-link" href="/nikki-dns-compare.html"><span class="__site-nav-title">Nikki DNS 分流配置对比</span><span class="__site-nav-sub">纯国内 vs GFW 分流</span></a>
+    <a class="__site-nav-link" href="/mihomo-traffic-flow.html"><span class="__site-nav-title">Mihomo 完整流量路径图解</span><span class="__site-nav-sub">fake-ip · TPROXY · 规则决策</span></a>
+    <a class="__site-nav-link" href="/openwrt-proxy-plugins.html"><span class="__site-nav-title">OpenWrt 代理插件横评</span><span class="__site-nav-sub">Nikki · OpenClash · HomeProxy</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+
+<script>
+const routerTunBlock = `# TUN（Nikki 托管模式）
+tun:
+  enable: true
+  stack: mixed
+  device: nikki
+  auto-route: false
+  auto-redirect: false
+  auto-detect-interface: false
+  dns-hijack:
+    - any:53
+    - tcp://any:53`;
+
+const localTunBlock = `# TUN（本地客户端配置）
+tun:
+  enable: true
+  stack: mixed
+  auto-route: true
+  auto-redirect: false
+  strict-route: true
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+    - tcp://any:53`;
+
+const sourceText = document.getElementById('sourceText');
+const resultText = document.getElementById('resultText');
+const sourceMeta = document.getElementById('sourceMeta');
+const resultMeta = document.getElementById('resultMeta');
+const statusEl = document.getElementById('status');
+let currentFileBase = 'mihomo-config';
+
+function normalizeNewlines(text) {
+  return text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+}
+
+function detectType(text) {
+  const body = normalizeNewlines(text);
+  const hasNikkiDevice = /^\s*device:\s*nikki\s*$/m.test(body);
+  const hasRouterRoute = /^\s*auto-route:\s*false\s*$/m.test(body) && /^\s*auto-detect-interface:\s*false\s*$/m.test(body);
+  const hasLocalRoute = /^\s*auto-route:\s*true\s*$/m.test(body) && /^\s*strict-route:\s*true\s*$/m.test(body);
+  const hasStrictProcess = /^find-process-mode:\s*strict\s*$/m.test(body);
+  const hasOffProcess = /^find-process-mode:\s*off\s*$/m.test(body);
+
+  if (hasNikkiDevice || (hasRouterRoute && hasOffProcess)) return 'router';
+  if (hasLocalRoute || hasStrictProcess) return 'local';
+  if (/^tun:\s*$/m.test(body)) return 'unknown-tun';
+  return 'unknown';
+}
+
+function typeLabel(type) {
+  if (type === 'router') return '软路由 Nikki';
+  if (type === 'local') return '本地客户端';
+  if (type === 'unknown-tun') return '有 TUN，无法确定环境';
+  return '未识别';
+}
+
+function setStatus(text, strong) {
+  statusEl.innerHTML = strong ? `${text}<strong>${strong}</strong>` : text;
+}
+
+function replaceScalar(text, key, value) {
+  const re = new RegExp(`^${key}:\\s*.*$`, 'm');
+  if (re.test(text)) return text.replace(re, `${key}: ${value}`);
+  const anchor = /^geodata-mode:/m;
+  if (anchor.test(text)) return text.replace(anchor, `${key}: ${value}\n\ngeodata-mode:`);
+  return `${key}: ${value}\n${text}`;
+}
+
+function replaceTopLevelBlock(text, key, block) {
+  const lines = normalizeNewlines(text).split('\n');
+  const start = lines.findIndex(line => new RegExp(`^${key}:\\s*(#.*)?$`).test(line));
+  if (start === -1) {
+    const insertAt = lines.findIndex(line => /^external-controller:|^dns:/.test(line));
+    if (insertAt === -1) return `${text.trimEnd()}\n\n${block}\n`;
+    lines.splice(insertAt, 0, block, '');
+    return lines.join('\n');
+  }
+
+  let end = start + 1;
+  while (end < lines.length) {
+    const line = lines[end];
+    if (line.trim() !== '' && !/^[ \t]/.test(line)) break;
+    end += 1;
+  }
+
+  let commentStart = start;
+  while (commentStart > 0) {
+    const prev = lines[commentStart - 1];
+    if (/^#.*TUN/.test(prev) || /^#\s*[─-]+.*TUN/.test(prev)) {
+      commentStart -= 1;
+      break;
+    }
+    if (prev.trim() === '') break;
+    break;
+  }
+
+  lines.splice(commentStart, end - commentStart, block, '');
+  return lines.join('\n').replace(/\n{4,}/g, '\n\n\n');
+}
+
+function convert(text, target) {
+  if (!text.trim()) throw new Error('源 YAML 为空。');
+  let out = normalizeNewlines(text).trimEnd() + '\n';
+  const sourceType = detectType(out);
+
+  if (target === 'router') {
+    out = replaceScalar(out, 'find-process-mode', 'off');
+    out = replaceTopLevelBlock(out, 'tun', routerTunBlock);
+  } else if (target === 'local') {
+    out = replaceScalar(out, 'find-process-mode', 'strict');
+    out = replaceTopLevelBlock(out, 'tun', localTunBlock);
+  } else {
+    throw new Error('未知目标类型。');
+  }
+
+  return {
+    text: out.trimEnd() + '\n',
+    sourceType,
+    targetType: target,
+  };
+}
+
+function runConvert(target) {
+  try {
+    const converted = convert(sourceText.value, target);
+    resultText.value = converted.text;
+    sourceMeta.textContent = typeLabel(converted.sourceType);
+    resultMeta.textContent = typeLabel(converted.targetType);
+    setStatus('已生成：', typeLabel(converted.targetType));
+  } catch (err) {
+    setStatus(err.message || '转换失败。');
+  }
+}
+
+function autoConvert() {
+  const type = detectType(sourceText.value);
+  if (type === 'router') return runConvert('local');
+  if (type === 'local') return runConvert('router');
+  setStatus('无法自动判断，请手动选择“转为软路由 Nikki”或“转为本地客户端”。');
+  sourceMeta.textContent = typeLabel(type);
+}
+
+function downloadResult() {
+  const text = resultText.value.trim() ? resultText.value : sourceText.value;
+  if (!text.trim()) {
+    setStatus('没有可下载内容。');
+    return;
+  }
+  const type = detectType(text);
+  const suffix = type === 'router' ? 'openwrt-nikki' : type === 'local' ? 'local-mihomo' : 'converted';
+  const blob = new Blob([normalizeNewlines(text)], { type: 'text/yaml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${currentFileBase}.${suffix}.yaml`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  setStatus('已下载：', a.download);
+}
+
+function refreshSourceType() {
+  const type = detectType(sourceText.value);
+  sourceMeta.textContent = typeLabel(type);
+}
+
+document.getElementById('fileInput').addEventListener('change', async event => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  currentFileBase = file.name.replace(/\.(ya?ml|txt)$/i, '') || 'mihomo-config';
+  sourceText.value = await file.text();
+  resultText.value = '';
+  resultMeta.textContent = '尚未转换';
+  refreshSourceType();
+  setStatus('已读取文件：', file.name);
+});
+
+document.getElementById('toRouterBtn').addEventListener('click', () => runConvert('router'));
+document.getElementById('toLocalBtn').addEventListener('click', () => runConvert('local'));
+document.getElementById('autoBtn').addEventListener('click', autoConvert);
+document.getElementById('downloadBtn').addEventListener('click', downloadResult);
+document.getElementById('swapBtn').addEventListener('click', () => {
+  if (!resultText.value.trim()) {
+    setStatus('右侧没有结果可放回左侧。');
+    return;
+  }
+  sourceText.value = resultText.value;
+  resultText.value = '';
+  resultMeta.textContent = '尚未转换';
+  refreshSourceType();
+  setStatus('已把结果放回左侧。');
+});
+document.getElementById('clearBtn').addEventListener('click', () => {
+  sourceText.value = '';
+  resultText.value = '';
+  sourceMeta.textContent = '未识别';
+  resultMeta.textContent = '尚未转换';
+  currentFileBase = 'mihomo-config';
+  setStatus('等待输入 YAML。');
+});
+sourceText.addEventListener('input', refreshSourceType);
+
+const sections = document.querySelectorAll('.section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+    }
+  });
+}, { rootMargin: '-52px 0px -60% 0px' });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
