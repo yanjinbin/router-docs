@@ -104,6 +104,7 @@ pre{margin:0;padding:14px;overflow:auto;color:var(--text2);font-family:var(--mon
     <a href="#dns">DNS</a>
     <a href="#sniffer">Sniffer</a>
     <a href="#funnel">Rules 漏斗</a>
+    <a href="#examples">配置样例</a>
     <a href="#principles">设计原则</a>
   </div>
 </nav>
@@ -234,6 +235,151 @@ pre{margin:0;padding:14px;overflow:auto;color:var(--text2);font-family:var(--mon
     </div>
   </div>
 
+  <div class="section" id="examples">
+    <div class="section-header">
+      <div class="section-title">DNS / Sniffer / Rules 样例</div>
+      <div class="section-sub">来自 Nikki-DNS分流-ZJU 配置，已去掉订阅和节点敏感信息</div>
+    </div>
+    <div class="code-grid">
+      <div class="code-card">
+        <h3>DNS 样例</h3>
+        <pre><span class="green">dns:</span>
+  enable: true
+  cache-algorithm: arc
+  ipv6: false
+  listen: 0.0.0.0:1053
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: true
+  respect-rules: true
+
+  default-nameserver:
+    - 223.5.5.5
+
+  nameserver-policy:
+    "geosite:cn":
+      - 223.5.5.5
+    "geosite:geolocation-!cn":
+      - https://8.8.8.8/dns-query
+      - https://1.1.1.1/dns-query
+
+  nameserver:
+    - 223.5.5.5
+    - https://8.8.8.8/dns-query
+
+  proxy-server-nameserver:
+    - 223.5.5.5
+    - https://sh.dns44.cn:44443/dns-query
+
+  fake-ip-filter:
+    - "geosite:cn"
+    - "*.zju.edu.cn"
+    - "*.edu.cn"
+    - "*.lan"
+    - "*.local"
+    - "*.msftconnecttest.com"
+    - "captive.apple.com"
+    - "+.pool.ntp.org"
+    - "stun.*.*"
+    - "*.ts.net"
+    - "*.tailscale.com"
+    - "节点域名.example.com"</pre>
+      </div>
+      <div class="code-card">
+        <h3>Sniffer 样例</h3>
+        <pre><span class="green">sniffer:</span>
+  enable: true
+  force-dns-mapping: true
+  parse-pure-ip: true
+  override-destination: true
+  sniff:
+    TLS:
+      ports: [443, 8443]
+    HTTP:
+      ports: [80, 8080]
+      override-destination: true
+
+  skip-dst-address:
+    - 192.168.0.0/16
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 149.154.160.0/20
+    - 91.108.4.0/22
+
+  force-domain:
+    - "+.v2ex.com"
+
+  skip-domain:
+    - "geosite:huawei"
+    - "geosite:hikvision"
+    - "+.h3c.com"
+    - "+.mi.com"
+    - "+.apple.com"
+    - "+.push.apple.com"
+    - "+.local"
+    - "*.lan"
+    - "*.msftncsi.com"
+    - "+.pool.ntp.org"
+    - "+.weixin.qq.com"
+    - "+.qq.com"
+    - "stun.*.*"
+    - "*.tailscale.com"
+    - "节点域名.example.com"</pre>
+      </div>
+      <div class="code-card">
+        <h3>Rules 漏斗样例</h3>
+        <pre><span class="green">rules:</span>
+  # L0 临时覆盖：最高优先级，方便快速修正
+  - RULE-SET,temp-direct,DIRECT
+  - RULE-SET,temp-proxy,🔧临时代理
+
+  # L1 网络层硬拦截：不触发 DNS
+  - IP-CIDR6,::/0,REJECT,no-resolve
+  - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
+
+  # L2 内网 / 私有 / Tailscale / PT 直连
+  - RULE-SET,private,DIRECT,no-resolve
+  - RULE-SET,bypass,DIRECT,no-resolve
+  - RULE-SET,tailscale,DIRECT,no-resolve
+  - GEOIP,LAN,DIRECT,no-resolve
+  - GEOSITE,category-pt,DIRECT
+
+  # L3 广告 / 隐私 / 追踪拒绝
+  - RULE-SET,adblock-lite,REJECT
+  - RULE-SET,privacy-reject,REJECT
+  - GEOSITE,apple-update,REJECT
+
+  # L4 高价值业务专线
+  - RULE-SET,claude+,Claude专用
+  - GEOSITE,anthropic,Claude专用
+  - RULE-SET,gemini+,Antigravity专用
+  - GEOSITE,openai,OpenAI专用
+  - GEOSITE,youtube,油管
+
+  # L5 具体 Google 搜索入口先于 Google 大类
+  - DOMAIN,www.google.com,Antigravity专用
+  - DOMAIN-SUFFIX,google.com.hk,🔍Google搜索
+  - DOMAIN-SUFFIX,google.co.jp,🔍Google搜索
+  - GEOSITE,google,Antigravity专用
+
+  # L6 平台类和自定义代理
+  - GEOSITE,telegram,🐟🍵
+  - GEOSITE,github,🌐 节点选择
+  - RULE-SET,auto-proxy,🌐 节点选择
+
+  # L7 国内直连兜底
+  - GEOSITE,cn,DIRECT
+  - GEOIP,cn,DIRECT,no-resolve
+
+  # L8 最终兜底
+  - MATCH,🌐 节点选择</pre>
+      </div>
+    </div>
+    <div class="alert" style="margin-top:14px">
+      <strong>使用方式：</strong>新增规则时先判断它属于哪一层。越确定、越窄、越容易出故障的规则越靠前；越宽泛、越兜底的规则越靠后。Google、AI、流媒体这类大类规则尤其要注意先放具体入口，再放 <code>GEOSITE</code> 大类。
+    </div>
+  </div>
+
   <div class="section" id="principles">
     <div class="section-header">
       <div class="section-title">设计原则</div>
@@ -274,7 +420,7 @@ pre{margin:0;padding:14px;overflow:auto;color:var(--text2);font-family:var(--mon
     <a class="__site-nav-link" href="/mihomo-yaml-converter.html"><span class="__site-nav-title">Mihomo YAML 本地客户端/软路由 配置差异转换</span><span class="__site-nav-sub">Clash Party · Clash Verge · Nikki</span></a>
     <a class="__site-nav-link" href="/nikki-dns-compare.html"><span class="__site-nav-title">Nikki DNS 分流配置对比</span><span class="__site-nav-sub">纯国内 vs GFW 分流</span></a>
     <a class="__site-nav-link" href="/mihomo-traffic-flow.html"><span class="__site-nav-title">Mihomo 完整流量路径图解</span><span class="__site-nav-sub">fake-ip · TPROXY · 规则决策</span></a>
-    <a class="__site-nav-link" href="/nikki-yaml-upload-guide.html"><span class="__site-nav-title">Nikki 插件访问与 YAML 上传</span><span class="__site-nav-sub">LuCI 登录 · 重载 · Zashboard</span></a>
+    <a class="__site-nav-link" href="/nikki-yaml-upload-guide.html"><span class="__site-nav-title">Nikki 插件访问与 YAML 上传和更新重载</span><span class="__site-nav-sub">LuCI 登录 · 重载 · Zashboard</span></a>
   </div>
   <a class="__site-nav-home" href="/">← 返回首页</a>
 </div>
