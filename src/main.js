@@ -34,7 +34,7 @@ const docs = [
     tagColor: '#c084fc',
   },
   {
-    title: 'Nikki 插件访问与 YAML 上传',
+    title: 'Nikki 插件访问与 YAML 上传和更新重载',
     subtitle: 'LuCI 登录 · 上传配置 · 重载启动 · Zashboard',
     desc: '从 192.168.2.1 登录软路由 Nikki 插件页面，上传 Mihomo YAML，选择配置后重载启动，并打开 Zashboard 控制面板。',
     href: '/nikki-yaml-upload-guide.html',
