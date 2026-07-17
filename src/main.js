@@ -42,7 +42,7 @@ const docs = [
     tagColor: '#3dd68c',
   },
   {
-    title: 'Mihomo YAML 本地/软路由转换',
+    title: 'Mihomo YAML 本地客户端/软路由 配置差异转换',
     subtitle: 'Clash Party · Clash Verge · Nikki',
     desc: '对比本地 Mihomo 客户端与 OpenWrt Nikki 透明代理配置差异，支持 YAML 上传、自动识别、互相转换和下载。',
     href: '/mihomo-yaml-converter.html',
