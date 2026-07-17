@@ -48,8 +48,24 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
 .step p{font-size:12px;color:var(--text2);line-height:1.65}
 .shot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .shot{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.shot img{display:block;width:100%;height:auto;background:#0b0d12}
+.shot-trigger{position:relative;display:block;width:100%;border:0;padding:0;background:#0b0d12;color:inherit;cursor:zoom-in;text-align:left}
+.shot-trigger img{display:block;width:100%;height:auto;background:#0b0d12;transition:transform .18s ease,filter .18s ease}
+.shot-trigger:hover img{transform:scale(1.012);filter:brightness(1.04)}
+.shot-trigger:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+.shot-zoom{position:absolute;right:12px;bottom:12px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(15,17,23,.78);border:1px solid rgba(255,255,255,.16);box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.shot-zoom::before{content:'';width:12px;height:12px;border:2px solid var(--text);border-radius:50%;display:block}
+.shot-zoom::after{content:'';position:absolute;width:8px;height:2px;background:var(--text);transform:translate(9px,9px) rotate(45deg);border-radius:1px}
 .shot-caption{padding:12px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)}
+.lightbox{position:fixed;inset:0;z-index:500;background:rgba(5,7,12,.86);backdrop-filter:blur(12px);display:grid;grid-template-rows:auto 1fr auto;gap:12px;padding:18px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .16s ease,visibility .16s ease}
+.lightbox.open{opacity:1;visibility:visible;pointer-events:auto}
+.lightbox-bar{display:flex;align-items:center;justify-content:flex-end;min-height:38px}
+.lightbox-close{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(24,28,37,.88);color:var(--text);font-size:26px;line-height:1;cursor:pointer;transition:background .15s,border-color .15s,transform .12s}
+.lightbox-close:hover{background:rgba(30,35,51,.96);border-color:rgba(255,255,255,.32);transform:scale(1.04)}
+.lightbox-close:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.lightbox-stage{min-height:0;display:flex;align-items:center;justify-content:center}
+.lightbox-image{display:block;max-width:min(100%,1400px);max-height:calc(100svh - 134px);width:auto;height:auto;border-radius:8px;background:#0b0d12;box-shadow:0 24px 80px rgba(0,0,0,.55);cursor:zoom-out}
+.lightbox-caption{max-width:960px;margin:0 auto;color:var(--text2);font-size:12px;line-height:1.6;text-align:center}
+body.lightbox-lock{overflow:hidden}
 .callout{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.25);border-radius:8px;padding:14px 16px;margin:0 0 24px;font-size:12px;color:var(--text2);line-height:1.7}
 .callout strong{color:var(--text)}
 .callout-green{background:rgba(61,214,140,.08);border-color:rgba(61,214,140,.25)}
@@ -78,6 +94,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
 @media(max-width:640px){
   nav{padding:0 16px}.wrap{padding:0 16px 64px}.hero{padding-top:36px}
   .nav-brand{display:none}
+  .lightbox{padding:10px}
+  .lightbox-image{max-height:calc(100svh - 112px)}
 }
 </style>
 </head>
@@ -156,11 +174,17 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
     </div>
     <div class="shot-grid">
       <figure class="shot">
-        <img src="/assets/mihomo-yaml-上传示意图.png" alt="Nikki 页面上传 Mihomo YAML 配置示意图">
+        <button class="shot-trigger" type="button" data-full="/assets/mihomo-yaml-上传示意图.png" data-caption="在 Nikki 插件页面上传 Mihomo YAML 配置文件。" aria-label="放大查看 Nikki 页面上传 Mihomo YAML 配置示意图">
+          <img src="/assets/mihomo-yaml-上传示意图.png" alt="Nikki 页面上传 Mihomo YAML 配置示意图">
+          <span class="shot-zoom" aria-hidden="true"></span>
+        </button>
         <figcaption class="shot-caption">在 Nikki 插件页面上传 Mihomo YAML 配置文件。</figcaption>
       </figure>
       <figure class="shot">
-        <img src="/assets/mihomo-yaml-选择-重载-启动示意图.png" alt="Nikki 页面选择配置重载并启动示意图">
+        <button class="shot-trigger" type="button" data-full="/assets/mihomo-yaml-选择-重载-启动示意图.png" data-caption="选择上传后的配置，保存、重载并启动 Nikki。" aria-label="放大查看 Nikki 页面选择配置重载并启动示意图">
+          <img src="/assets/mihomo-yaml-选择-重载-启动示意图.png" alt="Nikki 页面选择配置重载并启动示意图">
+          <span class="shot-zoom" aria-hidden="true"></span>
+        </button>
         <figcaption class="shot-caption">选择上传后的配置，保存、重载并启动 Nikki。</figcaption>
       </figure>
     </div>
@@ -205,6 +229,16 @@ nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-fi
   <a class="__site-nav-home" href="/">← 返回首页</a>
 </div>
 
+<div class="lightbox" id="imageLightbox" role="dialog" aria-modal="true" aria-label="截图预览" aria-hidden="true">
+  <div class="lightbox-bar">
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="关闭截图预览">×</button>
+  </div>
+  <div class="lightbox-stage">
+    <img class="lightbox-image" id="lightboxImage" alt="">
+  </div>
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
 <script>
 const sections = document.querySelectorAll('.section[id], .quick-grid[id]');
 const navLinks = document.querySelectorAll('.nav-links a');
@@ -216,6 +250,44 @@ const obs = new IntersectionObserver(entries => {
   });
 }, { rootMargin: '-52px 0px -60% 0px' });
 sections.forEach(s => obs.observe(s));
+
+const lightbox = document.getElementById('imageLightbox');
+const lightboxImage = document.getElementById('lightboxImage');
+const lightboxCaption = document.getElementById('lightboxCaption');
+const lightboxClose = document.getElementById('lightboxClose');
+let lastTrigger = null;
+
+function openLightbox(trigger) {
+  lastTrigger = trigger;
+  lightboxImage.src = trigger.dataset.full;
+  lightboxImage.alt = trigger.querySelector('img')?.alt || '';
+  lightboxCaption.textContent = trigger.dataset.caption || '';
+  lightbox.classList.add('open');
+  lightbox.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('lightbox-lock');
+  lightboxClose.focus();
+}
+
+function closeLightbox() {
+  if (!lightbox.classList.contains('open')) return;
+  lightbox.classList.remove('open');
+  lightbox.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('lightbox-lock');
+  lightboxImage.removeAttribute('src');
+  if (lastTrigger) lastTrigger.focus();
+}
+
+document.querySelectorAll('.shot-trigger').forEach(trigger => {
+  trigger.addEventListener('click', () => openLightbox(trigger));
+});
+lightboxClose.addEventListener('click', closeLightbox);
+lightboxImage.addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', event => {
+  if (event.target === lightbox || event.target.classList.contains('lightbox-stage')) closeLightbox();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeLightbox();
+});
 </script>
 </body>
 </html>
