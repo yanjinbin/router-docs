@@ -38,7 +38,7 @@
     .btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
     .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-top:28px}
     figure.photo{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-    figure.photo img{display:block;width:100%;height:100%;object-fit:cover;max-height:520px;background:#111}
+    figure.photo img{display:block;width:100%;height:auto;object-fit:cover;max-height:520px;background:#111}
     figure.photo figcaption{font-size:12px;color:var(--muted);padding:11px 13px;border-top:1px solid var(--border)}
     .summary{display:grid;gap:10px}
     .summary-item{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:17px}
@@ -132,7 +132,7 @@
       </div>
       <div class="hero-grid">
         <figure class="photo">
-          <img src="/weakbox-renovation/current-real-overview.jpg" alt="当前实际弱电箱状态，光猫、R5C 和 AX82U AP 已经接入运行" loading="eager">
+          <img src="/weakbox-renovation/optimized/current-real-overview.jpg" alt="当前实际弱电箱状态，光猫、R5C 和 AX82U AP 已经接入运行" loading="eager" width="1400" height="788">
           <figcaption>当前实际：光猫在箱内，R5C 挂在门板/箱外，AX82U 作为 AP 已接入；电源和网线已经占用较多空间。</figcaption>
         </figure>
         <div class="summary">
@@ -162,8 +162,8 @@
         </table>
       </div>
       <div class="photo-row">
-        <figure class="photo"><img src="/weakbox-renovation/current-left.jpg" alt="弱电箱左侧五口路由器和同轴分配器特写" loading="lazy"><figcaption>左侧五口路由器只适合老式分发，改造后不再承担路由功能。</figcaption></figure>
-        <figure class="photo"><img src="/weakbox-renovation/current-ax82u-door.jpg" alt="AX82U 当前挂在弱电箱门外作为 AP 使用" loading="lazy"><figcaption>AX82U 当前挂在弱电箱门外，适合继续做 AP，不适合再做 DHCP/NAT。</figcaption></figure>
+        <figure class="photo"><img src="/weakbox-renovation/optimized/current-left.jpg" alt="弱电箱左侧五口路由器和同轴分配器特写" loading="lazy" width="788" height="1400"><figcaption>左侧五口路由器只适合老式分发，改造后不再承担路由功能。</figcaption></figure>
+        <figure class="photo"><img src="/weakbox-renovation/optimized/current-ax82u-door.jpg" alt="AX82U 当前挂在弱电箱门外作为 AP 使用" loading="lazy" width="1400" height="788"><figcaption>AX82U 当前挂在弱电箱门外，适合继续做 AP，不适合再做 DHCP/NAT。</figcaption></figure>
       </div>
     </section>
 
@@ -214,8 +214,8 @@
         </table>
       </div>
       <div class="photo-row">
-        <figure class="photo"><img src="/weakbox-renovation/current-power-cables.jpg" alt="弱电箱内电源适配器和线缆占位情况" loading="lazy"><figcaption>当前电源适配器与线缆已经比较拥挤，新增交换机前应先处理供电和走线。</figcaption></figure>
-        <figure class="photo"><img src="/weakbox-renovation/current-r5c-ax82u.jpg" alt="R5C 和 AX82U 当前实际连接状态" loading="lazy"><figcaption>实际链路为光猫 → R5C → AX82U AP，交换机应插在 R5C LAN 后面，而不是替代 R5C。</figcaption></figure>
+        <figure class="photo"><img src="/weakbox-renovation/optimized/current-power-cables.jpg" alt="弱电箱内电源适配器和线缆占位情况" loading="lazy" width="1400" height="788"><figcaption>当前电源适配器与线缆已经比较拥挤，新增交换机前应先处理供电和走线。</figcaption></figure>
+        <figure class="photo"><img src="/weakbox-renovation/optimized/current-r5c-ax82u.jpg" alt="R5C 和 AX82U 当前实际连接状态" loading="lazy" width="1400" height="788"><figcaption>实际链路为光猫 → R5C → AX82U AP，交换机应插在 R5C LAN 后面，而不是替代 R5C。</figcaption></figure>
       </div>
       <div class="callout bad"><strong>不建议：</strong>不要用多个大电源适配器硬挤同一个五孔位，不要把排插塞到完全不通风的位置，不要让电源线压住光纤和网线水晶头。</div>
     </section>
