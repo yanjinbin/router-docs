@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RT-AX82U 无线优化记录 · 5GHz 粘性客户端 & 漫游助手</title>
+<meta name="description" content="RT-AX82U 在 R5C 主路由架构下作为单 AP 的 Smart Connect 最终配置，包含 2.4GHz/5GHz 参数、漫游助手、实测结果与双 AP 改造边界。">
+<title>RT-AX82U 单 AP 无线优化 · Smart Connect 最终配置</title>
 <style>
 :root{
   --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
@@ -71,6 +72,18 @@ strong{color:var(--text)}
 .callout.green{border-left-color:var(--green)}
 .callout.amber{border-left-color:var(--amber)}
 
+/* CURRENT BASELINE */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 28px}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:15px}
+.metric-label{font-size:11px;color:var(--text3);margin-bottom:5px}
+.metric-value{font-size:17px;font-weight:700;color:var(--text)}
+.metric-note{font-size:11px;color:var(--text2);margin-top:3px}
+.metric.good .metric-value{color:var(--green)}
+.metric.warn .metric-value{color:var(--amber)}
+.metric.bad .metric-value{color:var(--red)}
+.setting-ok{color:var(--green);font-weight:700}
+.setting-off{color:var(--amber);font-weight:700}
+
 /* SCREENSHOTS */
 .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:8px 0 8px}
 .shot{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden}
@@ -82,6 +95,7 @@ strong{color:var(--text)}
   nav{padding:0 16px}
   .wrap{padding:0 16px 64px}
   .section{padding:20px}
+  .metrics{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -89,14 +103,15 @@ strong{color:var(--text)}
 
 <nav>
   <a href="/" class="nav-home">← 返回首页</a>
-  <div class="nav-brand">RT-AX82U 无线优化记录</div>
+  <div class="nav-brand">RT-AX82U 单 AP 无线优化</div>
   <div class="nav-links">
+    <a href="#baseline">当前结论</a>
+    <a href="#settings">最终配置</a>
     <a href="#diagnosis">问题诊断</a>
     <a href="#shots">信号实测</a>
-    <a href="#changes">改动清单</a>
     <a href="#scan">信道扫描</a>
-    <a href="#result">实施结果</a>
-    <a href="#ap-mode">AP 模式</a>
+    <a href="#validation">验收方法</a>
+    <a href="#limits">能力边界</a>
     <a href="/rt-ax82u-network-renovation.html">网络改造</a>
   </div>
 </nav>
@@ -104,19 +119,38 @@ strong{color:var(--text)}
 <div class="wrap">
 
 <div class="hero">
-  <div class="hero-tag">ASUS RT-AX82U · Merlin 3004.388.10_2 · 2026-07</div>
-  <h1>RT-AX82U 无线优化记录：治好 MacBook 黏 5GHz 不切换</h1>
-  <p>MacBook 从客厅回主卧后死黏在 -72 dBm 的 5GHz 上不漫游，速率跌到 72 Mbps。用「漫游助手 -68 dBm + 固定 5GHz 信道 149 + 2.4GHz 扫描选信道 6」三步解决，含 macOS 随机 MAC 地址的坑与 AP 模式说明。</p>
+  <div class="hero-tag">R5C 主路由 · RT-AX82U AP · Merlin 3004.388.10_2 · 2026-07-18</div>
+  <h1>单台 RT-AX82U：Smart Connect 最终优化基线</h1>
+  <p>AX82U 工作在无线访问点模式，R5C 负责网关、DHCP、DNS 与 Nikki。单 AP 阶段保留一个 SSID，通过 Smart Connect 分频段，并用「仅 5GHz 漫游助手 -68 dBm」解决 MacBook 在主卧黏住弱 5GHz 的问题。</p>
 </div>
 
-<div class="callout green"><strong>后续实测更新</strong>：主卧 5GHz 最低降至 -80~-82 dBm，2.4GHz 又会被 YouTube 高速缓冲占满。已完成双 AP 有线回程的<a href="/rt-ax82u-network-renovation.html">107㎡住宅网络改造方案</a>，包含户型点位、施工线路、物料与 PDF。</div>
+<div class="metrics" aria-label="当前无线实测指标">
+  <div class="metric good"><div class="metric-label">客厅 5GHz</div><div class="metric-value">-40 dBm</div><div class="metric-note">Tx 1134 Mbps</div></div>
+  <div class="metric bad"><div class="metric-label">主卧 5GHz</div><div class="metric-value">-80~-82 dBm</div><div class="metric-note">8~32 Mbps，边缘链路</div></div>
+  <div class="metric warn"><div class="metric-label">主卧 2.4GHz</div><div class="metric-value">约 -64 dBm</div><div class="metric-note">68~97 Mbps，稳定兜底</div></div>
+  <div class="metric"><div class="metric-label">有线回程</div><div class="metric-value">0% 丢包</div><div class="metric-note">R5C → AX82U 约 0.6 ms</div></div>
+</div>
+
+<div id="baseline" class="section">
+  <div class="section-header">
+    <div class="section-title">当前结论</div>
+    <div class="section-sub">先把单 AP 调到稳定，再判断是否施工</div>
+  </div>
+  <div class="callout green"><strong>最终组合：</strong>Smart Connect 开启；2.4GHz 固定 20MHz/信道 6；5GHz 固定 80MHz/信道 149；仅 5GHz 开启漫游助手并设为 -68 dBm；2.4GHz 漫游助手关闭。</div>
+  <ul class="plain">
+    <li><strong>这不是 AP 漫游：</strong>只有一台 AP 时，Smart Connect 的作用是让同一个 SSID 在 2.4GHz 与 5GHz 之间选择。</li>
+    <li><strong>主卧策略：</strong>当 5GHz 低于 -68 dBm，AX82U 断开弱链路，让 Mac 重新连接信号更强的 2.4GHz。</li>
+    <li><strong>不再追求 160MHz：</strong>主卧瓶颈是穿墙后的信噪比，不是频道宽度；160MHz 会增加 DFS 与稳定性风险。</li>
+    <li><strong>能力边界：</strong>这套配置能改善稳定性，不能把主卧 -80 dBm 的 5GHz 变成高速链路；需要高速 5GHz 时应增加走廊有线 AP。</li>
+  </ul>
+</div>
 
 <div id="diagnosis" class="section">
   <div class="section-header">
-    <div class="section-title">问题诊断</div>
-    <div class="section-sub">粘性客户端（Sticky Client）</div>
+    <div class="section-title">问题诊断与演变</div>
+    <div class="section-sub">历史粘频问题与当前位置极限</div>
   </div>
-  <p>MacBook 从客厅回到主卧后<strong>黏在 5GHz 频段不切换</strong>：5GHz 穿墙衰减大，到主卧只剩 -72 dBm，但没差到断连，macOS 不会主动漫游，于是一直挂着低速连接。ping 网关 0% 丢包、5ms —— 连接没坏，只是带宽和稳定性差。</p>
+  <p>第一阶段发现 MacBook 从客厅回到主卧后<strong>黏在 5GHz 频段不切换</strong>：当时主卧约 -72 dBm，链路没有断开但速率明显下降。AX82U 从玄关移到客厅后，公共区更强，但主卧的斜向穿墙路径仍让 5GHz 最低降到 -80~-82 dBm。这说明频段切换可以调，墙体造成的信号衰减无法靠参数消除。</p>
 
   <div class="full-table-wrap">
     <table class="full-table">
@@ -137,16 +171,22 @@ strong{color:var(--text)}
           <td style="color:var(--green);font-weight:600">1134 Mbps</td>
         </tr>
         <tr>
-          <td>主卧异常时</td>
+          <td>主卧 · 第一阶段</td>
           <td>5GHz 信道149 / <code>...ea:8c</code></td>
           <td style="color:var(--red);font-weight:600">-72 dBm</td>
           <td style="color:var(--red);font-weight:600">72 Mbps（MCS 1、单流）</td>
+        </tr>
+        <tr>
+          <td>主卧 · 移至客厅后最低值</td>
+          <td>5GHz 信道149 / <code>...ea:8c</code></td>
+          <td style="color:var(--red);font-weight:600">-80~-82 dBm</td>
+          <td style="color:var(--red);font-weight:600">8~32 Mbps（MCS 1）</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div class="callout amber"><strong>临时恢复方法</strong>：在主卧关开一次 Wi-Fi，重连时会自动选信号最强的 2.4GHz。</div>
+  <div class="callout amber"><strong>临时恢复方法：</strong>在主卧关开一次 Wi-Fi，重连通常会选择信号更强的 2.4GHz；长期方案由 5GHz 漫游助手在 -68 dBm 主动触发重连。</div>
 
   <h3 id="shots">信号实测截图（MacBook · option 点 Wi-Fi 图标）</h3>
   <div class="shots">
@@ -165,64 +205,73 @@ strong{color:var(--text)}
   </div>
 </div>
 
-<div id="changes" class="section">
+<div id="settings" class="section">
   <div class="section-header">
-    <div class="section-title">路由器改动清单</div>
+    <div class="section-title">单 AP 最终配置</div>
     <div class="section-sub">无线网络 → 一般设置 / 专业设置</div>
   </div>
 
-  <h3 style="margin-top:0">必改 <span class="badge badge-red">3 项</span></h3>
+  <h3 style="margin-top:0">一般设置 · 双频共用</h3>
   <div class="full-table-wrap">
     <table class="full-table">
-      <thead>
-        <tr><th>位置</th><th>设置项</th><th>改为</th><th>原因</th></tr>
-      </thead>
+      <thead><tr><th>设置项</th><th>最终值</th><th>说明</th></tr></thead>
       <tbody>
-        <tr>
-          <td>专业设置 → 5GHz</td>
-          <td>漫游助手</td>
-          <td><strong style="color:var(--green)">启用，-68 dBm</strong></td>
-          <td>主动踢掉弱信号设备，逼其重连 2.4GHz。主卧实测 -71~-72，设 -70 在波动边缘会时灵时不灵，-68 留出余量</td>
-        </tr>
-        <tr>
-          <td>一般设置 → 5GHz</td>
-          <td>频道</td>
-          <td><strong style="color:var(--green)">固定 149</strong>，取消「包括 DFS 频道」</td>
-          <td>国内 149~165 是高功率段，36~64 是低功率段；「自动」选到 36 会削弱穿墙能力</td>
-        </tr>
-        <tr>
-          <td>一般设置 → 2.4GHz</td>
-          <td>频道</td>
-          <td><strong style="color:var(--green)">固定 1、6 或 11</strong>（选最空的）</td>
-          <td>当前自动落在信道 10，与 6、11 重叠互扰；1/6/11 是仅有的三个不重叠信道</td>
-        </tr>
+        <tr><td>Smart Connect</td><td><span class="setting-ok">开启 · 双频</span></td><td>2.4GHz 与 5GHz 共用 SSID <code>ASUS395</code></td></tr>
+        <tr><td>Smart Connect 规则</td><td>默认</td><td>单 AP 不深改 PHY Rate、带宽占用等组合条件，避免条件互相阻塞</td></tr>
+        <tr><td>隐藏 SSID</td><td>否</td><td>隐藏不会提高安全性，还会增加终端主动探测</td></tr>
+        <tr><td>无线模式</td><td>自动；可禁用 11b</td><td>若极老 IoT 无法连接，再恢复 11b</td></tr>
+        <tr><td>802.11ax / WiFi 6</td><td><span class="setting-ok">开启</span></td><td>MacBook 与新手机使用 WiFi 6</td></tr>
+        <tr><td>WiFi Agile Multiband</td><td><span class="setting-off">关闭</span></td><td>单 AP 没有多 AP 协同需求</td></tr>
+        <tr><td>Target Wake Time</td><td><span class="setting-off">关闭</span></td><td>混合终端环境优先兼容性</td></tr>
+        <tr><td>安全</td><td>WPA2-Personal / AES</td><td>保护管理帧设“可选”，群组密钥轮换 <code>3600</code> 秒</td></tr>
       </tbody>
     </table>
   </div>
 
-  <h3>保持不动 <span class="badge badge-green">6 项</span></h3>
+  <h3>一般设置 · 分频段</h3>
   <div class="full-table-wrap">
     <table class="full-table">
-      <thead>
-        <tr><th>设置项</th><th>保持</th><th>原因</th></tr>
-      </thead>
+      <thead><tr><th>频段</th><th>频道带宽</th><th>频道</th><th>扩展设置</th></tr></thead>
       <tbody>
-        <tr><td>2.4GHz 漫游助手</td><td>停用</td><td>2.4GHz 是覆盖兜底，无 Mesh 时踢掉后设备无处可去</td></tr>
-        <tr><td>2.4GHz MU-MIMO / OFDMA</td><td>停用</td><td>2.4GHz 客户端多为单天线 IoT 设备用不上，开了反而易致智能家居掉线</td></tr>
-        <tr><td>5GHz MU-MIMO / OFDMA</td><td>启用 / DL+UL</td><td>5GHz 客户端（MacBook、新手机）真正支持这些特性</td></tr>
-        <tr><td>Smart Connect</td><td>启用</td><td>负责新连接分频段，与漫游助手（踢粘性设备）互补</td></tr>
-        <tr><td>5GHz 160 MHz</td><td>不勾</td><td>需借用 DFS 信道，遇雷达检测强制切换断流</td></tr>
-        <tr><td>专业设置其余项</td><td>默认</td><td>已是调校好的默认值</td></tr>
+        <tr><td>2.4GHz</td><td><span class="setting-ok">20MHz</span></td><td><span class="setting-ok">固定 6</span></td><td>扩展频道自动；作为远距离与 IoT 稳定兜底</td></tr>
+        <tr><td>5GHz</td><td><span class="setting-ok">80MHz</span></td><td><span class="setting-ok">固定 149</span></td><td>不启用 160MHz，不自动选择 DFS 频道</td></tr>
       </tbody>
     </table>
   </div>
 
-  <h3>可选（与漫游无关）</h3>
-  <ul class="plain">
-    <li><strong>换 WiFi 密码</strong>：现密码强度弱，建议换 12 位以上混合密码（所有设备需重连）。</li>
-    <li><strong>升级固件</strong>：<span class="badge badge-green">✓ 已完成</span> 优化时为 2022 年的 386.7_2 koolshare 版，2026-07-04 已升级至 <code>3004_388.10_2_puresqubi-20251119</code>。升级后建议重新核对本页无线设置（漫游助手、固定信道等），大版本升级可能恢复默认值。</li>
-    <li><strong>备用调整</strong>：老设备频繁掉线 → 停用「通用 Beamforming」；5GHz 莫名卡顿 → OFDMA 改仅 DL。</li>
-  </ul>
+  <h3>专业设置 · 2.4GHz</h3>
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead><tr><th>设置项</th><th>最终值</th><th>原因</th></tr></thead>
+      <tbody>
+        <tr><td>漫游助手</td><td><span class="setting-off">关闭</span></td><td>2.4GHz 是单 AP 的覆盖兜底，不能再把弱终端踢掉</td></tr>
+        <tr><td>WMM / WMM APSD</td><td><span class="setting-ok">开启</span></td><td>维持多媒体优先级与终端省电能力</td></tr>
+        <tr><td>WMM No-Acknowledgement</td><td><span class="setting-off">关闭</span></td><td>避免噪声环境下错误率升高</td></tr>
+        <tr><td>无线传输公平性</td><td><span class="setting-off">关闭</span></td><td>减少 IoT 与弱信号终端的兼容性问题</td></tr>
+        <tr><td>MU-MIMO / OFDMA</td><td><span class="setting-off">关闭</span></td><td>2.4GHz 以兼容性优先；需要时再单项测试</td></tr>
+        <tr><td>显性 / 通用 Beamforming</td><td>显性开启；通用关闭</td><td>保留标准显式协商，关闭旧式估算型 Beamforming</td></tr>
+        <tr><td>发射功率</td><td><span class="setting-ok">最大</span></td><td>覆盖优先</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>专业设置 · 5GHz</h3>
+  <div class="full-table-wrap">
+    <table class="full-table">
+      <thead><tr><th>设置项</th><th>最终值</th><th>原因</th></tr></thead>
+      <tbody>
+        <tr><td>漫游助手</td><td><span class="setting-ok">开启，-68 dBm</span></td><td>主动结束主卧的弱 5GHz 链路，使终端重连 2.4GHz</td></tr>
+        <tr><td>WMM / WMM APSD</td><td><span class="setting-ok">开启</span></td><td>保持 WiFi 5/6 正常吞吐、时延与省电机制</td></tr>
+        <tr><td>TX Burst / WMM No-Ack</td><td><span class="setting-off">关闭</span></td><td>TX Burst 主要服务旧 802.11g；No-Ack 会提高噪声环境错误率</td></tr>
+        <tr><td>802.11ac MU-MIMO</td><td><span class="setting-ok">开启</span></td><td>支持多个现代终端并发</td></tr>
+        <tr><td>OFDMA / 802.11ax MU-MIMO</td><td><span class="setting-ok">DL/UL + MU-MIMO</span></td><td>启用 WiFi 6 多用户调度能力</td></tr>
+        <tr><td>802.11ax/ac / 通用 Beamforming</td><td>显性开启；通用关闭</td><td>保留标准 Beamforming，避免旧式隐式兼容问题</td></tr>
+        <tr><td>发射功率</td><td><span class="setting-ok">最大</span></td><td>单 AP 覆盖优先</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout amber"><strong>低层参数保持默认：</strong>组播速率、AMPDU RTS、RTS 门槛 <code>2347</code>、DTIM、Beacon <code>100</code>、AMPDU 聚集和调制方式不要同时调整。当前问题是频段选择与物理衰减，不是帧聚合参数。</div>
 </div>
 
 <div id="scan" class="section">
@@ -255,33 +304,37 @@ strong{color:var(--text)}
   </ul>
 </div>
 
-<div id="result" class="section">
+<div id="validation" class="section">
   <div class="section-header">
-    <div class="section-title">实施结果</div>
-    <div class="section-sub">2026-07-04 已验证 <span class="badge badge-green">✓ 解决</span></div>
+    <div class="section-title">实施结果与验收</div>
+    <div class="section-sub">粘频已处理，覆盖能力需分开评价</div>
   </div>
-  <p>改完后主卧实测：连上 2.4GHz <code>...ea:88</code>，信道 6，RSSI <strong style="color:var(--green)">-61 dBm</strong>，Tx <strong style="color:var(--green)">68 Mbps</strong> —— 优于优化前的正常状态（信道 10 / -63 dBm / 48 Mbps），漫游问题解决。</p>
+  <p>第一阶段改完后，Mac 在主卧重新连接到 2.4GHz <code>...ea:88</code>，信道 6，RSSI 约 -61~-64 dBm，Tx 约 68~97 Mbps。结论应准确表述为：<strong>弱 5GHz 粘频得到控制，主卧恢复稳定可用；单 AP 的主卧高速 5GHz 仍未解决。</strong></p>
   <div class="callout amber"><strong>macOS 随机 MAC 的坑</strong>：Mac 对该 SSID 使用 macOS「专用 Wi-Fi 地址」（随机化地址，与真实硬件地址不同）。在路由器上做 DHCP 绑定 / MAC 过滤 / 漫游阻止列表时要用当前随机地址，或在 Mac 的 Wi-Fi 网络设置中关闭「专用 Wi-Fi 地址」改用真实地址。</div>
 
-  <h3>验证方法</h3>
+  <h3>单 AP 验收方法</h3>
   <ul class="plain">
     <li>每页改完点「应用本页面设置」，无线重启、设备断线几秒属正常。</li>
-    <li>带 MacBook 到主卧等十几秒，看 Wi-Fi 详情：BSSID 应为 <code>...ea:88</code>（2.4GHz）。</li>
-    <li>若仍挂在 5GHz：检查「漫游阻止列表」里是否有 Mac 的 MAC 地址（在列表里则漫游助手对它不生效）。</li>
+    <li>客厅应连接 5GHz <code>...ea:8c</code>，RSSI 接近 -40 dBm，Tx 可达千兆级协商速率。</li>
+    <li>带 MacBook 到主卧等待 30 秒；当 5GHz 低于 -68 dBm 后，应重新连接 2.4GHz <code>...ea:88</code>。</li>
+    <li>若仍挂在弱 5GHz：检查“漫游阻止列表”是否包含 Mac 当前专用地址 <code>92:a0:22:8e:5b:4d</code>。</li>
+    <li>播放 YouTube 的同时持续 ping <code>192.168.1.1</code>；应保持 0% 丢包，避免无线链路出现持续高延迟。</li>
+    <li>如果频繁在两个频段间跳动，把 5GHz 阈值从 -68 调低到 -70 或 -72 dBm；一次只改 2 dB 并重新观察。</li>
   </ul>
 </div>
 
-<div id="ap-mode" class="section">
+<div id="limits" class="section">
   <div class="section-header">
-    <div class="section-title">关于切换 AP 模式</div>
-    <div class="section-sub">无线层设置全部保留</div>
+    <div class="section-title">AP 模式与能力边界</div>
+    <div class="section-sub">路由层正常，下一步取决于主卧带宽目标</div>
   </div>
   <ul class="plain">
-    <li>无线层设置（漫游助手、固定频道、Smart Connect、专业设置）<strong>在 AP 模式下全部保留、照常生效</strong>。</li>
-    <li>失效的是路由功能：NAT、DHCP、防火墙、QoS、家长控制、AiProtection、VPN、端口转发等（交给上游路由器）。</li>
-    <li>注意：① 切换后重新核对一遍无线设置（部分固件会恢复默认）；② 管理 IP 会变，建议上游绑定固定 IP；③ koolshare 插件大多依赖路由模式，AP 下部分失效属正常。</li>
-    <li>双路由扩覆盖场景：两台 SSID 相同、信道错开，漫游助手负责把设备踢到近的那台。</li>
+    <li>当前 AX82U 已是 AP 模式，Smart Connect、漫游助手、固定频道和专业无线设置继续生效。</li>
+    <li>R5C <code>192.168.1.1</code> 是唯一网关，负责 PPPoE、DHCP、NAT、DNS、Nikki 和防火墙；AX82U 管理地址为 <code>192.168.1.106</code>。</li>
+    <li>R5C 到 AX82U 实测约 0.6 ms、0% 丢包，说明软路由和有线回程不是当前瓶颈。</li>
+    <li>如果主卧只要求网页、消息和一般视频，2.4GHz 兜底可以继续使用；如果要求稳定高速 5GHz、局域网传输或多设备高负载，应进入双 AP 有线回程阶段。</li>
   </ul>
+  <div class="callout green"><strong>下一阶段：</strong><a href="/rt-ax82u-network-renovation.html">107㎡住宅网络改造方案</a>已经给出走廊 AP2 点位、Cat6/PoE 施工线路、物料清单和验收标准。更换一台“功率更大”的单路由器，通常不如在卧室区增加有线 AP 有效。</div>
 </div>
 
 </div><!-- /wrap -->
@@ -300,15 +353,15 @@ strong{color:var(--text)}
 <div class="__site-nav">
   <h3>相关文档</h3>
   <div class="__site-nav-grid">
-<a class="__site-nav-link" href="/rt-ax82u-network-renovation.html"><span class="__site-nav-title">107㎡住宅网络改造方案</span><span class="__site-nav-sub">双 AP · Cat6 · PoE · 施工 PDF</span></a>
-<a class="__site-nav-link" href="/merlin-setup-guide.html"><span class="__site-nav-title">梅林固件设置指南</span><span class="__site-nav-sub">AX82U & RAX80</span></a>
+<a class="__site-nav-link" href="/rt-ax82u-network-renovation.html"><span class="__site-nav-title">107㎡住宅网络改造方案</span><span class="__site-nav-sub">单 AP 能力边界之后：双 AP · Cat6 · PoE</span></a>
+<a class="__site-nav-link" href="/merlin-setup-guide.html"><span class="__site-nav-title">梅林固件设置指南</span><span class="__site-nav-sub">AX82U &amp; RAX80</span></a>
 <a class="__site-nav-link" href="/yunyufen-config.html"><span class="__site-nav-title">多机场订阅组合</span><span class="__site-nav-sub">良心云 · 渔舍 · 赔钱 · 极风</span></a>
 <a class="__site-nav-link" href="/nanopi_r5c_guide.html"><span class="__site-nav-title">NanoPi R5C 刷机教程</span><span class="__site-nav-sub">ImmortalWrt 完整流程</span></a>
 <a class="__site-nav-link" href="/r5c-setup-init.html"><span class="__site-nav-title">NanoPi R5C 初始化 Setup</span><span class="__site-nav-sub">刷机 → PPPoE → SSH → Claude 分步实施</span></a>
 <a class="__site-nav-link" href="/softrouter-mega-comparison.html"><span class="__site-nav-title">软路由终极横评</span><span class="__site-nav-sub">17 款全对比</span></a>
 <a class="__site-nav-link" href="/immortalwrt-plugins.html"><span class="__site-nav-title">immortalwrt v25.12 必装插件</span><span class="__site-nav-sub">Nikki · Bandix · eqos</span></a>
 <a class="__site-nav-link" href="/nikki-dns-compare.html"><span class="__site-nav-title">Nikki DNS 分流配置对比</span><span class="__site-nav-sub">ImmortalWrt R5C · 25.12.0</span></a>
-<a class="__site-nav-link" href="/mihomo-traffic-flow.html"><span class="__site-nav-title">Mihomo 完整流量路径图解</span><span class="__site-nav-sub">五层架构 & 决策流程</span></a>
+<a class="__site-nav-link" href="/mihomo-traffic-flow.html"><span class="__site-nav-title">Mihomo 完整流量路径图解</span><span class="__site-nav-sub">五层架构 &amp; 决策流程</span></a>
   </div>
   <a class="__site-nav-home" href="/">← 返回首页</a>
 </div>

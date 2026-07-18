@@ -141,7 +141,7 @@
       <div class="hero-actions">
         <a class="btn btn-primary" href="/rt-ax82u-network-renovation/RT-AX82U_107sqm_network_renovation_plan.pdf" download>下载施工 PDF ↓</a>
         <a class="btn" href="#placement">查看户型点位</a>
-        <a class="btn" href="/rt-ax82u-wifi-optimization.html">查看前期无线优化记录</a>
+        <a class="btn" href="/rt-ax82u-wifi-optimization.html">查看单 AP 最终配置</a>
       </div>
     </section>
 
@@ -159,6 +159,7 @@
         <article class="decision"><b><span class="dot dot-green"></span>AP2 · 新增有线节点</b><p>放在平面图“2070”横向走廊上方，位于次卧一门与主卧门之间、略靠主卧门一侧，负责主卧及两个次卧。</p></article>
       </div>
       <div class="callout green"><strong>最终拓扑：</strong>光猫 → R5C → PoE/千兆交换机 → AX82U + 走廊 AP。R5C 继续负责 PPPoE、DHCP、Nikki 和防火墙；两个无线设备只工作在 AP/AiMesh 模式。</div>
+      <div class="callout"><strong>施工前过渡配置：</strong>单台 AX82U 保持 Smart Connect，2.4GHz 使用 20MHz/信道6，5GHz 使用 80MHz/信道149，并仅在 5GHz 启用 -68 dBm 漫游助手。完整参数见<a href="/rt-ax82u-wifi-optimization.html">单 AP 无线优化页</a>。</div>
     </section>
 
     <section id="placement" class="section">
@@ -216,9 +217,9 @@
           <thead><tr><th>设备</th><th>模式/地址</th><th>关键设置</th></tr></thead>
           <tbody>
             <tr><td>R5C</td><td><code>192.168.1.1/24</code></td><td>继续负责 PPPoE、DHCP、NAT、DNS、Nikki；作为唯一网关</td></tr>
-            <tr><td>AX82U AP1</td><td>AP/AiMesh 主节点；建议 <code>192.168.1.106</code></td><td>SSID 保持 ASUS395；Smart Connect 开启</td></tr>
+            <tr><td>AX82U AP1</td><td>AP/AiMesh 主节点；建议 <code>192.168.1.106</code></td><td>SSID 保持 ASUS395；Smart Connect 开启；显性 Beamforming 开启、通用 Beamforming 关闭</td></tr>
             <tr><td>AP2</td><td>AiMesh Node；建议 <code>192.168.1.107</code></td><td>回程优先级 Ethernet/WAN First，并确认拓扑显示有线</td></tr>
-            <tr><td>无线参数</td><td>5GHz 80MHz；2.4GHz 20MHz</td><td>5GHz 漫游助手先保持 -68 dBm；AiMesh 模式优先由系统协调信道</td></tr>
+            <tr><td>无线参数</td><td>5GHz 80MHz；2.4GHz 20MHz</td><td>单 AP 阶段：5GHz 信道149、漫游助手 -68 dBm，2.4GHz 信道6且关闭漫游助手；加入 AP2 后再按实测调整阈值与信道</td></tr>
           </tbody>
         </table>
       </div>
@@ -246,7 +247,7 @@
     <aside class="site-nav">
       <h3>相关文档</h3>
       <div class="site-nav-grid">
-        <a class="site-nav-link" href="/rt-ax82u-wifi-optimization.html"><span class="site-nav-title">RT-AX82U 无线优化记录</span><span class="site-nav-sub">漫游助手 · 信号实测 · 信道扫描</span></a>
+        <a class="site-nav-link" href="/rt-ax82u-wifi-optimization.html"><span class="site-nav-title">RT-AX82U 单 AP 无线优化</span><span class="site-nav-sub">Smart Connect · 双频参数 · 漫游助手</span></a>
         <a class="site-nav-link" href="/r5c-setup-init.html"><span class="site-nav-title">NanoPi R5C 初始化 Setup</span><span class="site-nav-sub">PPPoE · DHCP · SSH · Nikki</span></a>
         <a class="site-nav-link" href="/immortalwrt-plugins.html"><span class="site-nav-title">ImmortalWrt 必装插件</span><span class="site-nav-sub">Nikki · Bandix · eqos</span></a>
       </div>

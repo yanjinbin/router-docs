@@ -106,9 +106,9 @@ const docs = [
     tagColor: '#3dd68c',
   },
   {
-    title: 'RT-AX82U 无线优化记录',
-    subtitle: '5GHz 粘性客户端 · 漫游助手 · 信道扫描',
-    desc: 'MacBook 回主卧黏在 -72 dBm 的 5GHz 不漫游、速率跌到 72 Mbps：漫游助手 -68 dBm + 固定 5GHz 信道 149 + 2.4GHz 扫描选信道 6 三步解决，含三张实测截图、CSMA/CA 信道共享原理与 macOS 随机 MAC 的坑',
+    title: 'RT-AX82U 单 AP 无线优化',
+    subtitle: 'AP 模式 · Smart Connect · 双频最终参数',
+    desc: 'R5C 作为主路由、AX82U 作为单 AP 的最终配置基线：Smart Connect、5GHz 漫游助手 -68 dBm、2.4GHz 20MHz/信道6、5GHz 80MHz/信道149，以及主卧 -80 dBm 场景的验收与改造边界',
     href: '/rt-ax82u-wifi-optimization.html',
     tag: '实战',
     tagColor: '#f06060',
