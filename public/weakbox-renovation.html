@@ -83,7 +83,24 @@
     .card h3{margin:0 0 6px;font-size:14px}
     .card p{font-size:12.5px;margin:0}
     .photo-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
-    .port-plan{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .port-section{display:grid;gap:18px}
+    .port-group{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:18px}
+    .port-group h3{margin:0 0 12px;font-size:15px}
+    .port-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .port-card{position:relative;min-height:122px;background:rgba(15,17,23,.35);border:1px solid var(--border);border-radius:10px;padding:13px}
+    .port-card.primary{border-color:rgba(79,142,247,.5);background:rgba(79,142,247,.08)}
+    .port-card.ap{border-color:rgba(61,214,140,.42);background:rgba(61,214,140,.06)}
+    .port-card.reserve{border-style:dashed}
+    .port-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:22px;border-radius:5px;background:var(--panel3);color:var(--text);font-family:var(--mono);font-size:11px;font-weight:800;margin-bottom:9px}
+    .port-card.primary .port-num{background:rgba(79,142,247,.2);color:#d6e4ff}
+    .port-card.ap .port-num{background:rgba(61,214,140,.16);color:var(--green)}
+    .port-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px}
+    .port-desc{font-size:12px;color:var(--muted);line-height:1.55;margin:0}
+    .role-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .role-card{display:grid;grid-template-columns:auto 1fr;gap:11px;background:rgba(15,17,23,.35);border:1px solid var(--border);border-radius:10px;padding:13px}
+    .role-icon{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:var(--panel3);color:var(--blue);font-family:var(--mono);font-size:11px;font-weight:800}
+    .role-card b{display:block;font-size:13px;margin-bottom:2px}
+    .role-card span{display:block;font-size:12px;color:var(--muted);line-height:1.55}
     .checklist{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
     .checklist li{position:relative;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px 10px 34px;color:var(--muted);font-size:12.5px}
     .checklist li:before{content:"";position:absolute;left:12px;top:13px;width:10px;height:10px;border-radius:3px;border:1px solid var(--green)}
@@ -95,14 +112,17 @@
     .site-nav-title{font-size:13px;font-weight:700;color:var(--text)}
     .site-nav-sub{font-size:11px;color:var(--muted)}
     @media(max-width:960px){
-      .hero-grid,.port-plan{grid-template-columns:1fr}
+      .hero-grid{grid-template-columns:1fr}
       .flow{grid-template-columns:1fr}
-      .cards,.photo-row{grid-template-columns:1fr}
+      .cards,.photo-row,.role-grid{grid-template-columns:1fr}
+      .port-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .checklist{grid-template-columns:1fr}
     }
     @media(max-width:640px){
       nav{padding:0 14px}.nav-title{display:none}.wrap{padding:0 14px 56px}section{padding:20px}.hero{padding-top:38px}
       .summary-value{font-size:15px}
+      .port-grid{grid-template-columns:1fr}
+      .port-group{padding:14px}
     }
   </style>
 </head>
@@ -222,39 +242,80 @@
 
     <section id="ports">
       <div class="section-head"><h2>端口规划</h2><span>按 8 口 2.5G 非 PoE 交换机设计</span></div>
-      <div class="port-plan">
-        <div>
+      <div class="port-section">
+        <div class="callout good"><strong>接线原则：</strong>交换机只做二层扩展。P1 固定接 R5C LAN，其他端口接 AP、房间墙口和高带宽终端；全屋仍由 R5C 统一发 DHCP、做网关和代理入口。</div>
+        <div class="port-group">
           <h3>交换机端口建议</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>端口</th><th>连接对象</th><th>说明</th></tr></thead>
-              <tbody>
-                <tr><td>P1</td><td>R5C LAN</td><td>交换机上联，接 R5C 的 LAN 口</td></tr>
-                <tr><td>P2</td><td>客厅网线 / AX82U AP</td><td>客厅主 AP 或电视墙弱电口</td></tr>
-                <tr><td>P3</td><td>主卧/走廊 AP</td><td>新增 AP 有线回程，PoE AP 需另选 PoE 交换机或注入器</td></tr>
-                <tr><td>P4</td><td>书房 / 台式机</td><td>优先给固定高带宽设备</td></tr>
-                <tr><td>P5</td><td>Apple TV / 电视盒子</td><td>客厅影音设备优先有线</td></tr>
-                <tr><td>P6</td><td>MacBook 扩展坞</td><td>办公位 2.5G 有线接入</td></tr>
-                <tr><td>P7</td><td>NAS / 游戏主机</td><td>预留高速终端</td></tr>
-                <tr><td>P8</td><td>备用</td><td>留给新 AP、摄像头或智能家居网关</td></tr>
-              </tbody>
-            </table>
+          <div class="port-grid">
+            <article class="port-card primary">
+              <span class="port-num">P1</span>
+              <div class="port-title">R5C LAN</div>
+              <p class="port-desc">交换机上联口，固定接 R5C 的 LAN 口，作为全屋有线网络入口。</p>
+            </article>
+            <article class="port-card ap">
+              <span class="port-num">P2</span>
+              <div class="port-title">客厅 / AX82U AP</div>
+              <p class="port-desc">接客厅墙口或 AX82U AP，有线回程优先，承接主要无线覆盖。</p>
+            </article>
+            <article class="port-card ap">
+              <span class="port-num">P3</span>
+              <div class="port-title">卧室 / 新增 AP</div>
+              <p class="port-desc">给新增 AP 或 AiMesh Node；非 PoE 交换机下，AP 仍需独立供电。</p>
+            </article>
+            <article class="port-card">
+              <span class="port-num">P4</span>
+              <div class="port-title">书房 / 台式机</div>
+              <p class="port-desc">固定办公位优先接有线，适合台式机、扩展坞或 2.5G 网卡。</p>
+            </article>
+            <article class="port-card">
+              <span class="port-num">P5</span>
+              <div class="port-title">Apple TV / 电视盒子</div>
+              <p class="port-desc">客厅影音设备优先有线，减少 4K 播放、投屏和家庭中枢抖动。</p>
+            </article>
+            <article class="port-card">
+              <span class="port-num">P6</span>
+              <div class="port-title">MacBook 扩展坞</div>
+              <p class="port-desc">桌面办公接入，方便大文件传输、远程开发和稳定视频会议。</p>
+            </article>
+            <article class="port-card">
+              <span class="port-num">P7</span>
+              <div class="port-title">NAS / 游戏主机</div>
+              <p class="port-desc">预留给高速终端或后续 NAS，减少频繁改线。</p>
+            </article>
+            <article class="port-card reserve">
+              <span class="port-num">P8</span>
+              <div class="port-title">备用扩展</div>
+              <p class="port-desc">留给摄像头、智能家居网关、临时调试设备或新增房间网口。</p>
+            </article>
           </div>
         </div>
-        <div>
+        <div class="port-group">
           <h3>地址与角色建议</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>设备</th><th>角色</th><th>建议</th></tr></thead>
-              <tbody>
-                <tr><td>R5C</td><td>主路由</td><td><code>192.168.1.1</code>，唯一 DHCP 和网关</td></tr>
-                <tr><td>AX82U</td><td>AP / AiMesh 主节点</td><td>可绑定 <code>192.168.1.106</code>，关闭路由/NAT</td></tr>
-                <tr><td>新增 AP</td><td>AiMesh Node / AP</td><td>可绑定 <code>192.168.1.107</code>，优先有线回程</td></tr>
-                <tr><td>二级子路由</td><td>尽量 AP 化</td><td>除非有隔离需求，否则不要再发 DHCP</td></tr>
-                <tr><td>Apple TV</td><td>有线终端</td><td>固定地址可选，方便投屏和家庭中枢</td></tr>
-                <tr><td>台式机 / NAS</td><td>高带宽终端</td><td>建议静态租约，方便远程访问和共享</td></tr>
-              </tbody>
-            </table>
+          <div class="role-grid">
+            <article class="role-card">
+              <span class="role-icon">GW</span>
+              <div><b>R5C · 主路由</b><span><code>192.168.1.1</code>，唯一 DHCP、NAT、DNS、网关和 Nikki/Mihomo 入口。</span></div>
+            </article>
+            <article class="role-card">
+              <span class="role-icon">AP1</span>
+              <div><b>AX82U · AP / AiMesh 主节点</b><span>建议绑定 <code>192.168.1.106</code>，关闭路由/NAT，只负责无线覆盖。</span></div>
+            </article>
+            <article class="role-card">
+              <span class="role-icon">AP2</span>
+              <div><b>新增 AP · AiMesh Node</b><span>建议绑定 <code>192.168.1.107</code>，优先有线回程；PoE AP 另配 PoE 注入器或 PoE 交换机。</span></div>
+            </article>
+            <article class="role-card">
+              <span class="role-icon">SUB</span>
+              <div><b>二级子路由 · 尽量 AP 化</b><span>没有隔离需求时不要再发 DHCP，避免双 NAT 和地址冲突。</span></div>
+            </article>
+            <article class="role-card">
+              <span class="role-icon">TV</span>
+              <div><b>Apple TV / 广电 4K 盒子</b><span>Apple TV 优先接交换机或墙口；传统广电 4K 机顶盒按需要保留同轴输入。</span></div>
+            </article>
+            <article class="role-card">
+              <span class="role-icon">PC</span>
+              <div><b>台式机 / NAS / MacBook</b><span>高带宽终端建议做静态租约，方便共享、投屏、远程访问和故障排查。</span></div>
+            </article>
           </div>
         </div>
       </div>
