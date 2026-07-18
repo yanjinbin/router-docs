@@ -114,6 +114,14 @@ const docs = [
     tagColor: '#f06060',
   },
   {
+    title: '107㎡住宅网络改造方案',
+    subtitle: 'R5C · RT-AX82U · 双 AP 有线回程',
+    desc: '基于主卧 5GHz -80 dBm 与 2.4GHz 满载高延迟实测，给出户型 AP 点位、Cat6/PoE 施工线路、网络拓扑、物料清单、配置基线及高负载验收标准，并提供 7 页施工 PDF 下载',
+    href: '/rt-ax82u-network-renovation.html',
+    tag: '施工',
+    tagColor: '#39c6dc',
+  },
+  {
     title: 'Mihomo 完整流量路径图解',
     subtitle: '五层架构 & 决策流程 · TPROXY · fake-ip · 三路出口',
     desc: '两张图解析 Mihomo 全链路：架构图展示物理网卡→内核 netfilter→fw4/Nikki→应用层→ppp0 五层并列关系；决策图追踪 DNS 劫持→fake-ip→规则匹配→bypass/直连/代理三路出口的完整判断逻辑',

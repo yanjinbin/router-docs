@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="107㎡住宅 R5C + RT-AX82U 双 AP 有线回程网络改造方案，包含户型点位、施工线路、网络拓扑、物料清单与验收标准。">
+  <title>107㎡住宅网络改造方案 · R5C + RT-AX82U + 有线 AP</title>
+  <style>
+    :root{
+      --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;--bg4:#242a3a;
+      --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);
+      --text:#e8eaf0;--text2:#9aa0b4;--text3:#697189;
+      --blue:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;--cyan:#39c6dc;
+      --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+      --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:#c9d1d9}
+
+    nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+    .nav-home{font-size:12px;font-weight:600;color:#fff;padding:5px 12px;background:var(--blue);border-radius:6px;white-space:nowrap;flex-shrink:0}
+    .nav-home:hover{opacity:.85;text-decoration:none}
+    .nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px;white-space:nowrap}
+    .nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto}
+    .nav-links a{font-size:12px;color:var(--text2);padding:0 11px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap}
+    .nav-links a:hover{color:var(--text);border-bottom-color:var(--blue);text-decoration:none}
+
+    .wrap{max-width:1120px;margin:0 auto;padding:0 24px 80px}
+    .hero{padding:52px 0 34px;position:relative;overflow:hidden}
+    .hero::after{content:"";position:absolute;width:320px;height:320px;border-radius:50%;right:-80px;top:-155px;background:radial-gradient(circle,rgba(79,142,247,.17),rgba(79,142,247,0) 68%);pointer-events:none}
+    .hero-tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:11px}
+    .hero h1{font-size:clamp(25px,4vw,38px);font-weight:750;line-height:1.22;letter-spacing:-.02em;max-width:850px;margin-bottom:14px}
+    .hero p{font-size:14px;color:var(--text2);max-width:780px;line-height:1.8}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 15px;border-radius:8px;font-size:12px;font-weight:650;border:1px solid var(--border2);color:var(--text);background:var(--bg2)}
+    .btn:hover{text-decoration:none;border-color:rgba(79,142,247,.5);transform:translateY(-1px)}
+    .btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:38px}
+    .metric{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:17px 18px}
+    .metric-label{font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+    .metric-value{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
+    .metric-note{font-size:11px;color:var(--text2);margin-top:3px}
+    .metric.bad .metric-value{color:var(--red)}
+    .metric.warn .metric-value{color:var(--amber)}
+    .metric.good .metric-value{color:var(--green)}
+
+    .section{margin-bottom:30px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:30px}
+    .section-header{display:flex;align-items:baseline;gap:10px;margin-bottom:20px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+    .section-title{font-size:18px;font-weight:700}
+    .section-sub{font-size:12px;color:var(--text3)}
+    h3{font-size:15px;margin:24px 0 11px;color:var(--text)}
+    p{color:var(--text2);margin-bottom:14px}
+    strong{color:var(--text)}
+
+    .callout{border-left:3px solid var(--blue);background:var(--bg3);border-radius:0 8px 8px 0;padding:14px 17px;margin:16px 0;color:var(--text2)}
+    .callout.green{border-left-color:var(--green)}
+    .callout.amber{border-left-color:var(--amber)}
+    .callout.red{border-left-color:var(--red)}
+
+    .decision-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .decision{border:1px solid var(--border);background:var(--bg3);border-radius:10px;padding:18px}
+    .decision b{display:block;font-size:14px;margin-bottom:5px}
+    .decision p{font-size:12.5px;margin:0}
+    .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:1px}
+    .dot-blue{background:var(--blue)}.dot-green{background:var(--green)}
+
+    .plan-figure{margin:4px 0 10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .plan-figure img{display:block;width:100%;height:auto;background:#f4f7fb}
+    .plan-figure figcaption{padding:12px 15px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)}
+
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+    .step{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px}
+    .step-num{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:50%;background:rgba(61,214,140,.14);color:var(--green);font-size:11px;font-weight:700;margin-bottom:9px}
+    .step b{display:block;font-size:13px;margin-bottom:4px}
+    .step p{font-size:12px;margin:0}
+
+    .table-wrap{overflow-x:auto;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin:12px 0 22px}
+    table{border-collapse:collapse;width:100%;min-width:720px;font-size:12.5px}
+    th{text-align:left;font-size:11px;letter-spacing:.04em;color:var(--text3);background:var(--bg4);white-space:nowrap}
+    th,td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+    td{color:var(--text2)}
+    td:first-child{font-weight:650;color:var(--text)}
+    tr:last-child td{border-bottom:0}
+    tbody tr:hover td{background:rgba(255,255,255,.018)}
+
+    .checklist{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px}
+    .checklist li{position:relative;padding:9px 12px 9px 34px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12.5px}
+    .checklist li::before{content:"";position:absolute;left:12px;top:12px;width:11px;height:11px;border:1px solid var(--green);border-radius:3px}
+
+    .download-panel{display:flex;align-items:center;justify-content:space-between;gap:20px;background:linear-gradient(135deg,rgba(79,142,247,.14),rgba(61,214,140,.08));border:1px solid rgba(79,142,247,.28);border-radius:12px;padding:24px}
+    .download-panel h3{margin:0 0 4px;font-size:17px}
+    .download-panel p{margin:0;font-size:12.5px}
+
+    .badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:650;white-space:nowrap}
+    .badge-blue{background:rgba(79,142,247,.15);color:var(--blue)}
+    .badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+    .badge-amber{background:rgba(245,166,35,.14);color:var(--amber)}
+
+    .site-nav{margin-top:48px;border-top:1px solid var(--border);padding:30px 0 0}
+    .site-nav h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:0 0 14px}
+    .site-nav-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+    .site-nav-link{display:flex;flex-direction:column;padding:13px 15px;background:var(--bg2);border:1px solid var(--border);border-radius:9px}
+    .site-nav-link:hover{border-color:rgba(79,142,247,.45);text-decoration:none}
+    .site-nav-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+    .site-nav-sub{font-size:11px;color:var(--text2)}
+
+    @media(max-width:820px){
+      .metrics{grid-template-columns:1fr 1fr}.decision-grid{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.checklist{grid-template-columns:1fr}
+      .download-panel{align-items:flex-start;flex-direction:column}
+    }
+    @media(max-width:640px){
+      nav{padding:0 14px}.nav-brand{display:none}.nav-links a{padding:0 8px}
+      .wrap{padding:0 14px 60px}.hero{padding-top:38px}.section{padding:20px}.metrics{grid-template-columns:1fr 1fr;gap:8px}
+      .metric{padding:13px}.metric-value{font-size:15px}
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="nav-home">← 返回首页</a>
+    <div class="nav-brand">107㎡住宅网络改造</div>
+    <div class="nav-links">
+      <a href="#decision">方案结论</a>
+      <a href="#placement">点位图</a>
+      <a href="#construction">施工图</a>
+      <a href="#materials">物料</a>
+      <a href="#acceptance">验收</a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-tag">R5C · RT-AX82U · Wired AiMesh · 2026-07</div>
+      <h1>107㎡住宅无线网络改造：从单点覆盖到双 AP 有线回程</h1>
+      <p>主卧 5GHz 实测低至 -80~-82 dBm，回落 2.4GHz 后虽然信号约 -64 dBm，但 YouTube 以 32~60 Mbps 缓冲时会占满无线链路。最终方案不再让一台 AX82U 从住宅一角承担全屋，而是保留 R5C 路由层，建立客餐厅与卧室区两个有线覆盖点。</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/rt-ax82u-network-renovation/RT-AX82U_107sqm_network_renovation_plan.pdf" download>下载施工 PDF ↓</a>
+        <a class="btn" href="#placement">查看户型点位</a>
+        <a class="btn" href="/rt-ax82u-wifi-optimization.html">查看前期无线优化记录</a>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="关键实测指标">
+      <div class="metric bad"><div class="metric-label">主卧 5GHz</div><div class="metric-value">-80~-82 dBm</div><div class="metric-note">8~32 Mbps，MCS 1</div></div>
+      <div class="metric warn"><div class="metric-label">主卧 2.4GHz</div><div class="metric-value">68~97 Mbps</div><div class="metric-note">可用但容量容易被占满</div></div>
+      <div class="metric good"><div class="metric-label">改造目标</div><div class="metric-value">≥ -65 dBm</div><div class="metric-note">主卧 5GHz / NSS 2</div></div>
+      <div class="metric"><div class="metric-label">推荐结构</div><div class="metric-value">2 AP + Cat6</div><div class="metric-note">全程有线回程</div></div>
+    </section>
+
+    <section id="decision" class="section">
+      <div class="section-header"><div class="section-title">方案结论</div><div class="section-sub">只改无线层，不动 R5C 路由层</div></div>
+      <div class="decision-grid">
+        <article class="decision"><b><span class="dot dot-blue"></span>AP1 · RT-AX82U</b><p>放在客厅/餐厅交界的右侧，靠卧室走廊入口，负责客厅、餐厅、厨房和阳台。避免放在客厅左侧、电视背后或低柜内。</p></article>
+        <article class="decision"><b><span class="dot dot-green"></span>AP2 · 新增有线节点</b><p>放在平面图“2070”横向走廊上方，位于次卧一门与主卧门之间、略靠主卧门一侧，负责主卧及两个次卧。</p></article>
+      </div>
+      <div class="callout green"><strong>最终拓扑：</strong>光猫 → R5C → PoE/千兆交换机 → AX82U + 走廊 AP。R5C 继续负责 PPPoE、DHCP、Nikki 和防火墙；两个无线设备只工作在 AP/AiMesh 模式。</div>
+    </section>
+
+    <section id="placement" class="section">
+      <div class="section-header"><div class="section-title">无线点位总图</div><div class="section-sub">蓝色覆盖公共区，绿色覆盖卧室区</div></div>
+      <figure class="plan-figure">
+        <img src="/rt-ax82u-network-renovation/placement-plan.png" alt="107平方米户型无线点位总图，标注 R5C、AX82U AP1 与走廊 AP2" loading="lazy">
+        <figcaption>AP2 位于横向走廊中心、靠主卧门一侧，让信号经门口进入主卧，减少连续穿越两堵实体墙。</figcaption>
+      </figure>
+      <div class="callout amber"><strong>为什么移动 AX82U 没有解决：</strong>从玄关移到客厅后，主卧 5GHz 反而从约 -73 dBm 降至 -80~-82 dBm；客厅到主卧的斜向传播仍需穿越次卧一附近墙体，单点位置优化已到极限。</div>
+    </section>
+
+    <section id="construction" class="section">
+      <div class="section-header"><div class="section-title">综合布线施工图</div><div class="section-sub">优先星形布线，备选由 AX82U LAN 续接</div></div>
+      <figure class="plan-figure">
+        <img src="/rt-ax82u-network-renovation/construction-plan.png" alt="107平方米住宅 Cat6 网络综合布线施工图" loading="lazy">
+        <figcaption><span class="badge badge-blue">C01</span> 既有链路到 AX82U；<span class="badge badge-green">C02</span> 推荐从弱电箱新增 Cat6 到走廊 AP；橙色虚线为低改造量备选。</figcaption>
+      </figure>
+      <div class="steps">
+        <article class="step"><span class="step-num">1</span><b>铺设 Cat6</b><p>六类非屏蔽纯铜线，永久链路不设中间接头；与强电平行净距建议大于 200 mm。</p></article>
+        <article class="step"><span class="step-num">2</span><b>安装 AP2</b><p>吸顶点避开灯具、金属检修口和空调风口至少 300 mm，AP 端预留 0.5~1 m 线缆。</p></article>
+        <article class="step"><span class="step-num">3</span><b>测线与标记</b><p>使用测线仪验证 8 芯线序、短路和开路；弱电箱与 AP 端统一贴 C02 标签。</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-title">网络拓扑与地址规划</div><div class="section-sub">避免双 DHCP、双 NAT 和无线回程误选</div></div>
+      <figure class="plan-figure">
+        <img src="/rt-ax82u-network-renovation/network-topology.png" alt="R5C、PoE交换机、AX82U 与新增 AP 的网络拓扑图" loading="lazy">
+        <figcaption>建议为 AP1 保留 <code>192.168.1.106</code>，为 AP2 绑定 <code>192.168.1.107</code>；AP2 回程设置为 Ethernet/WAN First。</figcaption>
+      </figure>
+    </section>
+
+    <section id="materials" class="section">
+      <div class="section-header"><div class="section-title">物料准备</div><div class="section-sub">数量需在施工前复尺并增加 15%~20% 余量</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>编号</th><th>物料</th><th>建议规格</th><th>数量</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>M01</td><td>新增无线节点</td><td>ASUS EBA63 PoE，或 RT-AX57 级 AiMesh 节点</td><td>1 台</td><td>吸顶优先 EBA63；柜顶方案可使用普通 AiMesh 路由器</td></tr>
+            <tr><td>M02</td><td>六类网线</td><td>Cat6 U/UTP，23AWG，纯铜，低烟无卤优先</td><td>约 20 m</td><td>拒绝铜包铝及没有实际必要的家装 Cat7/Cat8</td></tr>
+            <tr><td>M03</td><td>PoE 交换机</td><td>5 口千兆，802.3af/at，PoE 预算 ≥45W</td><td>1 台</td><td>若选非 PoE 节点，可改为普通千兆交换机</td></tr>
+            <tr><td>M04</td><td>六类模块/水晶头</td><td>Cat6 免打模块或合格水晶头</td><td>2~4 个</td><td>永久链路优先模块化端接</td></tr>
+            <tr><td>M05</td><td>线槽/穿线管</td><td>PVC 20 mm 管或 20×10 mm 以上线槽</td><td>约 15 m</td><td>根据吊顶、踢脚线和墙面路径调整</td></tr>
+            <tr><td>M06</td><td>短跳线与辅材</td><td>Cat6 成品跳线、标签、扎带、底盒、膨胀螺丝</td><td>1 批</td><td>C01/C02 两端编号必须一致</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout"><strong>设备取舍：</strong>RT-AX57 级节点成本更低、与消费级 AiMesh 配置直接；EBA63 支持 PoE 和吸顶，施工整洁，但购买前应确认当前 AX82U 固件可发现并接纳该节点。</div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-title">配置基线</div><div class="section-sub">施工完成后的统一设置</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>设备</th><th>模式/地址</th><th>关键设置</th></tr></thead>
+          <tbody>
+            <tr><td>R5C</td><td><code>192.168.1.1/24</code></td><td>继续负责 PPPoE、DHCP、NAT、DNS、Nikki；作为唯一网关</td></tr>
+            <tr><td>AX82U AP1</td><td>AP/AiMesh 主节点；建议 <code>192.168.1.106</code></td><td>SSID 保持 ASUS395；Smart Connect 开启</td></tr>
+            <tr><td>AP2</td><td>AiMesh Node；建议 <code>192.168.1.107</code></td><td>回程优先级 Ethernet/WAN First，并确认拓扑显示有线</td></tr>
+            <tr><td>无线参数</td><td>5GHz 80MHz；2.4GHz 20MHz</td><td>5GHz 漫游助手先保持 -68 dBm；AiMesh 模式优先由系统协调信道</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="acceptance" class="section">
+      <div class="section-header"><div class="section-title">施工与性能验收</div><div class="section-sub">必须在 YouTube 高负载状态下验收</div></div>
+      <ul class="checklist">
+        <li>主卧连接 5GHz，RSSI 达到 -50~-65 dBm，NSS 2，Tx ≥300 Mbps。</li>
+        <li>次卧一、次卧二优先连接 5GHz，RSSI ≥-67 dBm，无频繁切换。</li>
+        <li>播放 YouTube 同时 ping 192.168.1.1：丢包 0%，平均低于 20 ms。</li>
+        <li>AiMesh 拓扑中 AP2 显示 Ethernet/WAN，链路协商速率 1Gbps。</li>
+        <li>可选 iperf3：主卧 5GHz 局域网实际吞吐达到 300 Mbps 以上。</li>
+        <li>C01/C02 八芯全部直通，无短路、反接、分线；两端标签一致。</li>
+        <li>Cat6 不与强电同管，吊顶与线槽内走线留存施工照片。</li>
+        <li>AP2 固定牢靠，周围无金属遮挡、热源和空调风口。</li>
+      </ul>
+    </section>
+
+    <section class="download-panel">
+      <div><h3>下载完整施工交底 PDF</h3><p>7 页 A4 横向版，包含点位总图、布线施工图、端口规划、物料表、配置基线和签字验收表。</p></div>
+      <a class="btn btn-primary" href="/rt-ax82u-network-renovation/RT-AX82U_107sqm_network_renovation_plan.pdf" download>下载 PDF ↓</a>
+    </section>
+
+    <aside class="site-nav">
+      <h3>相关文档</h3>
+      <div class="site-nav-grid">
+        <a class="site-nav-link" href="/rt-ax82u-wifi-optimization.html"><span class="site-nav-title">RT-AX82U 无线优化记录</span><span class="site-nav-sub">漫游助手 · 信号实测 · 信道扫描</span></a>
+        <a class="site-nav-link" href="/r5c-setup-init.html"><span class="site-nav-title">NanoPi R5C 初始化 Setup</span><span class="site-nav-sub">PPPoE · DHCP · SSH · Nikki</span></a>
+        <a class="site-nav-link" href="/immortalwrt-plugins.html"><span class="site-nav-title">ImmortalWrt 必装插件</span><span class="site-nav-sub">Nikki · Bandix · eqos</span></a>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>
