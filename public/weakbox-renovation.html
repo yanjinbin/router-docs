@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="家庭弱电箱改造页面，覆盖当前光猫-R5C-AX82U AP 实际链路、3 个五孔插座约束、交换机扩展、二级子路由、无线 AP、广电 4K 机顶盒、Apple TV、MacBook 与台式机的接线规划。">
+  <title>弱电箱改造方案 · 光猫 + R5C + AX82U AP + 交换机</title>
+  <style>
+    :root{
+      --bg:#0f1117;--panel:#181c25;--panel2:#202635;--panel3:#252c3d;
+      --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.16);
+      --text:#e8eaf0;--muted:#a2a8ba;--faint:#70798f;
+      --blue:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--cyan:#39c6dc;--purple:#c084fc;
+      --mono:'JetBrains Mono','SF Mono','Fira Code','Cascadia Code',monospace;
+      --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.72;-webkit-font-smoothing:antialiased}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code{font-family:var(--mono);font-size:12px;color:#d6e4ff;background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.24);border-radius:4px;padding:1px 6px}
+    nav{position:sticky;top:0;z-index:30;height:52px;display:flex;align-items:center;gap:12px;padding:0 22px;background:rgba(15,17,23,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .nav-home{font-size:12px;font-weight:700;color:#fff;background:var(--blue);padding:5px 12px;border-radius:6px;white-space:nowrap}
+    .nav-home:hover{text-decoration:none;filter:brightness(1.05)}
+    .nav-title{font-size:13px;font-weight:700;white-space:nowrap}
+    .nav-links{display:flex;margin-left:auto;overflow-x:auto;height:52px}
+    .nav-links a{display:flex;align-items:center;padding:0 10px;color:var(--muted);font-size:12px;border-bottom:2px solid transparent;white-space:nowrap}
+    .nav-links a:hover{color:var(--text);border-bottom-color:var(--blue);text-decoration:none}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 24px 76px}
+    .hero{padding:54px 0 32px}
+    .eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+    h1{font-size:clamp(28px,4vw,42px);line-height:1.18;letter-spacing:-.02em;margin-bottom:14px;max-width:900px}
+    .hero p{font-size:15px;color:var(--muted);max-width:840px}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;border-radius:8px;padding:0 15px;border:1px solid var(--border2);background:var(--panel);color:var(--text);font-size:12px;font-weight:700}
+    .btn:hover{text-decoration:none;border-color:rgba(79,142,247,.54);transform:translateY(-1px)}
+    .btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+    .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-top:28px}
+    figure.photo{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    figure.photo img{display:block;width:100%;height:100%;object-fit:cover;max-height:520px;background:#111}
+    figure.photo figcaption{font-size:12px;color:var(--muted);padding:11px 13px;border-top:1px solid var(--border)}
+    .summary{display:grid;gap:10px}
+    .summary-item{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:17px}
+    .summary-label{font-size:10px;color:var(--faint);font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+    .summary-value{font-size:18px;font-family:var(--mono);font-weight:800}
+    .summary-item.good .summary-value{color:var(--green)}
+    .summary-item.warn .summary-value{color:var(--amber)}
+    .summary-item.bad .summary-value{color:var(--red)}
+    section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:28px;margin-top:22px}
+    .section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:18px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+    .section-head h2{font-size:19px;line-height:1.25}
+    .section-head span{font-size:12px;color:var(--faint)}
+    h3{font-size:15px;margin:20px 0 9px}
+    p{color:var(--muted);margin-bottom:12px}
+    strong{color:var(--text)}
+    .callout{border-left:3px solid var(--blue);background:var(--panel2);border-radius:0 8px 8px 0;padding:13px 16px;margin:14px 0;color:var(--muted)}
+    .callout.good{border-left-color:var(--green)}
+    .callout.warn{border-left-color:var(--amber)}
+    .callout.bad{border-left-color:var(--red)}
+    .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--panel2)}
+    table{border-collapse:collapse;width:100%;min-width:760px;font-size:12.5px}
+    th{background:var(--panel3);color:var(--faint);font-size:11px;text-align:left;letter-spacing:.04em}
+    th,td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+    td{color:var(--muted)}
+    td:first-child{color:var(--text);font-weight:700;white-space:nowrap}
+    tr:last-child td{border-bottom:0}
+    .badge{display:inline-flex;align-items:center;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:800;white-space:nowrap}
+    .keep{background:rgba(61,214,140,.13);color:var(--green)}
+    .remove{background:rgba(240,96,96,.13);color:var(--red)}
+    .ignore{background:rgba(245,166,35,.14);color:var(--amber)}
+    .replace{background:rgba(79,142,247,.14);color:var(--blue)}
+    .topology{display:grid;gap:10px;margin:16px 0}
+    .flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:stretch}
+    .node{min-height:78px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:13px}
+    .node b{display:block;font-size:13px;margin-bottom:4px}
+    .node span{display:block;font-size:11.5px;color:var(--muted)}
+    .node.core{border-color:rgba(79,142,247,.44)}
+    .node.good{border-color:rgba(61,214,140,.42)}
+    .arrow{display:none}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px}
+    .card h3{margin:0 0 6px;font-size:14px}
+    .card p{font-size:12.5px;margin:0}
+    .photo-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+    .port-plan{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .checklist{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+    .checklist li{position:relative;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px 10px 34px;color:var(--muted);font-size:12.5px}
+    .checklist li:before{content:"";position:absolute;left:12px;top:13px;width:10px;height:10px;border-radius:3px;border:1px solid var(--green)}
+    .site-nav{margin-top:38px;border-top:1px solid var(--border);padding-top:24px}
+    .site-nav h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 12px}
+    .site-nav-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+    .site-nav-link{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:13px 15px}
+    .site-nav-link:hover{border-color:rgba(79,142,247,.45);text-decoration:none}
+    .site-nav-title{font-size:13px;font-weight:700;color:var(--text)}
+    .site-nav-sub{font-size:11px;color:var(--muted)}
+    @media(max-width:960px){
+      .hero-grid,.port-plan{grid-template-columns:1fr}
+      .flow{grid-template-columns:1fr}
+      .cards,.photo-row{grid-template-columns:1fr}
+      .checklist{grid-template-columns:1fr}
+    }
+    @media(max-width:640px){
+      nav{padding:0 14px}.nav-title{display:none}.wrap{padding:0 14px 56px}section{padding:20px}.hero{padding-top:38px}
+      .summary-value{font-size:15px}
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-home" href="/">← 返回首页</a>
+    <div class="nav-title">弱电箱改造</div>
+    <div class="nav-links">
+      <a href="#inventory">现状设备</a>
+      <a href="#target">目标拓扑</a>
+      <a href="#entertainment">文娱设备</a>
+      <a href="#power">电源位</a>
+      <a href="#ports">端口规划</a>
+      <a href="#steps">施工步骤</a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <header class="hero">
+      <div class="eyebrow">R5C · 光猫桥接 · 2.5G 交换机 · AP / AiMesh · 文娱网络</div>
+      <h1>家庭弱电箱改造方案：保留光猫 → R5C → AX82U AP，新增交换机接管房间网口</h1>
+      <p>当前实际链路是光猫 → R5C 软路由 → AX82U AP，网络已经能跑；弱电箱内还有开发商五口路由器、电话分线、同轴电视分配和各房间网线。改造目标不是换掉 R5C，而是让老路由退出，新增 8 口 2.5G 交换机统一接管房间网口，并在只有 3 个五孔插座的条件下安排光猫、R5C、AX82U、交换机和文娱设备。</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#target">查看目标接线</a>
+        <a class="btn" href="#inventory">当前设备去留</a>
+        <a class="btn" href="/rt-ax82u-network-renovation.html">查看 AP 改造方案</a>
+      </div>
+      <div class="hero-grid">
+        <figure class="photo">
+          <img src="/weakbox-renovation/current-real-overview.jpg" alt="当前实际弱电箱状态，光猫、R5C 和 AX82U AP 已经接入运行" loading="eager">
+          <figcaption>当前实际：光猫在箱内，R5C 挂在门板/箱外，AX82U 作为 AP 已接入；电源和网线已经占用较多空间。</figcaption>
+        </figure>
+        <div class="summary">
+          <div class="summary-item good"><div class="summary-label">当前主链路</div><div class="summary-value">光猫 → R5C → AX82U AP</div><p>R5C 负责 PPPoE、DHCP、NAT、DNS、Nikki/Mihomo；AX82U 只做无线 AP。</p></div>
+          <div class="summary-item warn"><div class="summary-label">建议新增</div><div class="summary-value">8 口 2.5G 交换机</div><p>替代五口路由器的 LAN 分发功能，统一接客厅、卧室、书房、AP 和有线终端。</p></div>
+          <div class="summary-item bad"><div class="summary-label">硬约束</div><div class="summary-value">3 个五孔插座</div><p>光猫、R5C、AX82U 已经占满常规电源位。新增交换机前要先处理供电位和散热。</p></div>
+        </div>
+      </div>
+    </header>
+
+    <section id="inventory">
+      <div class="section-head"><h2>从左到右的设备清单</h2><span>按照片中弱电箱位置识别</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>位置</th><th>设备</th><th>当前作用</th><th>改造建议</th><th>原因</th></tr></thead>
+          <tbody>
+            <tr><td>最左窄条</td><td>GDY1 电源模块</td><td>给弱电箱内置五口路由器供电，标注 <code>DC7.5V 输出</code></td><td><span class="badge remove">可断电</span></td><td>五口路由器退出后，它没有实际网络价值。不要拆 220V 侧，只断低压设备即可。</td></tr>
+            <tr><td>左侧大黑盒</td><td>开发商五口路由器</td><td>老式 WAN + 4 LAN 路由分发，默认 <code>192.168.0.1</code></td><td><span class="badge remove">淘汰</span></td><td>R5C 已经是主路由。继续使用会引入双 NAT、DHCP 冲突和性能瓶颈。</td></tr>
+            <tr><td>上方和底部线束</td><td>各房间网线</td><td>通往客厅、卧室、书房等墙面网口</td><td><span class="badge keep">保留</span></td><td>这是家庭有线网络的核心资产，后续统一插到新交换机。</td></tr>
+            <tr><td>中间圆口模块</td><td>GT3/4 有线电视同轴分配器</td><td>一路广电同轴信号分到多个房间电视圆口</td><td><span class="badge ignore">原地保留</span></td><td>如果不用广电有线电视或 Cable Modem，可以不接不管。不要剪线，未来可恢复。</td></tr>
+            <tr><td>右中 RJ11 模块</td><td>GT1/28 电话分线模块</td><td>固定电话线分到各房间电话口</td><td><span class="badge ignore">原地保留</span></td><td>当前不需要电话。保留不影响网络，占位即可。</td></tr>
+            <tr><td>右侧白色盒子</td><td>运营商光猫 ONT</td><td>光纤入户转以太网，提供宽带入口</td><td><span class="badge keep">必须保留</span></td><td>当前链路第一跳。建议保持桥接或低干预模式，由 R5C 做拨号和路由。</td></tr>
+            <tr><td>门板/箱外黑色盒</td><td>R5C 软路由</td><td>主网关，运行防火墙、DHCP、DNS、Nikki/Mihomo</td><td><span class="badge keep">必须保留</span></td><td>当前实际网络控制中心。交换机只扩展 LAN 口，不替代 R5C。</td></tr>
+            <tr><td>箱门外黑色路由器</td><td>AX82U 无线 AP</td><td>当前无线覆盖设备，已经接在 R5C 后面</td><td><span class="badge keep">保留</span></td><td>继续 AP 模式或 AiMesh 主节点。不要让它做第二个主路由。</td></tr>
+            <tr><td>新增位置</td><td>8 口 2.5G 交换机</td><td>把 R5C 的 LAN 分给所有房间和设备</td><td><span class="badge replace">新增替换</span></td><td>接管五口路由器的分线功能，并为 MacBook、台式机、AP、Apple TV 留足端口。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="photo-row">
+        <figure class="photo"><img src="/weakbox-renovation/current-left.jpg" alt="弱电箱左侧五口路由器和同轴分配器特写" loading="lazy"><figcaption>左侧五口路由器只适合老式分发，改造后不再承担路由功能。</figcaption></figure>
+        <figure class="photo"><img src="/weakbox-renovation/current-ax82u-door.jpg" alt="AX82U 当前挂在弱电箱门外作为 AP 使用" loading="lazy"><figcaption>AX82U 当前挂在弱电箱门外，适合继续做 AP，不适合再做 DHCP/NAT。</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="target">
+      <div class="section-head"><h2>目标拓扑</h2><span>当前网络和未来 AP/文娱设备都按这个逻辑接</span></div>
+      <div class="topology">
+        <div class="flow">
+          <div class="node"><b>光纤入户</b><span>运营商线路，不动光纤头和光猫注册信息</span></div>
+          <div class="node"><b>光猫 ONT</b><span>桥接或低干预模式，LAN 接 R5C WAN</span></div>
+          <div class="node core"><b>R5C 软路由</b><span>唯一网关：PPPoE / DHCP / NAT / DNS / Nikki</span></div>
+          <div class="node good"><b>8 口 2.5G 交换机</b><span>只做二层交换，扩展所有 LAN 口</span></div>
+          <div class="node"><b>房间与终端</b><span>AP、Apple TV、台式机、MacBook、电视盒子</span></div>
+        </div>
+      </div>
+      <div class="callout good"><strong>主线接法：</strong>光猫 LAN → R5C WAN，R5C LAN → 交换机任意 2.5G 口，交换机其余端口 → 各房间网线、AX82U AP 和有线终端。</div>
+      <div class="callout warn"><strong>不要这样接：</strong>光猫 → 五口路由器 → R5C，或者 R5C 与五口路由器同时发 DHCP。这样会制造双 NAT 和网段错乱。</div>
+    </section>
+
+    <section id="entertainment">
+      <div class="section-head"><h2>文娱和办公设备怎么接</h2><span>支持二级子路由、AP、广电 4K、Apple TV、MacBook、台式机</span></div>
+      <div class="cards">
+        <article class="card"><h3>无线 AP / AiMesh</h3><p>AX82U 或新增 AP 用 AP 模式。上联线接交换机，关闭下级 DHCP。吸顶或面板 AP 才需要 PoE。</p></article>
+        <article class="card"><h3>二级子路由</h3><p>如果必须保留二级路由，优先改 AP 模式。只有访客隔离或特殊实验网络才让它继续做 NAT。</p></article>
+        <article class="card"><h3>Apple TV / 电视盒子</h3><p>优先走有线接交换机或客厅墙口。流媒体、投屏、Plex/Jellyfin 都走网线或 Wi-Fi，不走同轴。</p></article>
+        <article class="card"><h3>广电 4K 数字机顶盒</h3><p>如果是广电传统有线电视盒，需要同轴分配器的 OUT 口；如果是 IPTV 盒子，则接网线到交换机。</p></article>
+        <article class="card"><h3>MacBook</h3><p>固定办公位建议用 USB-C 2.5G 网卡或扩展坞接墙口。移动使用 Wi-Fi，靠 AP 覆盖质量决定体验。</p></article>
+        <article class="card"><h3>台式机 / NAS</h3><p>优先有线接交换机。若有 2.5G 网卡，接 2.5G 口；NAS 未来可考虑 SFP+ 或 10G 上联。</p></article>
+      </div>
+      <div class="callout"><strong>同轴是否需要：</strong>只看广电传统有线电视和圆形电视口。Apple TV、电视 App、IPTV、NAS、投屏都不需要同轴分配器。</div>
+    </section>
+
+    <section id="power">
+      <div class="section-head"><h2>电源位约束</h2><span>当前只有 3 个五孔位，新增交换机前必须先规划供电</span></div>
+      <div class="cards">
+        <article class="card"><h3>当前 3 个电源位</h3><p>实际已经被光猫、R5C、AX82U AP 三类设备占用。继续直接新增交换机，会出现适配器互相遮挡或叠插风险。</p></article>
+        <article class="card"><h3>新增交换机用电</h3><p>8 口 2.5G 非 PoE 交换机通常还需要一个独立电源适配器。PoE 交换机功率更高，发热也更明显。</p></article>
+        <article class="card"><h3>优先处理方式</h3><p>优先选无风扇、外置电源、小尺寸交换机；电源用合规带线短排插或弱电箱专用电源模块，不要用劣质一转多。</p></article>
+      </div>
+      <div class="table-wrap" style="margin-top:14px">
+        <table>
+          <thead><tr><th>电源位</th><th>推荐接入</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>五孔位 1</td><td>光猫</td><td>宽带入口必须稳定供电，不建议和大功率设备挤在同一个转接头上。</td></tr>
+            <tr><td>五孔位 2</td><td>R5C</td><td>主路由必须持续运行。R5C 断电会导致全屋网络、DHCP、DNS、代理全部中断。</td></tr>
+            <tr><td>五孔位 3</td><td>AX82U AP 或短排插上联</td><td>若 AX82U 继续放在箱外，可保留原供电；新增交换机时建议用合规短排插扩展。</td></tr>
+            <tr><td>新增供电</td><td>交换机</td><td>不要让交换机电源适配器压住光猫和 R5C 散热孔。PoE 版更要留通风空间。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="photo-row">
+        <figure class="photo"><img src="/weakbox-renovation/current-power-cables.jpg" alt="弱电箱内电源适配器和线缆占位情况" loading="lazy"><figcaption>当前电源适配器与线缆已经比较拥挤，新增交换机前应先处理供电和走线。</figcaption></figure>
+        <figure class="photo"><img src="/weakbox-renovation/current-r5c-ax82u.jpg" alt="R5C 和 AX82U 当前实际连接状态" loading="lazy"><figcaption>实际链路为光猫 → R5C → AX82U AP，交换机应插在 R5C LAN 后面，而不是替代 R5C。</figcaption></figure>
+      </div>
+      <div class="callout bad"><strong>不建议：</strong>不要用多个大电源适配器硬挤同一个五孔位，不要把排插塞到完全不通风的位置，不要让电源线压住光纤和网线水晶头。</div>
+    </section>
+
+    <section id="ports">
+      <div class="section-head"><h2>端口规划</h2><span>按 8 口 2.5G 非 PoE 交换机设计</span></div>
+      <div class="port-plan">
+        <div>
+          <h3>交换机端口建议</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>端口</th><th>连接对象</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td>P1</td><td>R5C LAN</td><td>交换机上联，接 R5C 的 LAN 口</td></tr>
+                <tr><td>P2</td><td>客厅网线 / AX82U AP</td><td>客厅主 AP 或电视墙弱电口</td></tr>
+                <tr><td>P3</td><td>主卧/走廊 AP</td><td>新增 AP 有线回程，PoE AP 需另选 PoE 交换机或注入器</td></tr>
+                <tr><td>P4</td><td>书房 / 台式机</td><td>优先给固定高带宽设备</td></tr>
+                <tr><td>P5</td><td>Apple TV / 电视盒子</td><td>客厅影音设备优先有线</td></tr>
+                <tr><td>P6</td><td>MacBook 扩展坞</td><td>办公位 2.5G 有线接入</td></tr>
+                <tr><td>P7</td><td>NAS / 游戏主机</td><td>预留高速终端</td></tr>
+                <tr><td>P8</td><td>备用</td><td>留给新 AP、摄像头或智能家居网关</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h3>地址与角色建议</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>设备</th><th>角色</th><th>建议</th></tr></thead>
+              <tbody>
+                <tr><td>R5C</td><td>主路由</td><td><code>192.168.1.1</code>，唯一 DHCP 和网关</td></tr>
+                <tr><td>AX82U</td><td>AP / AiMesh 主节点</td><td>可绑定 <code>192.168.1.106</code>，关闭路由/NAT</td></tr>
+                <tr><td>新增 AP</td><td>AiMesh Node / AP</td><td>可绑定 <code>192.168.1.107</code>，优先有线回程</td></tr>
+                <tr><td>二级子路由</td><td>尽量 AP 化</td><td>除非有隔离需求，否则不要再发 DHCP</td></tr>
+                <tr><td>Apple TV</td><td>有线终端</td><td>固定地址可选，方便投屏和家庭中枢</td></tr>
+                <tr><td>台式机 / NAS</td><td>高带宽终端</td><td>建议静态租约，方便远程访问和共享</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="steps">
+      <div class="section-head"><h2>落地改造步骤</h2><span>按低风险顺序执行</span></div>
+      <ul class="checklist">
+        <li>拍照记录当前每根线位置，尤其是光猫 LAN、R5C WAN/LAN、客厅/卧室/书房标签。</li>
+        <li>确认光猫到 R5C 的 WAN 链路正常，不动光纤头和运营商注册信息。</li>
+        <li>断开五口路由器的电源，或至少拔掉它的 WAN/LAN 网线，让它退出网络。</li>
+        <li>把 R5C LAN 接到新 8 口 2.5G 交换机 P1。</li>
+        <li>把客厅、卧室、书房等房间网线逐一插到交换机，并贴新标签。</li>
+        <li>AX82U、无线 AP、Apple TV、台式机、MacBook 扩展坞优先走交换机或墙口。</li>
+        <li>如使用广电 4K 传统有线机顶盒，保留同轴 OUT 口；如使用 IPTV/OTT，则同轴不接。</li>
+        <li>在 R5C DHCP 里给 AP、Apple TV、NAS、台式机做静态租约，方便维护。</li>
+        <li>验收每个房间墙口是否能拿到 <code>192.168.1.x</code> 地址，并能访问 <code>192.168.1.1</code>。</li>
+        <li>整理电源适配器和线缆，保证弱电箱散热，避免把热源堆在光猫和交换机上。</li>
+      </ul>
+      <div class="callout bad"><strong>安全边界：</strong>不要剪同轴线、电话线、光纤线，不要拆 220V 强电接线。当前只需要调整网线和低压电源适配器。</div>
+    </section>
+
+    <aside class="site-nav">
+      <h3>相关文档</h3>
+      <div class="site-nav-grid">
+        <a class="site-nav-link" href="/rt-ax82u-network-renovation.html"><span class="site-nav-title">107㎡住宅网络改造方案</span><span class="site-nav-sub">双 AP 有线回程 · 点位与施工</span></a>
+        <a class="site-nav-link" href="/rt-ax82u-wifi-optimization.html"><span class="site-nav-title">RT-AX82U 单 AP 无线优化</span><span class="site-nav-sub">Smart Connect · 漫游助手 · 信道</span></a>
+        <a class="site-nav-link" href="/r5c-setup-init.html"><span class="site-nav-title">NanoPi R5C 初始化 Setup</span><span class="site-nav-sub">PPPoE · DHCP · SSH · Nikki</span></a>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

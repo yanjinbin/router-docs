@@ -122,6 +122,14 @@ const docs = [
     tagColor: '#39c6dc',
   },
   {
+    title: '弱电箱改造方案',
+    subtitle: '光猫 · R5C · AX82U AP · 8口2.5G交换机',
+    desc: '基于当前光猫-R5C-AX82U AP 实际链路和 3 个五孔插座限制，梳理弱电箱从左到右设备去留、同轴/电话模块处理、交换机端口规划、文娱设备与办公终端接法。',
+    href: '/weakbox-renovation.html',
+    tag: '施工',
+    tagColor: '#39c6dc',
+  },
+  {
     title: 'Mihomo 完整流量路径图解',
     subtitle: '五层架构 & 决策流程 · TPROXY · fake-ip · 三路出口',
     desc: '两张图解析 Mihomo 全链路：架构图展示物理网卡→内核 netfilter→fw4/Nikki→应用层→ppp0 五层并列关系；决策图追踪 DNS 劫持→fake-ip→规则匹配→bypass/直连/代理三路出口的完整判断逻辑',
