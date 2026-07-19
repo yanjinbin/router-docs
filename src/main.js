@@ -150,7 +150,7 @@ document.querySelector('#app').innerHTML = `
         <rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/>
         <line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>
       </svg>
-      友善 R5C ARM软路由 & 华硕梅林固件指南
+      R5C Gateway Lab
     </div>
     <a class="status-badge" href="https://www.ilanzou.com/s/QOIXYvaw" target="_blank" rel="noopener" data-tip="访问密码：小区门牌号">
       <span class="dot"></span>固件 + Mihomo 文件 ↗
@@ -160,8 +160,8 @@ document.querySelector('#app').innerHTML = `
 
 <main>
   <div class="hero">
-    <h1>友善 R5C ARM软路由 & 华硕梅林固件指南</h1>
-    <p>NanoPi R5C · 华硕 AX82U / RAX80 · ImmortalWrt · 梅林固件 · 设备选型</p>
+    <h1>R5C Gateway Lab</h1>
+    <p>ImmortalWrt 25.12.1 · ARM 软路由 · Nikki / Mihomo · 家庭网络改造资料库</p>
     <p class="hero-note">📦 配套资料：<a href="https://www.ilanzou.com/s/QOIXYvaw" target="_blank" rel="noopener">固件 + Mihomo 配置下载</a> · 访问密码为小区门牌号 🙂</p>
   </div>
 
@@ -180,7 +180,7 @@ document.querySelector('#app').innerHTML = `
   </div>
 
   <footer>
-    <p>NanoPi R5C · ImmortalWrt 25.12 · Nikki（Mihomo）· 持续稳定运行</p>
+    <p>NanoPi R5C · ImmortalWrt 25.12.1 · Nikki（Mihomo）· 持续稳定运行</p>
   </footer>
 </main>
 `
