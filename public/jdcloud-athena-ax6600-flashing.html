@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>京东云雅典娜 AX6600 免拆刷机指南</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism-okaidia.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/plugins/toolbar/prism-toolbar.min.css">
   <style>
     :root {
       --bg: #0f1117;
@@ -42,10 +44,12 @@
     .nav-title { font-size: 14px; font-weight: 700; }
     .nav-home {
       color: var(--text);
+      background: transparent;
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 5px 10px;
       font-size: 13px;
+      line-height: 1.4;
     }
     main {
       max-width: 1040px;
@@ -139,15 +143,34 @@
       border-radius: 4px;
       padding: 1px 4px;
     }
-    pre {
+    pre[class*="language-"] {
       overflow: auto;
       margin: 12px 0;
       padding: 14px;
       background: #0b0d12;
       border: 1px solid var(--line);
       border-radius: 8px;
-      color: #d8e1f0;
       white-space: pre-wrap;
+    }
+    pre[class*="language-"] code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      white-space: pre;
+    }
+    div.code-toolbar > .toolbar {
+      top: 8px;
+      right: 8px;
+      opacity: 1;
+    }
+    div.code-toolbar > .toolbar button {
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 5px;
+      padding: 3px 8px;
+      box-shadow: none;
+      cursor: pointer;
     }
     .warn {
       border-color: rgba(240,96,96,.32);
@@ -186,7 +209,7 @@
     }
   </style>
 </head>
-<body>
+<body data-prismjs-copy="复制" data-prismjs-copy-success="已复制" data-prismjs-copy-error="复制失败">
   <nav class="nav">
     <div class="nav-title">JDCloud Athena AX6600 · 免拆刷机</div>
     <a class="nav-home" href="/">← 返回首页</a>
@@ -243,7 +266,7 @@
         <li>用 Chrome 内核浏览器登录原厂管理页：<code>jdcloudwifi.com</code>。</li>
         <li>打开开发者工具控制台，执行下面脚本，把 <code>odhcpd.leasetrigger</code> 指到 <code>/usr/sbin/dropbear</code> 并提交。</li>
       </ol>
-      <pre><code>const sessionid = document.cookie
+      <pre class="language-js"><code>const sessionid = document.cookie
   .split('; ')
   .find(row => row.startsWith('sessionid='))
   ?.split('=')[1] || '';
@@ -284,11 +307,11 @@ await rpc('commit', [
     <section>
       <h2>2. SSH 连接并写入 U-Boot</h2>
       <p>电脑终端连接路由器，看到 JD CLOUD 字样即可继续。密码使用原厂后台登录密码。</p>
-      <pre><code>ssh root@192.168.68.1</code></pre>
+      <pre class="language-bash"><code>ssh root@192.168.68.1</code></pre>
       <p>把 U-Boot 文件传到路由器 <code>/root</code>。macOS 可以用：</p>
-      <pre><code>scp uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin root@192.168.68.1:/root/</code></pre>
+      <pre class="language-bash"><code>scp uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin root@192.168.68.1:/root/</code></pre>
       <p>登录路由器后写入两个 APPSBL 分区：</p>
-      <pre><code>dd if=/root/uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin of=$(blkid -t PARTLABEL=0:APPSBL -o device) conv=fsync
+      <pre class="language-bash"><code>dd if=/root/uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin of=$(blkid -t PARTLABEL=0:APPSBL -o device) conv=fsync
 dd if=/root/uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin of=$(blkid -t PARTLABEL=0:APPSBL_1 -o device) conv=fsync</code></pre>
     </section>
 
@@ -343,5 +366,9 @@ dd if=/root/uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin of=$(blkid -t PARTLA
       <p class="source">整理自 <a href="https://www.right.com.cn/forum/thread-8429666-1-1.html" target="_blank" rel="noopener">恩山无线论坛 Kinser 的 AX6600 雅典娜免拆刷机经验</a>、<a href="https://250.ac.cn/2025/01/12/JDCloud-AX6600-openwrt/" target="_blank" rel="noopener">惊蛰的 JDCloud AX6600 刷机记录</a> 和 <a href="https://github.com/ZqinKing/wrt_release/releases" target="_blank" rel="noopener">ZqinKing 固件发布页</a>。本文按个人资料库方式重排，刷机前请回源确认文件版本。</p>
     </section>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/plugins/toolbar/prism-toolbar.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
 </body>
 </html>
