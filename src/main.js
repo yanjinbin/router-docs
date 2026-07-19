@@ -37,6 +37,14 @@ const docs = [
     tagColor: '#c084fc',
   },
   {
+    title: '京东云雅典娜 AX6600 免拆刷机',
+    subtitle: 'JDCloud Athena · U-Boot · OpenWrt',
+    desc: '从原厂系统开启 SSH、写入 U-Boot、刷大分区到 OpenWrt factory 固件的免拆流程，含 MacBook Type-C 转 RJ45 有线刷机物料和避坑提示。',
+    href: '/jdcloud-athena-ax6600-flashing.html',
+    tag: '刷机',
+    tagColor: '#39c6dc',
+  },
+  {
     title: 'Nikki 插件访问与 YAML 上传和更新重载',
     subtitle: 'LuCI 登录 · 上传配置 · 重载启动 · Zashboard',
     desc: '从 192.168.2.1 登录软路由 Nikki 插件页面，上传 Mihomo YAML，选择配置后重载启动，并打开 Zashboard 控制面板。',

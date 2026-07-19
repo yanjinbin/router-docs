@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>京东云雅典娜 AX6600 免拆刷机指南</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --panel: #181c25;
+      --panel2: #1f2533;
+      --text: #e8eaf0;
+      --muted: #9aa0b4;
+      --line: rgba(255,255,255,.1);
+      --blue: #4f8ef7;
+      --green: #3dd68c;
+      --orange: #f5a623;
+      --red: #f06060;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100svh; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 24px;
+      background: rgba(15,17,23,.92);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .nav-title { font-size: 14px; font-weight: 700; }
+    .nav-home {
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 36px 24px 72px;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 28px;
+      align-items: center;
+      padding: 28px;
+      background: linear-gradient(135deg, rgba(79,142,247,.15), rgba(61,214,140,.08));
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .tag {
+      display: inline-flex;
+      color: var(--green);
+      background: rgba(61,214,140,.1);
+      border: 1px solid rgba(61,214,140,.25);
+      border-radius: 5px;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 34px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .hero img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #dbeeff;
+    }
+    .quick {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0 0;
+    }
+    .quick div, section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .quick div { padding: 14px; }
+    .quick strong {
+      display: block;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .quick span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    section {
+      margin-top: 18px;
+      padding: 22px;
+    }
+    h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+    h3 {
+      margin: 22px 0 8px;
+      font-size: 16px;
+    }
+    p { margin: 8px 0; }
+    ul, ol { margin: 8px 0 0; padding-left: 22px; }
+    li { margin: 6px 0; }
+    code, pre {
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+    code {
+      color: #dce8ff;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 4px;
+      padding: 1px 4px;
+    }
+    pre {
+      overflow: auto;
+      margin: 12px 0;
+      padding: 14px;
+      background: #0b0d12;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #d8e1f0;
+      white-space: pre-wrap;
+    }
+    .warn {
+      border-color: rgba(240,96,96,.32);
+      background: rgba(240,96,96,.08);
+    }
+    .ok {
+      border-color: rgba(61,214,140,.28);
+      background: rgba(61,214,140,.08);
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+    .table th, .table td {
+      border: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+    .table th { color: var(--text); background: var(--panel2); }
+    .table td { color: var(--muted); }
+    .source {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    @media (max-width: 760px) {
+      .hero { grid-template-columns: 1fr; padding: 22px; }
+      .quick { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+      main { padding: 24px 16px 56px; }
+      .nav { padding: 10px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-title">JDCloud Athena AX6600 · 免拆刷机</div>
+    <a class="nav-home" href="/">← 返回首页</a>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <div>
+        <div class="tag">JDCloud AX6600 · Athena · OpenWrt</div>
+        <h1>京东云雅典娜 AX6600 免拆刷机指南</h1>
+        <p class="lead">面向纯小白的避坑流程：先利用原厂系统开启 SSH，写入 U-Boot，再进恢复页面刷大分区和 OpenWrt factory 固件。适合出厂固件仍可开启 SSH 的库存机。</p>
+      </div>
+      <img src="/assets/typec-rj45-hub.png" alt="MacBook 使用 Type-C 转 RJ45 扩展坞连接路由器刷机">
+    </div>
+
+    <div class="quick">
+      <div><strong>原厂版本样例</strong><span>JDC02-1.5.50.r2204，未联网自动升级前更稳。</span></div>
+      <div><strong>默认管理地址</strong><span>原厂：192.168.68.1；U-Boot / OpenWrt：192.168.1.1。</span></div>
+      <div><strong>必要物料</strong><span>MacBook 需要 Type-C 转 RJ45 扩展坞，刷大分区和固件阶段必须走有线。</span></div>
+    </div>
+
+    <section class="warn">
+      <h2>先看风险</h2>
+      <ul>
+        <li>刷机有变砖风险，至少确认自己能进入 U-Boot 恢复页面再继续。</li>
+        <li>新机到手建议先不要接外网，避免原厂系统自动升级后堵住 SSH 开启路径。</li>
+        <li>本文整理自恩山帖子和惊蛰博客，链接放在文末；具体固件版本请以作者发布页为准。</li>
+        <li>如果你的出厂版本已经无法通过漏洞开启 SSH，本文的免拆流程可能不适用。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>文件和工具</h2>
+      <table class="table">
+        <tr><th>类别</th><th>内容</th></tr>
+        <tr><td>资料包</td><td><a href="https://www.ilanzou.com/s/z8hLX9KN?code=9902" target="_blank" rel="noopener">蓝奏云刷机资料包</a>，提取码 <code>9902</code>。</td></tr>
+        <tr><td>U-Boot</td><td><a href="https://250.ac.cn/file/uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin" target="_blank" rel="noopener">uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin</a>。</td></tr>
+        <tr><td>大分区 GPT</td><td><a href="https://250.ac.cn/file/gpt-JDC_AX6600_Athena_dual-boot_rootfs2048M_no-last-partition.bin" target="_blank" rel="noopener">gpt-JDC_AX6600_Athena_dual-boot_rootfs2048M_no-last-partition.bin</a>。</td></tr>
+        <tr><td>OpenWrt 固件</td><td><a href="https://github.com/ZqinKing/wrt_release/releases" target="_blank" rel="noopener">ZqinKing/wrt_release</a>，帖子经验选择 <code>25.05.26_16.47.57_jdcloud_ipq60xx_libwrt</code> 中包含 <code>factory</code> 的版本。</td></tr>
+        <tr><td>传文件工具</td><td>Windows 可用 WinSCP；macOS 可用 <code>scp</code> 或图形化 SCP/SFTP 工具。</td></tr>
+        <tr><td>有线网卡</td><td>MacBook 使用 Type-C 转 RJ45 扩展坞，刷机阶段用网线连接电脑和路由器 WAN 口。</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>刷机逻辑</h2>
+      <p>免拆刷机的依赖关系是：OpenWrt 需要 U-Boot 和大分区；写 U-Boot 需要先把文件传进路由器；免拆传文件依赖 SSH；SSH 需要先在原厂系统里通过配置漏洞拉起 dropbear。</p>
+      <p>所以实际顺序是：开启 SSH → 连接路由器 → 上传并写入 U-Boot → 进 U-Boot 刷大分区 → 再刷 OpenWrt factory 固件。</p>
+    </section>
+
+    <section>
+      <h2>1. 原厂系统开启 SSH</h2>
+      <ol>
+        <li>用 Chrome 内核浏览器登录原厂管理页：<code>jdcloudwifi.com</code>。</li>
+        <li>打开开发者工具控制台，执行下面脚本，把 <code>odhcpd.leasetrigger</code> 指到 <code>/usr/sbin/dropbear</code> 并提交。</li>
+      </ol>
+      <pre><code>const sessionid = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('sessionid='))
+  ?.split('=')[1] || '';
+
+async function rpc(method, params) {
+  const res = await fetch('/jdcapi', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'call', params })
+  });
+  console.log(method, await res.json());
+}
+
+await rpc('set', [
+  sessionid,
+  'uci',
+  'set',
+  {
+    config: 'dhcp',
+    type: 'odhcpd',
+    section: 'odhcpd',
+    values: { leasetrigger: '/usr/sbin/dropbear' }
+  }
+]);
+
+await rpc('commit', [
+  sessionid,
+  'uci',
+  'commit',
+  { config: 'dhcp' }
+]);</code></pre>
+      <ol start="3">
+        <li>进入「路由设置 → 上网设置 → IPv6 网络设置」。</li>
+        <li>打开 IPv6 开关，把上网方式切为 NAT6 并保存，触发 dropbear。</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>2. SSH 连接并写入 U-Boot</h2>
+      <p>电脑终端连接路由器，看到 JD CLOUD 字样即可继续。密码使用原厂后台登录密码。</p>
+      <pre><code>ssh root@192.168.68.1</code></pre>
+      <p>把 U-Boot 文件传到路由器 <code>/root</code>。macOS 可以用：</p>
+      <pre><code>scp uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin root@192.168.68.1:/root/</code></pre>
+      <p>登录路由器后写入两个 APPSBL 分区：</p>
+      <pre><code>dd if=/root/uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin of=$(blkid -t PARTLABEL=0:APPSBL -o device) conv=fsync
+dd if=/root/uboot-JDC_AX1800_Pro-AX6600_Athena-20240510.bin of=$(blkid -t PARTLABEL=0:APPSBL_1 -o device) conv=fsync</code></pre>
+    </section>
+
+    <section>
+      <h2>3. 进入 U-Boot 刷大分区</h2>
+      <ol>
+        <li>路由器断电。</li>
+        <li>按住 reset 插电，红灯闪烁后蓝灯常亮，再松开 reset。</li>
+        <li>MacBook 用 Type-C 转 RJ45 扩展坞接网线，建议电脑连路由器 WAN 口。</li>
+        <li>电脑手动设置 IPv4：IP <code>192.168.1.2</code> 到 <code>192.168.1.200</code> 任意一个，网关 <code>192.168.1.1</code>，子网掩码 <code>255.255.255.0</code>。</li>
+        <li>浏览器打开 <code>http://192.168.1.1/img.html</code>。</li>
+        <li>上传 GPT 大分区文件并提交，等待写入完成。</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>4. 刷入 OpenWrt factory 固件</h2>
+      <ol>
+        <li>大分区写入后，如果路由器红灯常亮，先拔电。</li>
+        <li>再次按住 reset 插电，红灯闪烁后蓝灯常亮，松开 reset。</li>
+        <li>浏览器打开 <code>http://192.168.1.1</code>，注意这次不是 <code>/img.html</code>。</li>
+        <li>上传 <code>factory</code> 固件并提交。</li>
+        <li>刷完后把网线插回 LAN 口，电脑 IPv4 改回自动获取。</li>
+      </ol>
+      <div class="ok" style="padding:14px;border-radius:8px;margin-top:12px">
+        OpenWrt 默认信息：LAN 地址 <code>192.168.1.1</code>，Wi-Fi 密码 <code>12345678</code>。首次登录后建议立刻改管理密码和无线密码。
+      </div>
+    </section>
+
+    <section>
+      <h2>5. 调整 WAN / LAN 口</h2>
+      <p>刷好后可以把 2.5G 网口留给局域网，便于接 2.5G 交换机。经验做法是在接口管理里：</p>
+      <ul>
+        <li>从 LAN 接口里取消 <code>lan4</code>，加入 <code>wan</code>。</li>
+        <li>从 WAN 接口里取消 <code>wan</code>，加入 <code>lan4</code>。</li>
+      </ul>
+      <p>调整前先确认当前网口映射，避免远程操作把自己踢下线。</p>
+    </section>
+
+    <section>
+      <h2>常见卡点</h2>
+      <ul>
+        <li>SSH 开不了：优先怀疑原厂系统已联网更新，先恢复出厂再重试；如果仍不行，可能需要拆机或其他路径。</li>
+        <li>进不了 U-Boot 页面：确认 reset 时机、电脑静态 IP、网线和 Type-C 网卡是否正常。</li>
+        <li>刷完红灯：换确认可用的 factory 固件版本，不要随便刷 sysupgrade 包。</li>
+        <li>MacBook 没有网口：必须准备 Type-C 转 RJ45 扩展坞，Wi-Fi 不能替代 U-Boot 刷机阶段的有线连接。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>来源</h2>
+      <p class="source">整理自 <a href="https://www.right.com.cn/forum/thread-8429666-1-1.html" target="_blank" rel="noopener">恩山无线论坛 Kinser 的 AX6600 雅典娜免拆刷机经验</a>、<a href="https://250.ac.cn/2025/01/12/JDCloud-AX6600-openwrt/" target="_blank" rel="noopener">惊蛰的 JDCloud AX6600 刷机记录</a> 和 <a href="https://github.com/ZqinKing/wrt_release/releases" target="_blank" rel="noopener">ZqinKing 固件发布页</a>。本文按个人资料库方式重排，刷机前请回源确认文件版本。</p>
+    </section>
+  </main>
+</body>
+</html>
