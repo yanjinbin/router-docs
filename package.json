@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:pages": "vite build --base=/router-docs/ && node scripts/rebase-dist.mjs dist /router-docs/",
     "preview": "vite preview"
   },
   "devDependencies": {

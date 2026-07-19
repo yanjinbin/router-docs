@@ -1,5 +1,8 @@
 import './style.css'
 
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '')
+const withBase = (path) => `${basePath}${path}`
+
 const docs = [
   {
     title: '多机场订阅组合',
@@ -164,7 +167,7 @@ document.querySelector('#app').innerHTML = `
 
   <div class="grid">
     ${docs.map(d => `
-      <a class="card" href="${d.href}">
+      <a class="card" href="${withBase(d.href)}">
         <div class="card-top">
           <span class="tag" style="--tag-color:${d.tagColor}">${d.tag}</span>
         </div>
