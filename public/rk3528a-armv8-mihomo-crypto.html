@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Radxa E20C RK3528A 上 Nikki/Mihomo 使用 ARMv8 AES、PMULL 加密指令加速 TLS 与 QUIC 的现场结论和完整调用链。">
+<title>RK3528A · Mihomo ARMv8 加密加速调用链 · Radxa E20C</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#687089;--blue:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.72;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+code{font-family:var(--mono);font-size:.9em;background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-radius:5px}
+
+nav{position:sticky;top:0;z-index:100;height:52px;padding:0 24px;display:flex;align-items:center;gap:12px;background:rgba(15,17,23,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-home{font-size:12px;font-weight:650;color:#fff;text-decoration:none;padding:5px 12px;background:var(--blue);border-radius:6px;white-space:nowrap}
+.nav-title{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-title span{color:var(--green)}
+.nav-links{margin-left:auto;display:flex;height:52px;overflow-x:auto}
+.nav-links a{display:flex;align-items:center;padding:0 11px;border-bottom:2px solid transparent;color:var(--text2);font-size:12px;text-decoration:none;white-space:nowrap}
+.nav-links a:hover{color:var(--text);border-bottom-color:var(--green)}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+.hero{padding:58px 0 34px}
+.eyebrow{color:var(--green);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.hero h1{max-width:850px;font-size:clamp(25px,4.6vw,42px);line-height:1.18;letter-spacing:-.025em;margin-bottom:14px}
+.hero p{max-width:790px;color:var(--text2);font-size:14px}
+.snapshot{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:7px 11px;border:1px solid rgba(61,214,140,.24);border-radius:999px;background:rgba(61,214,140,.07);color:var(--green);font:11px var(--mono)}
+.snapshot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+
+.verdict{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:12px;margin-bottom:54px}
+.verdict-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:19px}
+.verdict-card.primary{background:linear-gradient(135deg,rgba(61,214,140,.12),rgba(79,142,247,.05));border-color:rgba(61,214,140,.3)}
+.verdict-label{font:700 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.verdict-value{font-size:18px;font-weight:750;line-height:1.35;margin-bottom:7px}
+.verdict-card.primary .verdict-value{color:var(--green)}
+.verdict-desc{font-size:12px;color:var(--text2)}
+
+section{min-width:0;margin-bottom:58px;scroll-margin-top:72px}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;border-bottom:1px solid var(--border);padding-bottom:11px;margin-bottom:20px}
+.section-head h2{font-size:18px;line-height:1.3}
+.section-kicker{font:10px var(--mono);color:var(--text3);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.lead{color:var(--text2);font-size:13px;margin:-4px 0 18px;max-width:880px}
+
+.evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.evidence{min-width:0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.evidence-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.evidence h3{font-size:13px}
+.status{font:700 10px var(--mono);padding:2px 7px;border-radius:999px;background:rgba(61,214,140,.1);color:var(--green);border:1px solid rgba(61,214,140,.22);white-space:nowrap}
+.status.no{color:var(--red);background:rgba(240,96,96,.08);border-color:rgba(240,96,96,.22)}
+.evidence p{font-size:12px;color:var(--text2)}
+.mono-line{display:block;max-width:100%;margin-top:8px;padding:9px 10px;overflow-x:auto;white-space:nowrap;border-radius:7px;background:#10131b;color:#b9c6e4;font:11px/1.55 var(--mono)}
+
+.flow-shell{border:1px solid var(--border);border-radius:14px;background:radial-gradient(circle at 50% 0,rgba(79,142,247,.08),transparent 38%),var(--bg2);padding:22px}
+.flow{display:grid;grid-template-columns:1fr 44px 1fr 44px 1fr;align-items:stretch;gap:4px}
+.flow-node{min-width:0;min-height:126px;border:1px solid var(--border2);border-radius:10px;background:rgba(15,17,23,.72);padding:14px}
+.flow-node .num{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(79,142,247,.16);color:var(--blue);font:700 11px var(--mono);margin-bottom:9px}
+.flow-node.green .num{background:rgba(61,214,140,.13);color:var(--green)}
+.flow-node.purple .num{background:rgba(192,132,252,.13);color:var(--purple)}
+.flow-node h3{font-size:13px;margin-bottom:5px}
+.flow-node p{font-size:11.5px;color:var(--text2)}
+.flow-arrow{display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:22px}
+.flow-second{margin-top:12px;display:grid;grid-template-columns:1fr 44px 1fr 44px 1fr;gap:4px;align-items:stretch}
+.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.branch{border-radius:10px;padding:14px;border:1px solid var(--border);background:rgba(15,17,23,.56)}
+.branch h4{font-size:12px;margin-bottom:5px}
+.branch p{font-size:11.5px;color:var(--text2)}
+.branch.yes{border-color:rgba(61,214,140,.25)}.branch.yes h4{color:var(--green)}
+.branch.maybe{border-color:rgba(245,166,35,.25)}.branch.maybe h4{color:var(--amber)}
+.branch.no{border-color:rgba(240,96,96,.22)}.branch.no h4{color:var(--red)}
+.callout{margin-top:14px;border-left:3px solid var(--green);padding:11px 14px;background:rgba(61,214,140,.06);color:var(--text2);font-size:12px;border-radius:0 8px 8px 0}
+
+.table-wrap{min-width:0;max-width:100%;overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:700px;background:var(--bg2)}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--border);font-size:12px}
+th{font:700 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--text3);background:rgba(15,17,23,.5)}
+td{color:var(--text2)}td strong{color:var(--text)}
+tr:last-child td{border-bottom:none}
+.pill{display:inline-block;border-radius:999px;padding:1px 7px;font:700 10px var(--mono)}
+.pill.green{color:var(--green);background:rgba(61,214,140,.1)}
+.pill.amber{color:var(--amber);background:rgba(245,166,35,.1)}
+.pill.gray{color:var(--text2);background:rgba(154,160,180,.1)}
+
+.protocols{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.protocol{min-width:0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px}
+.protocol .count{font:750 23px var(--mono);color:var(--blue);line-height:1.1}
+.protocol h3{font-size:12px;margin:5px 0 3px}.protocol p{font-size:11px;color:var(--text2)}
+
+.limits{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.limit{min-width:0;padding:16px;border-radius:10px;background:var(--bg2);border:1px solid var(--border)}
+.limit h3{font-size:13px;margin-bottom:7px}.limit p,.limit li{font-size:12px;color:var(--text2)}
+.limit ul{padding-left:18px}.limit li+li{margin-top:5px}
+
+.code-block{position:relative;min-width:0;max-width:100%;margin-top:12px;background:#0a0d13;border:1px solid var(--border);border-radius:10px;overflow:auto}
+.code-title{position:sticky;left:0;padding:8px 12px;border-bottom:1px solid var(--border);font:10px var(--mono);color:var(--text3);background:#10131a}
+pre{padding:14px;min-width:max-content;color:#c6d1e9;font:11px/1.75 var(--mono);white-space:pre}
+
+.sources{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.source{display:block;min-width:0;padding:13px 15px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);text-decoration:none}
+.source:hover{border-color:rgba(79,142,247,.38)}
+.source strong{display:block;font-size:12px;color:var(--blue);margin-bottom:3px}
+.source span{font-size:11px;color:var(--text2)}
+
+.site-nav{margin-top:64px;padding-top:30px;border-top:1px solid var(--border)}
+.site-nav h2{font:700 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:13px}
+.site-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.site-link{min-width:0;padding:13px 15px;border-radius:9px;border:1px solid var(--border);background:var(--bg2);text-decoration:none}
+.site-link:hover{border-color:rgba(79,142,247,.38)}
+.site-link strong{display:block;font-size:12px}.site-link span{font-size:11px;color:var(--text2)}
+footer{margin-top:34px;text-align:center;color:var(--text3);font-size:11px}
+
+@media(max-width:820px){
+  .verdict{grid-template-columns:1fr}.evidence-grid{grid-template-columns:1fr}.protocols{grid-template-columns:repeat(2,1fr)}
+  .flow,.flow-second{grid-template-columns:1fr}.flow-arrow{height:28px;transform:rotate(90deg)}
+  .branch-grid,.site-grid{grid-template-columns:1fr}.limits{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  nav{padding:0 14px}.nav-links{display:none}.wrap{padding:0 16px 56px}.hero{padding-top:38px}
+  .hero h1{font-size:27px}.verdict{margin-bottom:44px}.flow-shell{padding:14px}.sources{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-home" href="/">← 首页</a>
+  <div class="nav-title">Radxa E20C · <span>ARMv8 加密加速调用链</span></div>
+  <div class="nav-links">
+    <a href="#verdict">结论</a><a href="#evidence">现场证据</a><a href="#chain">调用链</a><a href="#traffic">流量边界</a><a href="#verify">复核</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <header class="hero" id="verdict">
+    <div class="eyebrow">RK3528A · ARMv8 Crypto Extensions · Mihomo / Nikki</div>
+    <h1>Mihomo 会不会用到<br>RK3528A 的加密指令加速？</h1>
+    <p>会，但需要说清楚调用路径：Mihomo 不调用 Rockchip 独立 Crypto Engine，也不借道 Linux 内核 Crypto API；它由 Go 用户态密码库检测 CPU 能力，并在 AES-GCM 会话中直接执行 ARMv8 AES / PMULL 指令。</p>
+    <div class="snapshot">现场快照 · ssh e20c · 2026-08-03 · ImmortalWrt 25.12.1</div>
+  </header>
+
+  <div class="verdict">
+    <article class="verdict-card primary">
+      <div class="verdict-label">最终结论</div>
+      <div class="verdict-value">ARMv8 AES / PMULL 已启用，Mihomo 可自动使用</div>
+      <p class="verdict-desc">TLS / QUIC 最终协商为 AES-GCM 时，Go 直接进入 ARM64 汇编加速路径。</p>
+    </article>
+    <article class="verdict-card">
+      <div class="verdict-label">不是这条路径</div>
+      <div class="verdict-value">Rockchip Crypto Engine</div>
+      <p class="verdict-desc">当前固件未发现独立 Crypto Engine 的驱动、设备树节点或平台设备。</p>
+    </article>
+    <article class="verdict-card">
+      <div class="verdict-label">重要边界</div>
+      <div class="verdict-value">不是每条连接都用 AES</div>
+      <p class="verdict-desc">若协商为 ChaCha20-Poly1305，便不会执行 AES / PMULL 指令。</p>
+    </article>
+  </div>
+
+  <section id="evidence">
+    <div class="section-head"><h2>现场证据</h2><span class="section-kicker">Runtime evidence</span></div>
+    <p class="lead">以下数据来自正在运行的 E20C，而不是从芯片参数表或静态配置推测。设备树使用通用兼容名 <code>rockchip,rk3528</code>，Radxa 产品为 E20C / RK3528A。</p>
+    <div class="evidence-grid">
+      <article class="evidence">
+        <div class="evidence-top"><h3>CPU 向用户态暴露加密能力</h3><span class="status">已确认</span></div>
+        <p>四个核心均出现 AES、PMULL、SHA1、SHA2 与 CRC32。AES 负责分组加解密，PMULL 主要加速 GCM 的 GHASH 运算。</p>
+        <span class="mono-line">Features: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid</span>
+      </article>
+      <article class="evidence">
+        <div class="evidence-top"><h3>内核 ARM64 CE 实现可用</h3><span class="status">已确认</span></div>
+        <p><code>/proc/crypto</code> 注册了 aes-ce、gcm-aes-ce、sha1-ce 等实现，全部通过 selftest；其优先级高于 generic。</p>
+        <span class="mono-line">gcm-aes-ce · priority 300 · selftest passed</span>
+      </article>
+      <article class="evidence">
+        <div class="evidence-top"><h3>Mihomo 是 ARM64 Go 原生程序</h3><span class="status">已确认</span></div>
+        <p>运行进程没有设置 <code>GODEBUG=cpu.aes=off</code>，因此未人为禁用 Go 的 AES 能力检测。</p>
+        <span class="mono-line">Mihomo Meta v1.19.29 · linux/arm64 · go1.26.4</span>
+      </article>
+      <article class="evidence">
+        <div class="evidence-top"><h3>Rockchip 独立 Crypto Engine</h3><span class="status no">未启用</span></div>
+        <p>未发现 rk_crypto / rockchip-crypto 模块、设备树 crypto 节点、平台设备或驱动探测日志。这不影响 CPU 指令加速。</p>
+        <span class="mono-line">driver: absent · DT node: absent · platform device: absent</span>
+      </article>
+    </div>
+  </section>
+
+  <section id="chain">
+    <div class="section-head"><h2>从 Nikki 到 ARMv8 指令的调用链</h2><span class="section-kicker">Control plane → data plane → CPU</span></div>
+    <p class="lead">Nikki 位于控制面，负责配置、启动和透明代理规则；真正逐包处理、协议封装和加解密的是 Mihomo。</p>
+    <div class="flow-shell">
+      <div class="flow">
+        <article class="flow-node"><div class="num">1</div><h3>LuCI / UCI · Nikki</h3><p>保存配置、生成运行目录、维护 nftables/TUN/TPROXY，并由 procd 拉起 Mihomo。Nikki 本身不加解密代理载荷。</p></article>
+        <div class="flow-arrow">→</div>
+        <article class="flow-node"><div class="num">2</div><h3>Mihomo 入站与规则引擎</h3><p>接收透明代理流量，完成 DNS、嗅探、规则匹配与代理组选择，决定 DIRECT 或具体出站节点。</p></article>
+        <div class="flow-arrow">→</div>
+        <article class="flow-node"><div class="num">3</div><h3>协议出站适配器</h3><p>当前节点类型为 AnyTLS、Hysteria2、Trojan、VLESS；建立 TLS / Reality / QUIC 等加密传输。</p></article>
+      </div>
+      <div class="flow-second">
+        <article class="flow-node purple"><div class="num">4</div><h3>Go TLS / QUIC 密码栈</h3><p>crypto/tls、uTLS 或 QUIC 调用 Go 的 AES-GCM / ChaCha20-Poly1305 等密码原语；最终算法由协议配置和握手协商决定。</p></article>
+        <div class="flow-arrow">→</div>
+        <article class="flow-node green"><div class="num">5</div><h3>Go CPU 能力分派</h3><p>ARM64HasAES 与 ARM64HasPMULL 同时为真时，<code>supportsAESGCM</code> 成立，选择 Armv8.0 汇编实现。</p></article>
+        <div class="flow-arrow">→</div>
+        <article class="flow-node green"><div class="num">6</div><h3>RK3528A CPU 执行</h3><p>AES 轮函数由 AESE/AESMC 等指令执行，GCM 认证乘法由 PMULL 加速；数据不需要送到独立外设。</p></article>
+      </div>
+      <div class="branch-grid">
+        <article class="branch yes"><h4>AES-128/256-GCM</h4><p>使用 AES + PMULL，明确进入 ARMv8 加速路径。</p></article>
+        <article class="branch maybe"><h4>ChaCha20-Poly1305</h4><p>不使用 AES / PMULL；走 ARM64/ASIMD 优化或对应实现。</p></article>
+        <article class="branch no"><h4>DIRECT</h4><p>没有 Mihomo 代理协议层加密；客户端自身 HTTPS 仍由客户端处理。</p></article>
+      </div>
+      <div class="callout"><strong style="color:var(--text)">容易混淆：</strong>内核里的 <code>gcm-aes-ce</code> 和 Mihomo 里的 Go ARM64 AES-GCM 都能执行同一类 CPU 指令，但属于两套独立软件调用路径。Mihomo 通常不会通过 AF_ALG 调用 <code>/proc/crypto</code> 中的内核实现。</div>
+    </div>
+  </section>
+
+  <section id="traffic">
+    <div class="section-head"><h2>当前流量与加速边界</h2><span class="section-kicker">What is accelerated</span></div>
+    <div class="protocols">
+      <article class="protocol"><div class="count">29</div><h3>AnyTLS</h3><p>TLS 类代理传输</p></article>
+      <article class="protocol"><div class="count">35</div><h3>Hysteria2</h3><p>QUIC + TLS</p></article>
+      <article class="protocol"><div class="count">108</div><h3>Trojan</h3><p>TLS 代理传输</p></article>
+      <article class="protocol"><div class="count">92</div><h3>VLESS</h3><p>现场配置均为 tls: true</p></article>
+    </div>
+    <p class="lead">观察时 Mihomo 控制 API 有 <strong style="color:var(--text)">73 条活动连接</strong>，累计上传 23,347,476 字节、下载 318,811,973 字节。它证明数据面正在工作，但不能单凭流量计数判定每条连接的 TLS cipher。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>流量/算法</th><th>谁做加解密</th><th>ARMv8 AES/PMULL</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><strong>代理外层为 AES-GCM</strong></td><td>Mihomo / Go</td><td><span class="pill green">使用</span></td><td>Go 在本机满足 AES + PMULL 条件，自动选择 ARM64 汇编。</td></tr>
+          <tr><td><strong>代理外层为 ChaCha20</strong></td><td>Mihomo / Go</td><td><span class="pill amber">不使用 AES</span></td><td>仍是高效 AEAD，但不是 AES 指令路径。</td></tr>
+          <tr><td><strong>DIRECT 的普通 HTTP</strong></td><td>无代理加密</td><td><span class="pill gray">不涉及</span></td><td>Mihomo 只转发，不增加加密外层。</td></tr>
+          <tr><td><strong>DIRECT 的 HTTPS</strong></td><td>下游客户端/目标站</td><td><span class="pill gray">不由 Mihomo 使用</span></td><td>端到端 TLS 已在客户端完成，路由器看到的是密文转发。</td></tr>
+          <tr><td><strong>内核 IPsec / 磁盘等</strong></td><td>Linux Crypto API</td><td><span class="pill green">可使用内核 CE</span></td><td>属于 <code>/proc/crypto</code> 的另一条调用链，与 Mihomo 用户态实现分开。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="limits">
+    <div class="section-head"><h2>证据等级与不能过度推断的地方</h2><span class="section-kicker">Evidence boundary</span></div>
+    <div class="limits">
+      <article class="limit">
+        <h3 style="color:var(--green)">已经确认</h3>
+        <ul>
+          <li>RK3528A 四核均向用户态暴露 AES 与 PMULL。</li>
+          <li>Go ARM64 AES-GCM 的硬件分派条件在本机成立。</li>
+          <li>Mihomo 为 ARM64 Go 原生构建，且未禁用 CPU AES。</li>
+          <li>当前节点池全部为 TLS / QUIC 类代理协议。</li>
+        </ul>
+      </article>
+      <article class="limit">
+        <h3 style="color:var(--amber)">不能仅凭现有 API 确认</h3>
+        <ul>
+          <li>Mihomo 控制 API 不公开每条 TLS/QUIC 连接最终协商的 cipher suite。</li>
+          <li><code>/proc/crypto</code> 的 <code>refcnt</code> 不是算法调用次数，不能拿它证明 Mihomo 正在用。</li>
+          <li>不能把 73 条活动连接全部表述为 AES-GCM；其中可能存在 ChaCha20-Poly1305。</li>
+          <li>要逐连接硬证据，需要握手追踪、服务端日志或对照性能剖析。</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section id="verify">
+    <div class="section-head"><h2>在 E20C 上复核</h2><span class="section-kicker">Read-only commands</span></div>
+    <p class="lead">以下命令均为只读，不会修改 Nikki 配置或重启 Mihomo。</p>
+    <div class="code-block">
+      <div class="code-title">CPU、内核算法与 Mihomo 构建信息</div>
+      <pre>ssh e20c 'grep -m1 "^Features" /proc/cpuinfo'
+
+ssh e20c 'awk '\''BEGIN { RS="" } /driver[[:space:]]*:.*-(ce|arm64)/ {
+  print $0 "\n---"
+}'\'' /proc/crypto | grep -E "^(name|driver|priority|selftest|type)"'
+
+ssh e20c '/usr/bin/mihomo -v'
+
+ssh e20c 'pid=$(pidof mihomo); tr "\000" "\n" &lt; /proc/$pid/environ |
+  grep -E "^GODEBUG=" || echo "GODEBUG 未设置"'</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-title">确认 Rockchip 独立 Crypto Engine 没有注册</div>
+      <pre>ssh e20c 'cat /proc/modules | grep -Ei "rk_crypto|rockchip.*crypto" || true'
+ssh e20c 'find /sys/bus/platform/devices -maxdepth 1 -type l |
+  grep -Ei "crypto|rk.*crypto" || true'
+ssh e20c 'find /sys/firmware/devicetree/base -type d |
+  grep -Ei "/crypto(@|$)" || true'</pre>
+    </div>
+  </section>
+
+  <section id="sources">
+    <div class="section-head"><h2>源码与协议参考</h2><span class="section-kicker">Primary sources</span></div>
+    <div class="sources">
+      <a class="source" href="https://go.dev/src/crypto/internal/fips140/aes/aes_asm.go" target="_blank" rel="noopener"><strong>Go · AES 架构分派</strong><span>ARM64HasAES 成立时进入 AES 汇编实现。</span></a>
+      <a class="source" href="https://go.dev/src/crypto/internal/fips140/aes/gcm/gcm_asm.go" target="_blank" rel="noopener"><strong>Go · AES-GCM 架构分派</strong><span>ARM64HasAES 与 ARM64HasPMULL 同时为真。</span></a>
+      <a class="source" href="https://go.dev/src/crypto/internal/fips140/aes/gcm/gcm_arm64.s" target="_blank" rel="noopener"><strong>Go · GCM ARM64 汇编</strong><span>AES-GCM 在 ARM64 上的底层实现。</span></a>
+      <a class="source" href="https://go.dev/src/crypto/tls/cipher_suites.go" target="_blank" rel="noopener"><strong>Go · TLS cipher suite 选择</strong><span>硬件 AES-GCM 能力参与 TLS cipher 偏好判断。</span></a>
+      <a class="source" href="https://wiki.metacubex.one/en/config/proxies/hysteria2/" target="_blank" rel="noopener"><strong>Mihomo · Hysteria2</strong><span>QUIC、TLS 与协议参数参考。</span></a>
+      <a class="source" href="https://wiki.metacubex.one/en/config/proxies/vless/" target="_blank" rel="noopener"><strong>Mihomo · VLESS</strong><span>TLS、Reality 与传输层配置参考。</span></a>
+    </div>
+  </section>
+
+  <aside class="site-nav">
+    <h2>继续阅读</h2>
+    <div class="site-grid">
+      <a class="site-link" href="/mihomo-traffic-flow.html"><strong>Mihomo 完整流量路径图解</strong><span>从 TPROXY 到三路出口</span></a>
+      <a class="site-link" href="/mihomo-dns-sniffer-rules-guide.html"><strong>DNS / Sniffer / Rules 设计说明</strong><span>透明代理的决策边界</span></a>
+      <a class="site-link" href="/immortalwrt-plugins.html"><strong>ImmortalWrt 25.12 必装插件</strong><span>Nikki 与常用插件</span></a>
+    </div>
+  </aside>
+
+  <footer>Radxa E20C · RK3528A · ImmortalWrt 25.12.1 · Nikki / Mihomo · 现场核验于 2026-08-03</footer>
+</main>
+</body>
+</html>

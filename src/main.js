@@ -148,6 +148,14 @@ const docs = [
     tag: '图解',
     tagColor: '#c084fc',
   },
+  {
+    title: 'RK3528A · Mihomo ARMv8 加密加速',
+    subtitle: 'AES · PMULL · Go crypto · TLS / QUIC 调用链',
+    desc: '基于 E20C 运行现场，确认 ARMv8 加密指令是否生效，并拆解 Nikki 到 Mihomo、Go crypto、AES-GCM ARM64 汇编的完整调用链；明确独立 Crypto Engine、内核 Crypto API 与用户态指令加速的区别。',
+    href: '/rk3528a-armv8-mihomo-crypto.html',
+    tag: '架构',
+    tagColor: '#3dd68c',
+  },
 ]
 
 document.querySelector('#app').innerHTML = `
