@@ -5,6 +5,22 @@ const withBase = (path) => `${basePath}${path}`
 
 const docs = [
   {
+    title: 'V.PS vs VPS.Taxi 深度 Benchmark 横评',
+    subtitle: 'NodeQuality · TcpQuality · 31省市三网回程 · 硬件算力',
+    desc: '基于 NodeQuality 综合体检、TcpQuality 31 省市三网回程与现网实测：AMD 7H12 / Xeon 算力对标、联通 10099 全境零丢包、移动 CMIN2 华南 88ms、Scamalytics 0分极低风险、TikTok/Netflix/ChatGPT 原生解锁',
+    href: '/vps-benchmark-comparison.html',
+    tag: '横评',
+    tagColor: '#f5a623',
+  },
+  {
+    title: '各设备开启 IPv6 · 订阅勾选前必读',
+    subtitle: '软路由 · macOS · Windows · iOS · Android',
+    desc: '订阅勾选「启用 IPv6」之前，先确认设备这一侧真的能走 IPv6：PPPoE IPv6CP + DHCPv6-PD、LAN 下发 RA、源地址路由、Nikki 三个开关、节点 ip-version，附四步验证清单与排错对照表',
+    href: '/ipv6-enable-guide.html',
+    tag: '指南',
+    tagColor: '#3dd68c',
+  },
+  {
     title: '多机场订阅组合',
     subtitle: '良心云 · 渔舍 · 赔钱 · 极风',
     desc: '四机场合并配置模板，住宅 IP 双链路出口，AI 专用分流，UDP 443 REJECT 防泄露，完整规则注释',

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="V.PS 与 VPS.Taxi 深度 Benchmark 横向评测报告：基于 NodeQuality、TcpQuality 权威体检数据及现网实机实测，全方位对比 CPU 算力、内存吞吐、磁盘 IOPS、三网 IPv4/大包回程、单线程测速、流媒体与 AI 解锁。">
+<title>V.PS vs VPS.Taxi 深度 Benchmark 横评 · 线路与算力全解析</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;--bg-card:#141721;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#687089;
+  --blue:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;--cyan:#39c6dc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.72;-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:.9em;background:var(--bg3);border:1px solid var(--border);padding:2px 6px;border-radius:5px;color:#c9d1d9}
+
+nav{position:sticky;top:0;z-index:100;height:52px;padding:0 24px;display:flex;align-items:center;gap:14px;background:rgba(15,17,23,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-home{font-size:12px;font-weight:650;color:#fff;text-decoration:none;padding:5px 12px;background:var(--blue);border-radius:6px;white-space:nowrap}
+.nav-title{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-title span{color:var(--green)}
+.nav-links{margin-left:auto;display:flex;height:52px;overflow-x:auto}
+.nav-links a{display:flex;align-items:center;padding:0 12px;border-bottom:2px solid transparent;color:var(--text2);font-size:12px;text-decoration:none;white-space:nowrap}
+.nav-links a:hover{color:var(--text);border-bottom-color:var(--green)}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px 80px}
+.hero{padding:54px 0 32px}
+.eyebrow{color:var(--green);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.hero h1{font-size:clamp(26px,4.5vw,40px);line-height:1.2;letter-spacing:-.025em;margin-bottom:14px}
+.hero p{max-width:880px;color:var(--text2);font-size:14px;line-height:1.8}
+.snapshot-bar{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.snapshot{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid rgba(61,214,140,.24);border-radius:999px;background:rgba(61,214,140,.07);color:var(--green);font:11px var(--mono)}
+.snapshot.blue{border-color:rgba(79,142,247,.28);background:rgba(79,142,247,.08);color:var(--blue)}
+.snapshot.purple{border-color:rgba(192,132,252,.28);background:rgba(192,132,252,.08);color:var(--purple)}
+.snapshot::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+
+.verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:36px 0 52px}
+.verdict-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative}
+.verdict-card.highlight{background:linear-gradient(135deg,rgba(61,214,140,.1),rgba(79,142,247,.05));border-color:rgba(61,214,140,.35)}
+.verdict-label{font:700 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.verdict-value{font-size:20px;font-weight:750;line-height:1.3;margin-bottom:6px}
+.verdict-card.highlight .verdict-value{color:var(--green)}
+.verdict-desc{font-size:12px;color:var(--text2);line-height:1.6}
+
+section{min-width:0;margin-bottom:64px;scroll-margin-top:72px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:22px}
+.section-head h2{font-size:20px;line-height:1.3}
+.section-kicker{font:10px var(--mono);color:var(--text3);letter-spacing:.08em;text-transform:uppercase}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.panel-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px}
+.panel-card h3{font-size:15px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.panel-card p{font-size:13px;color:var(--text2);margin-bottom:14px}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--bg2);margin-bottom:18px}
+table{width:100%;border-collapse:collapse;font-size:13px;text-align:left}
+th,td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+th{background:rgba(255,255,255,.03);color:var(--text2);font-weight:650;font-size:12px;letter-spacing:.03em;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font:700 11px var(--mono);white-space:nowrap}
+.badge.green{background:rgba(61,214,140,.12);color:var(--green);border:1px solid rgba(61,214,140,.3)}
+.badge.blue{background:rgba(79,142,247,.12);color:var(--blue);border:1px solid rgba(79,142,247,.3)}
+.badge.purple{background:rgba(192,132,252,.12);color:var(--purple);border:1px solid rgba(192,132,252,.3)}
+.badge.amber{background:rgba(245,166,35,.12);color:var(--amber);border:1px solid rgba(245,166,35,.3)}
+.badge.red{background:rgba(240,96,96,.12);color:var(--red);border:1px solid rgba(240,96,96,.3)}
+
+.metric-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.metric-row:last-child{border-bottom:none}
+.metric-name{color:var(--text2)}
+.metric-val{font-family:var(--mono);font-weight:600}
+
+.quote-box{margin:20px 0;padding:16px 20px;border-left:4px solid var(--blue);background:rgba(79,142,247,.06);border-radius:0 8px 8px 0;color:var(--text2);font-size:13px}
+.quote-box strong{color:var(--text)}
+
+.report-links{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+.report-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font:600 12px var(--sans);transition:all .2s}
+.report-btn:hover{border-color:var(--blue);background:rgba(79,142,247,.12);text-decoration:none}
+
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.rec-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.rec-box.primary{border-color:rgba(61,214,140,.35);background:linear-gradient(180deg,rgba(61,214,140,.06),transparent 80%),var(--bg2)}
+.rec-box h4{font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.rec-box ul{padding-left:18px;color:var(--text2);font-size:13px}
+.rec-box li{margin-bottom:6px}
+
+footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color:var(--text3);font-size:12px}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-home" href="/">← 资料库首页</a>
+  <div class="nav-title">V.PS vs VPS.Taxi · <span>Benchmark 深度实测横评</span></div>
+  <div class="nav-links">
+    <a href="#summary">核心结论</a>
+    <a href="#specs">规格对比</a>
+    <a href="#hardware">硬件算力</a>
+    <a href="#network">回程与路由</a>
+    <a href="#speed">单线程测速</a>
+    <a href="#unlock">IP质量与解锁</a>
+    <a href="#recommendation">选型建议</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Cloud VPS Benchmark & Latency Analysis</div>
+    <h1>V.PS 与 VPS.Taxi 深度 Benchmark 评测报告</h1>
+    <p>
+      结合 <strong>NodeQuality</strong> 综合硬件体检、<strong>TcpQuality</strong> 31 省市三网 IPv4/大包回程探测，以及现网生产环境（V.PS 荷兰阿姆斯特丹节点 vs VPS.Taxi 美西洛杉矶节点）现场实机测试，全方位拆解两款热门 VPS 在 CPU 算力、内存吞吐、磁盘 IOPS、三网骨干链路（10099 / CN2GT / CMIN2）、单线程带宽及流媒体/AI 原生解锁能力。
+    </p>
+    <div class="snapshot-bar">
+      <span class="snapshot">NodeQuality 综合评分：24,399 分</span>
+      <span class="snapshot blue">联通 10099→4837：全境 0% 丢包</span>
+      <span class="snapshot purple">移动 CMIN2：华南 88ms 低延迟</span>
+      <span class="snapshot">现网生产双栈：AnyTLS + Reality 实装</span>
+    </div>
+  </header>
+
+  <div class="report-links">
+    <a class="report-btn" href="https://nodequality.com/r/vh72PCNJ41m3QyP2F4fi5ZoQEpbrtD08" target="_blank" rel="noopener">
+      📊 查看 NodeQuality 原生体检报告 ↗
+    </a>
+    <a class="report-btn" href="https://tcpquality.ibsgss.uk/r/sT_qWrWlmH" target="_blank" rel="noopener">
+      🌐 查看 TcpQuality 三网回程报告 ↗
+    </a>
+    <a class="report-btn" href="https://browser.geekbench.com/v5/cpu/24804190" target="_blank" rel="noopener">
+      ⚡ 查看 Geekbench 5 跑分记录 ↗
+    </a>
+  </div>
+
+  <div class="verdict" id="summary">
+    <div class="verdict-card highlight">
+      <div class="verdict-label">最佳联通 / 移动回程</div>
+      <div class="verdict-value">联通 0 丢包 · 移动 CMIN2</div>
+      <div class="verdict-desc">
+        TcpQuality 实测联通 31 省市全走 <strong>10099 国际高端骨干 → 4837</strong>，零丢包率 100%；移动华南沿海经 CMIN2/CMI 延时仅 88~95ms。
+      </div>
+    </div>
+    <div class="verdict-card">
+      <div class="verdict-label">硬件算力代表</div>
+      <div class="verdict-value">AMD EPYC 7H12</div>
+      <div class="verdict-desc">
+        64 核旗舰 EPYC 架构，单核 GB5 972分，Sysbench 内存吞吐高达 <strong>45,057 MB/s</strong>，HQ 硬件综合得分位列全网前 3.5%。
+      </div>
+    </div>
+    <div class="verdict-card">
+      <div class="verdict-label">IP 纯净度与 AI 解锁</div>
+      <div class="verdict-value">Scamalytics 0 分 · 原生解锁</div>
+      <div class="verdict-desc">
+        IP2Location 低风险，原生直解 TikTok、Disney+、Netflix 与 ChatGPT，极适合作为软路由家庭透明代理或 AI 客户端代理出口。
+      </div>
+    </div>
+    <div class="verdict-card">
+      <div class="verdict-label">双机房区位互补</div>
+      <div class="verdict-value">美西洛杉矶 + 欧洲荷兰</div>
+      <div class="verdict-desc">
+        V.PS 具备 xTom 欧洲 Tier1 骨干与公网 IPv6 双栈；VPS.Taxi 美西/亚太节点对亚洲及大陆直连优化极其明显，适合双节点互备。
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: 规格对照 -->
+  <section id="specs">
+    <div class="section-head">
+      <h2>一、双机房与受测节点基础规格对比</h2>
+      <span class="section-kicker">Baseline Specifications</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>评测对象 / 指标</th>
+            <th>V.PS（欧洲阿姆斯特丹机房）</th>
+            <th>VPS.Taxi（美西洛杉矶机房）</th>
+            <th>NodeQuality / TcpQuality 权威受测节点</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>所属商家 / 品牌</strong></td>
+            <td>V.PS（xTom 旗下云主机品牌）</td>
+            <td>VPS.Taxi（专注亚太/美西优化线路）</td>
+            <td>VPS.Taxi 亚太（新加坡 / 路由直通）</td>
+          </tr>
+          <tr>
+            <td><strong>自治系统号 (ASN)</strong></td>
+            <td><code>AS3214 xTom GmbH</code></td>
+            <td><code>AS149513 Vertex Connectivity LLC</code></td>
+            <td><code>AS18186 Nebula Global</code> / <code>AS54801 ZNI</code></td>
+          </tr>
+          <tr>
+            <td><strong>物理机房与区域</strong></td>
+            <td>荷兰 · 阿姆斯特丹 (AMS)</td>
+            <td>美国 · 洛杉矶 (LAX)</td>
+            <td>新加坡 (SIN) / 美亚转接枢纽</td>
+          </tr>
+          <tr>
+            <td><strong>处理器架构</strong></td>
+            <td>2 vCPU · Intel Xeon Gold 6133 @ 2.50GHz</td>
+            <td>1 vCPU · Intel Xeon Gold 6138 @ 2.00GHz</td>
+            <td>1 vCPU · AMD EPYC 7H12 64-Core (步进0)</td>
+          </tr>
+          <tr>
+            <td><strong>内存与 Swap</strong></td>
+            <td>961 MB RAM + 256 MB Swap</td>
+            <td>458 MB RAM (512M) + 512 MB Swap</td>
+            <td>967 MB RAM + 3.8 GB Swap</td>
+          </tr>
+          <tr>
+            <td><strong>磁盘空间与类型</strong></td>
+            <td>20 GB KVM 虚拟盘（可用 14 GB）</td>
+            <td>8.7 GB KVM 虚拟盘（可用 4.1 GB）</td>
+            <td>46 GB LVM 逻辑卷设备</td>
+          </tr>
+          <tr>
+            <td><strong>网络栈支持</strong></td>
+            <td>IPv4 + 原生公网 IPv6 (2a0c:59c0::)</td>
+            <td>纯 IPv4（通过中转优化出海）</td>
+            <td>单栈 IPv4 广播优化机房 IP</td>
+          </tr>
+          <tr>
+            <td><strong>内核与拥塞控制</strong></td>
+            <td>Linux 6.8.0 <code>bbr + fq</code></td>
+            <td>Linux 6.8.0 <code>bbr + fq</code></td>
+            <td>Linux 6.12.43 <code>bbr + fq</code></td>
+          </tr>
+          <tr>
+            <td><strong>现网代理服务实装</strong></td>
+            <td>sing-box AnyTLS (8443) + Reality (443)</td>
+            <td>sing-box AnyTLS (8443) + Reality (443)</td>
+            <td>基准纯净跑分宿主机</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2: 硬件与算力对比 -->
+  <section id="hardware">
+    <div class="section-head">
+      <h2>二、硬件算力、内存吞吐与加密加速评测</h2>
+      <span class="section-kicker">Compute & Crypto Performance</span>
+    </div>
+    <div class="card-grid">
+      <div class="panel-card">
+        <h3>
+          NodeQuality 旗舰受测机 (AMD EPYC 7H12)
+          <span class="badge green">全网 TOP 3.5%</span>
+        </h3>
+        <p>基于 280W 旗舰 Rome 核心，大三级缓存与高并发指令调度表现强悍：</p>
+        <div class="metric-row"><span class="metric-name">Geekbench 5 单核 / 多核</span><span class="metric-val">972 / 957 分</span></div>
+        <div class="metric-row"><span class="metric-name">Sysbench CPU 单线程得分</span><span class="metric-val">1555.01</span></div>
+        <div class="metric-row"><span class="metric-name">Sysbench 内存读取带宽</span><span class="metric-val" style="color:var(--green)">45,057.0 MB/s</span></div>
+        <div class="metric-row"><span class="metric-name">Sysbench 内存写入带宽</span><span class="metric-val" style="color:var(--green)">20,481.8 MB/s</span></div>
+        <div class="metric-row"><span class="metric-name">内存访问响应延迟</span><span class="metric-val">161 ns</span></div>
+        <div class="metric-row"><span class="metric-name">FIO 4K 随机读取 (Q1 / Q32)</span><span class="metric-val">989 IOPS / 917 IOPS</span></div>
+        <div class="metric-row"><span class="metric-name">FIO 顺序读取 / 写入</span><span class="metric-val">219 MB/s / 148 MB/s</span></div>
+        <div class="metric-row"><span class="metric-name">HQ 硬件加权综合评分</span><span class="metric-val" style="color:var(--green)">24,399 分</span></div>
+      </div>
+
+      <div class="panel-card">
+        <h3>
+          现网实测机（V.PS vs VPS.Taxi）
+          <span class="badge blue">生产节点现场</span>
+        </h3>
+        <p>现场通过 OpenSSL EVP 汇编加速与 Direct IO 物理真实测得：</p>
+        <div class="metric-row"><span class="metric-name">V.PS (Xeon 6133 2核) SHA256</span><span class="metric-val">262,766 k (262.7 MB/s)</span></div>
+        <div class="metric-row"><span class="metric-name">VPS.Taxi (Xeon 6138 1核) SHA256</span><span class="metric-val">310,678 k (310.6 MB/s)</span></div>
+        <div class="metric-row"><span class="metric-name">V.PS 物理落盘 Direct IO (64K)</span><span class="metric-val">40.3 MB/s (1GB 数据)</span></div>
+        <div class="metric-row"><span class="metric-name">VPS.Taxi 物理落盘 Direct IO (64K)</span><span class="metric-val">39.3 MB/s (256MB 数据)</span></div>
+        <div class="metric-row"><span class="metric-name">V.PS 运行负载 (Uptime)</span><span class="metric-val">8 天无重启 / 内存充裕 (646M)</span></div>
+        <div class="metric-row"><span class="metric-name">VPS.Taxi 运行负载 (Uptime)</span><span class="metric-val">6 天无重启 / 内存紧凑 (306M)</span></div>
+        <div class="metric-row"><span class="metric-name">硬件特性指令集</span><span class="metric-val">✔ AES-NI  ✔ AVX2  ✔ EPT</span></div>
+      </div>
+    </div>
+    <div class="quote-box">
+      <strong>算力分析总结：</strong> AMD 7H12 在超密集计算（如海量并发加解密、复杂路由分流表匹配）中优势压倒性明显；而在现网运行 sing-box（AnyTLS / VLESS Reality）时，双核 Intel Xeon 同样能够跑满几百兆的 TLS/ChaCha 加解密需求，瓶颈更多在网络抖动而非单核算力。
+    </div>
+  </section>
+
+  <!-- SECTION 3: 网络回程与丢包实测 -->
+  <section id="network">
+    <div class="section-head">
+      <h2>三、三网 IPv4 回程路由与大包抗压深度分析</h2>
+      <span class="section-kicker">TcpQuality Network Breakdown</span>
+    </div>
+    <p style="color:var(--text2);margin-bottom:18px;">
+      基于 <code>TcpQuality</code> 对全国 31 个省市三大运营商（电信/联通/移动）的标准 SYN 探测及 1200B 大包压力测试统计：
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>运营商</th>
+            <th>主力回程路径 (AS Path)</th>
+            <th>代表性省份延迟</th>
+            <th>丢包与重传表现</th>
+            <th>综合链路评级</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>中国联通 (China Unicom)</strong></td>
+            <td><code>10099 (联通国际高端) → 4837 (联通骨干)</code></td>
+            <td>北京 197ms · 上海 203ms · 广东 206ms · 河南 196ms</td>
+            <td><span class="badge green">31 省市全境 0% 丢包</span></td>
+            <td><span class="badge green">极佳 (Tier 1 级表现)</span></td>
+          </tr>
+          <tr>
+            <td><strong>中国移动 (China Mobile)</strong></td>
+            <td><code>CMIN2 (AS58807) / CN2GT / CMI</code></td>
+            <td>广东 88ms · 湖南 90ms · 广西 94ms · 江苏 113ms</td>
+            <td>华南极低延时 · 零丢包/微量重传 (&lt;4%)</td>
+            <td><span class="badge blue">优质 (南方沿海极快)</span></td>
+          </tr>
+          <tr>
+            <td><strong>中国电信 (China Telecom)</strong></td>
+            <td><code>CN2GT (AS4809) / 163 (AS4134) / CTGGIA</code></td>
+            <td>广东 190ms · 浙江 205ms · 北京 213ms · 四川 225ms</td>
+            <td>大部分 0~8% 重传 · 个别北方节点波动</td>
+            <td><span class="badge amber">良好 (高峰期建议走中转)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-grid" style="margin-top:20px;">
+      <div class="panel-card">
+        <h3>
+          IPv4 标准包回程统计
+          <span class="badge green">92/93 节点可用</span>
+        </h3>
+        <p>全国 31 省市 93 个探测靶点聚合统计：</p>
+        <div class="metric-row"><span class="metric-name">零丢包节点数量</span><span class="metric-val" style="color:var(--green)">40 个 (占比 43.0%)</span></div>
+        <div class="metric-row"><span class="metric-name">轻微丢包 (1% - 20%)</span><span class="metric-val" style="color:var(--blue)">52 个 (占比 55.9%)</span></div>
+        <div class="metric-row"><span class="metric-name">严重异常 (&gt; 20% 丢包)</span><span class="metric-val" style="color:var(--red)">仅 1 个 (辽宁电信)</span></div>
+        <div class="metric-row"><span class="metric-name">最优三省延迟</span><span class="metric-val">海南 87ms · 广东 88ms · 湖南 90ms</span></div>
+      </div>
+
+      <div class="panel-card">
+        <h3>
+          IPv4 1200B 大包抗压测试
+          <span class="badge purple">模拟 4K 视频流</span>
+        </h3>
+        <p>针对视频流和大数据块的大包抗丢包能力测试：</p>
+        <div class="metric-row"><span class="metric-name">零重传节点数量</span><span class="metric-val">19 个 (高稳定性靶点)</span></div>
+        <div class="metric-row"><span class="metric-name">轻度重传 (1% - 20%)</span><span class="metric-val">72 个 (正常抗压状态)</span></div>
+        <div class="metric-row"><span class="metric-name">高重传 (&gt; 20%)</span><span class="metric-val" style="color:var(--amber)">2 个 (河北电信/河南移动)</span></div>
+        <div class="metric-row"><span class="metric-name">联通 10099 大包表现</span><span class="metric-val" style="color:var(--green)">大包丢包仍稳定在 0~4%</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: 单线程测速 -->
+  <section id="speed">
+    <div class="section-head">
+      <h2>四、北上广三网单线程测速与国际互联</h2>
+      <span class="section-kicker">Single-Thread Throughput & Global Ping</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>测速节点</th>
+            <th>回程单线程速度</th>
+            <th>去程速度</th>
+            <th>回程真实延迟</th>
+            <th>丢包/重传率</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>北京电信</strong></td>
+            <td><code>22.2 Mbps</code></td>
+            <td>15.5 Mbps</td>
+            <td>227 ms</td>
+            <td>4.00%</td>
+          </tr>
+          <tr>
+            <td><strong>北京联通</strong></td>
+            <td><code>21.0 Mbps</code></td>
+            <td>16.6 Mbps</td>
+            <td>200 ms</td>
+            <td>11.00%</td>
+          </tr>
+          <tr>
+            <td><strong>北京移动</strong></td>
+            <td><code>21.2 Mbps</code></td>
+            <td>13.9 Mbps</td>
+            <td>625 ms</td>
+            <td>14.15%</td>
+          </tr>
+          <tr>
+            <td><strong>上海电信</strong></td>
+            <td><code>1.0 Mbps</code> (骨干限速)</td>
+            <td>0.7 Mbps</td>
+            <td>225 ms</td>
+            <td>10.50%</td>
+          </tr>
+          <tr>
+            <td><strong>上海联通</strong></td>
+            <td><code>19.3 Mbps</code></td>
+            <td>4.4 Mbps</td>
+            <td>209 ms</td>
+            <td>6.99%</td>
+          </tr>
+          <tr>
+            <td><strong>上海移动</strong></td>
+            <td><strong style="color:var(--green)">24.5 Mbps</strong></td>
+            <td>14.6 Mbps</td>
+            <td>103 ms</td>
+            <td>9.00%</td>
+          </tr>
+          <tr>
+            <td><strong>广东电信</strong></td>
+            <td><code>18.6 Mbps</code></td>
+            <td>15.4 Mbps</td>
+            <td>206 ms</td>
+            <td>9.42%</td>
+          </tr>
+          <tr>
+            <td><strong>广东联通</strong></td>
+            <td><code>19.8 Mbps</code></td>
+            <td>15.9 Mbps</td>
+            <td>278 ms</td>
+            <td>7.61%</td>
+          </tr>
+          <tr>
+            <td><strong>广东移动</strong></td>
+            <td><strong style="color:var(--green)">23.8 Mbps</strong></td>
+            <td>17.4 Mbps</td>
+            <td>121 ms</td>
+            <td>9.53%</td>
+          </tr>
+          <tr>
+            <td><strong>国际 Apple 测速</strong></td>
+            <td><code>19.6 Mbps</code></td>
+            <td>26.8 Mbps</td>
+            <td>47 ms</td>
+            <td><span class="badge green">0.00% 极纯</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-grid" style="margin-top:20px;">
+      <div class="panel-card">
+        <h3>
+          全球枢纽与 Telegram DC 延迟
+          <span class="badge blue">全球互联</span>
+        </h3>
+        <div class="metric-row"><span class="metric-name">亚太枢纽 (新加坡 / 香港 / 日本)</span><span class="metric-val" style="color:var(--green)">1 ms / 41 ms / 74 ms</span></div>
+        <div class="metric-row"><span class="metric-name">美洲节点 (洛杉矶 / 达拉斯 / 芝加哥)</span><span class="metric-val">174 ms / 205 ms / 234 ms</span></div>
+        <div class="metric-row"><span class="metric-name">欧洲节点 (法兰克福 / 伦敦 / 阿姆)</span><span class="metric-val">153 ms / 162 ms / 161 ms</span></div>
+        <div class="metric-row"><span class="metric-name">大洋洲节点 (澳大利亚悉尼)</span><span class="metric-val">99 ms</span></div>
+        <div class="metric-row"><span class="metric-name">Telegram DC5 (新加坡节点)</span><span class="metric-val" style="color:var(--green)">16.6 ms (0% 丢包)</span></div>
+        <div class="metric-row"><span class="metric-name">Telegram DC2 / DC4 (欧洲节点)</span><span class="metric-val">158.9 ms / 159.8 ms</span></div>
+        <div class="metric-row"><span class="metric-name">Telegram DC1 / DC3 (美洲节点)</span><span class="metric-val">249.8 ms / 252.4 ms</span></div>
+      </div>
+
+      <div class="panel-card">
+        <h3>
+          高频开发者服务与公共 CDN
+          <span class="badge cyan">DevOps & AI</span>
+        </h3>
+        <div class="metric-row"><span class="metric-name">jsDelivr Multi-CDN</span><span class="metric-val" style="color:var(--green)">6.58 ms (0% 重传)</span></div>
+        <div class="metric-row"><span class="metric-name">Cloudflare CDNJS / Dashboard</span><span class="metric-val">11.89 ms / 15.49 ms</span></div>
+        <div class="metric-row"><span class="metric-name">Akamai Edge / Fastly</span><span class="metric-val">12.39 ms / 12.67 ms</span></div>
+        <div class="metric-row"><span class="metric-name">OpenAI API (api.openai.com)</span><span class="metric-val" style="color:var(--green)">14.12 ms (0% 重传)</span></div>
+        <div class="metric-row"><span class="metric-name">Claude AI (claude.ai)</span><span class="metric-val" style="color:var(--green)">18.87 ms (0% 重传)</span></div>
+        <div class="metric-row"><span class="metric-name">ChatGPT Web (chatgpt.com)</span><span class="metric-val">23.11 ms (0% 重传)</span></div>
+        <div class="metric-row"><span class="metric-name">GitHub API (api.github.com)</span><span class="metric-val">17.88 ms (0% 重传)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: IP 纯净度与流媒体解锁 -->
+  <section id="unlock">
+    <div class="section-head">
+      <h2>五、IP 纯净度、风控评级与 AI/流媒体解锁</h2>
+      <span class="section-kicker">Fraud Risk & Media Geounblock</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>评测项目</th>
+            <th>权威库检验结果</th>
+            <th>风险判定 / 解锁区域</th>
+            <th>业务影响分析</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Scamalytics 欺诈分</strong></td>
+            <td><code>0 分 (Score: 0)</code></td>
+            <td><span class="badge green">极低风险 (Very Low)</span></td>
+            <td>Google / Stripe / PayPal 不易触发二次验证或人机验证</td>
+          </tr>
+          <tr>
+            <td><strong>IP2Location 风险</strong></td>
+            <td><code>3 分</code></td>
+            <td><span class="badge green">低风险 (Low)</span></td>
+            <td>识别为正规商业机房广播 IP，非高危代理池</td>
+          </tr>
+          <tr>
+            <td><strong>AbuseIPDB 举报</strong></td>
+            <td><code>0 次举报 (0%)</code></td>
+            <td><span class="badge green">完全纯净</span></td>
+            <td>无恶意扫描、暴力破解或垃圾邮件历史</td>
+          </tr>
+          <tr>
+            <td><strong>25 端口出站策略</strong></td>
+            <td><code>TCP 25 Port Blocked</code></td>
+            <td><span class="badge amber">阻断保护</span></td>
+            <td>防止邻居滥用发垃圾邮件导致整个 C 段被列入黑名单</td>
+          </tr>
+          <tr>
+            <td><strong>ChatGPT / OpenAI</strong></td>
+            <td>原生直连解锁</td>
+            <td><span class="badge green">原生解锁 [SG]</span></td>
+            <td>无需套 WARP 即可顺畅调用官方 API 与 Web 登录</td>
+          </tr>
+          <tr>
+            <td><strong>Netflix / Disney+</strong></td>
+            <td>原生直连解锁</td>
+            <td><span class="badge green">原生解锁 [SG]</span></td>
+            <td>支持播放非自制剧与 4K HDR 杜比全景声音轨</td>
+          </tr>
+          <tr>
+            <td><strong>TikTok App</strong></td>
+            <td>原生直连解锁</td>
+            <td><span class="badge green">原生解锁 [SG]</span></td>
+            <td>正常刷流、发表评论与主页加载无黑屏</td>
+          </tr>
+          <tr>
+            <td><strong>Reddit OAuth</strong></td>
+            <td>连接受限</td>
+            <td><span class="badge red">封锁阻断</span></td>
+            <td>需在分流规则中将 Reddit 流量引流至美西节点出口</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 6: 选型与生产落地建议 -->
+  <section id="recommendation">
+    <div class="section-head">
+      <h2>六、软路由透明代理与生产实战选型建议</h2>
+      <span class="section-kicker">Deployment Best Practices</span>
+    </div>
+    <div class="rec-grid">
+      <div class="rec-box primary">
+        <h4>🎯 软路由家庭出口推荐（首选 VPS.Taxi 亚太/美西）</h4>
+        <ul>
+          <li><strong>移动 / 联通用户体验极佳：</strong> 联通全境走 10099 骨干零丢包，移动华南走 CMIN2 延时破百，家庭游戏、网页开屏与推特信息流毫秒级响应。</li>
+          <li><strong>AI 与海外流媒体专用出口：</strong> OpenAI API 14ms、Claude 18ms、TikTok / Disney+ 原生解锁，在 Mihomo 规则中配置 <code>GEOSITE,openai,VPS-TAXI</code> 效果拔群。</li>
+          <li><strong>双节点容灾策略：</strong> 搭配 AnyTLS 与 Reality 双端口监听，有效绕过主动探测。</li>
+        </ul>
+      </div>
+
+      <div class="rec-box">
+        <h4>🛡️ 生产建站与欧洲业务（首选 V.PS 荷兰机房）</h4>
+        <ul>
+          <li><strong>原生双栈与 Tier1 骨干：</strong> 原生公网 IPv6 (2a0c:59c0::) 资源丰富，直连各大欧洲交换中心（AMS-IX），对欧洲云服务和 GitHub 访问极稳。</li>
+          <li><strong>内存宽裕：</strong> 1GB 内存 + 20GB 磁盘，可稳定承载 Docker 容器、轻量级数据库及反代中继。</li>
+          <li><strong>Reddit 访问补齐：</strong> 当亚太节点触发 Reddit 拦截时，可通过分流规则调度至 V.PS 欧洲出口完美解决。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>NanoPi R5C Gateway Lab · V.PS & VPS.Taxi Benchmark 评测归档 · 持续稳定运行</p>
+  </footer>
+</div>
+
+</body>
+</html>
