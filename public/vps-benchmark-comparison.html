@@ -92,6 +92,26 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .rec-box li{margin-bottom:6px}
 
 footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color:var(--text3);font-size:12px}
+
+/* NodeSeek 发帖格式导出 */
+.ns-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ns-tab{padding:7px 14px;border:1px solid var(--border2);border-radius:8px;background:var(--bg3);color:var(--text2);font:600 12px var(--sans);cursor:pointer;transition:all .15s}
+.ns-tab:hover{color:var(--text);border-color:var(--blue)}
+.ns-tab.active{background:rgba(79,142,247,.16);border-color:rgba(79,142,247,.5);color:#fff}
+.ns-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px}
+.ns-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:1px solid rgba(61,214,140,.4);border-radius:8px;background:rgba(61,214,140,.12);color:var(--green);font:700 12px var(--sans);cursor:pointer;transition:all .15s}
+.ns-btn:hover{background:rgba(61,214,140,.2);text-decoration:none}
+.ns-btn.blue{border-color:rgba(79,142,247,.4);background:rgba(79,142,247,.12);color:var(--blue)}
+.ns-btn.blue:hover{background:rgba(79,142,247,.2)}
+.ns-meta{font:11px var(--mono);color:var(--text3)}
+.ns-preview{margin:0;padding:18px;max-height:440px;overflow:auto;border:1px solid var(--border);border-radius:10px;background:#0b0d12;color:#c9d1d9;font:12px/1.72 var(--mono);white-space:pre-wrap;word-break:break-word;tab-size:2}
+.ns-tip{margin-top:12px;color:var(--text3);font-size:12px;line-height:1.85}
+.ns-tip code{font-size:11px}
+.ns-float{position:fixed;right:22px;bottom:22px;z-index:150;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border:1px solid rgba(61,214,140,.45);border-radius:999px;background:rgba(24,28,37,.94);backdrop-filter:blur(8px);color:var(--green);font:700 12px var(--sans);cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.45)}
+.ns-float:hover{background:rgba(61,214,140,.18)}
+.ns-toast{position:fixed;left:50%;bottom:86px;z-index:300;padding:10px 18px;border:1px solid rgba(61,214,140,.5);border-radius:999px;background:rgba(61,214,140,.15);color:var(--green);font:600 12px var(--sans);opacity:0;transform:translate(-50%,12px);transition:opacity .22s,transform .22s;pointer-events:none}
+.ns-toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:640px){.ns-float{right:14px;bottom:14px;padding:10px 13px;font-size:11px}}
 </style>
 </head>
 <body>
@@ -107,6 +127,7 @@ footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color
     <a href="#speed">单线程测速</a>
     <a href="#unlock">IP质量与解锁</a>
     <a href="#recommendation">选型建议</a>
+    <a href="#nodeseek">NodeSeek 格式</a>
   </div>
 </nav>
 
@@ -581,10 +602,283 @@ footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color
     </div>
   </section>
 
+  <!-- SECTION 7: NodeSeek 发帖格式导出 -->
+  <section id="nodeseek">
+    <div class="section-head">
+      <h2>七、NodeSeek 发帖格式（一键复制）</h2>
+      <span class="section-kicker">NodeSeek Markdown Export</span>
+    </div>
+    <p style="color:var(--text2);margin-bottom:18px;">
+      下面两版已按 NodeSeek 语法整理：GFM 表格、<code>&gt;</code> 引用、<code>**加粗**</code> 与 <code>[spoiler]</code> 折叠块都能原生渲染，复制后直接粘贴到 NodeSeek 编辑器即可发布，不用再手动排版。
+    </p>
+
+    <div class="ns-tabs" role="tablist">
+      <button class="ns-tab active" data-ns="full" role="tab" aria-selected="true">完整版 · 含全部表格</button>
+      <button class="ns-tab" data-ns="lite" role="tab" aria-selected="false">精简版 · 手机友好</button>
+    </div>
+
+    <div class="ns-actions">
+      <button class="ns-btn" id="ns-copy" type="button">📋 复制当前版本</button>
+      <button class="ns-btn blue" id="ns-download" type="button">⬇ 下载 .md</button>
+      <span class="ns-meta" id="ns-meta"></span>
+    </div>
+
+    <pre class="ns-preview" id="ns-preview"></pre>
+
+    <p class="ns-tip">
+      贴士：NodeSeek 的表格在手机上会横向滚动，正文建议保留 4~5 列；<code>[spoiler]…[/spoiler]</code> 内的长表默认折叠，读者点开才展开；图片需在 NodeSeek 编辑器里单独上传，正文引用外链图容易触发防盗链。
+    </p>
+  </section>
+
   <footer>
     <p>NanoPi R5C Gateway Lab · V.PS & VPS.Taxi Benchmark 评测归档 · 持续稳定运行</p>
   </footer>
 </div>
+
+<button class="ns-float" id="ns-float" type="button">📋 复制 NodeSeek 格式</button>
+<div class="ns-toast" id="ns-toast" role="status" aria-live="polite"></div>
+
+<script type="text/plain" id="ns-full">
+# V.PS vs VPS.Taxi 深度 Benchmark 横评：算力、三网回程与解锁全解析
+
+> 数据来源：**NodeQuality** 综合硬件体检 + **TcpQuality** 31 省市三网探针（SYN / 1200B 大包）+ 现网实机复测（V.PS 荷兰阿姆斯特丹 · VPS.Taxi 美西洛杉矶），全部 BBR + fq 环境。
+
+**一句话结论**：移动 / 联通家宽选 VPS.Taxi（联通 10099 全境 0 丢包、移动 CMIN2 华南 88ms）；欧洲建站、IPv6 双栈与算力机型选 V.PS（xTom Tier1、原生 2a0c:59c0::）。
+
+## 核心结论速览
+
+| 维度 | 更优 | 关键数据 |
+| --- | --- | --- |
+| 联通回程 | VPS.Taxi | 10099 → 4837，31 省市 **0% 丢包** |
+| 移动回程 | VPS.Taxi | CMIN2 / CMI，广东 **88ms**、湖南 90ms |
+| 电信回程 | 平手 | CN2GT / 163，190~225ms，重传 0~8% |
+| 单核算力 | 受测机 EPYC 7H12 | GB5 单核 **972** / 多核 957，Sysbench 1555 |
+| 内存吞吐 | 受测机 EPYC 7H12 | 读 **45,057 MB/s** / 写 20,481 MB/s |
+| 磁盘 IO | 平手 | FIO 4K 989 IOPS；物理落盘 40.3 / 39.3 MB/s |
+| 双栈 IPv6 | V.PS | 原生 2a0c:59c0:: |
+| IP 纯净度 | 受测机 | Scamalytics **0 分**、AbuseIPDB 0 次举报 |
+| 流媒体 AI | 受测机 | 原生解锁 TikTok / Netflix / Disney+ / ChatGPT |
+| 欧洲互联 | V.PS | 直连 AMS-IX，法兰克福 153ms |
+
+## 一、基础规格对照
+
+| 项目 | V.PS（阿姆斯特丹） | VPS.Taxi（洛杉矶） | NodeQuality 受测机 |
+| --- | --- | --- | --- |
+| ASN | AS3214 xTom | AS149513 Vertex | AS18186 Nebula |
+| CPU | 2 vCPU Xeon Gold 6133 | 1 vCPU Xeon Gold 6138 | 1 vCPU EPYC 7H12 |
+| 内存 | 961 MB + 256 MB Swap | 458 MB + 512 MB Swap | 967 MB + 3.8 GB Swap |
+| 磁盘 | 20 GB KVM（可用 14 GB） | 8.7 GB KVM（可用 4.1 GB） | 46 GB LVM |
+| 网络 | IPv4 + 原生 IPv6 | 纯 IPv4（中转优化出海） | 单栈 IPv4 |
+| 现网服务 | AnyTLS 8443 + Reality 443 | AnyTLS 8443 + Reality 443 | 纯净跑分宿主机 |
+
+## 二、算力 / 内存 / 磁盘
+
+**NodeQuality 受测机（AMD EPYC 7H12，HQ 24,399 分，全网 TOP 3.5%）**
+
+- Geekbench 5：单核 **972** / 多核 957
+- Sysbench CPU 单线程：1555.01
+- 内存：读 **45,057.0 MB/s**、写 20,481.8 MB/s、访问延迟 161 ns
+- FIO 4K 随机读：Q1 **989 IOPS** / Q32 917 IOPS；顺序读 219 MB/s、写 148 MB/s
+
+**现网两台实机（OpenSSL EVP + Direct IO 物理落盘）**
+
+| 项目 | V.PS（2C Xeon 6133） | VPS.Taxi（1C Xeon 6138） |
+| --- | --- | --- |
+| SHA256 | 262.7 MB/s | **310.6 MB/s** |
+| 物理落盘（64K Direct IO） | 40.3 MB/s | 39.3 MB/s |
+| 运行状态 | 8 天无重启 / 余 646M | 6 天无重启 / 余 306M |
+| 指令集 | AES-NI / AVX2 / EPT | AES-NI / AVX2 / EPT |
+
+> 结论：7H12 在并发加解密、大分流表匹配上优势压倒性；但跑 sing-box（AnyTLS / Reality）时双核 Xeon 也能吃满几百兆 TLS 吞吐，瓶颈在链路抖动而非单核算力。
+
+## 三、三网回程与大包抗压
+
+| 运营商 | 回程路径 | 代表延迟 | 丢包 / 重传 |
+| --- | --- | --- | --- |
+| 联通 | 10099 → 4837 | 京 197 / 沪 203 / 粤 206 / 豫 196 ms | **31 省市 0%** |
+| 移动 | CMIN2 / CN2GT / CMI | 粤 **88** / 湘 90 / 桂 94 / 苏 113 ms | 零丢包，微量重传 <4% |
+| 电信 | CN2GT / 163 / CTGGIA | 粤 190 / 浙 205 / 京 213 / 川 225 ms | 0~8%，北方个别波动 |
+
+- IPv4 标准包（93 靶点）：零丢包 40 个（43.0%）、轻丢包 52 个（55.9%）、严重异常仅 1 个（辽宁电信）
+- IPv4 1200B 大包：零重传 19 个、轻度 72 个、高重传 2 个（河北电信 / 河南移动）；联通 10099 大包仍稳在 0~4%
+- 最优三省：海南 87ms / 广东 88ms / 湖南 90ms
+
+## 四、单线程测速（回程 / 去程）
+
+[spoiler]
+**10 个测速节点明细（单位 Mbps，点开查看）**
+
+| 节点 | 回程 | 去程 | 延迟 | 丢包 |
+| --- | --- | --- | --- | --- |
+| 北京电信 | 22.2 | 15.5 | 227 ms | 4.00% |
+| 北京联通 | 21.0 | 16.6 | 200 ms | 11.00% |
+| 北京移动 | 21.2 | 13.9 | 625 ms | 14.15% |
+| 上海电信 | 1.0（骨干限速） | 0.7 | 225 ms | 10.50% |
+| 上海联通 | 19.3 | 4.4 | 209 ms | 6.99% |
+| 上海移动 | **24.5** | 14.6 | 103 ms | 9.00% |
+| 广东电信 | 18.6 | 15.4 | 206 ms | 9.42% |
+| 广东联通 | 19.8 | 15.9 | 278 ms | 7.61% |
+| 广东移动 | **23.8** | 17.4 | 121 ms | 9.53% |
+| Apple 国际 | 19.6 | 26.8 | 47 ms | **0.00%** |
+[/spoiler]
+
+## 五、IP 纯净度与解锁
+
+| 项目 | 结果 | 判定 |
+| --- | --- | --- |
+| Scamalytics | 0 分 | 极低风险，谷歌 / Stripe / PayPal 少触发二次验证 |
+| IP2Location | 3 分 | 低风险，正规商业机房广播 IP |
+| AbuseIPDB | 0 次举报 | 完全纯净，无扫描 / 爆破 / 垃圾邮件史 |
+| 25 端口 | 出站 Blocked | 防邻居滥发邮件把整段拖黑 |
+| ChatGPT / OpenAI | 原生直连 | 原生解锁 SG，无需套 WARP |
+| Netflix / Disney+ | 原生直连 | 非自制剧可播，支持 4K HDR |
+| TikTok | 原生直连 | 刷流 / 评论 / 主页加载正常 |
+| Reddit | 受限 | 需分流至美西或欧洲出口 |
+
+> 实测 API 延迟：OpenAI 14.12ms、Claude 18.87ms、GitHub 17.88ms、jsDelivr 6.58ms，全部 0% 重传。
+
+## 六、选型建议
+
+**① 家庭软路由透明代理 → VPS.Taxi 亚太 / 美西**
+
+- 联通走 10099 全境零丢包，移动华南 CMIN2 破百毫秒，开屏与信息流跟手
+- Mihomo 里直接写 GEOSITE,openai,VPS-TAXI，AI 与流媒体原生解锁
+- AnyTLS 与 Reality 双端口同时监听，抗主动探测
+
+**② 欧洲建站 / Docker / 反代中继 → V.PS 阿姆斯特丹**
+
+- 原生 IPv6 2a0c:59c0::，直连 AMS-IX，欧洲云服务与 GitHub 访问稳定
+- 1GB 内存 + 20GB 磁盘，跑 Docker、轻量数据库、反代中继都富裕
+- 亚太节点被 Reddit 拦时，分流到 V.PS 出口即可补齐
+
+---
+
+原始报告：[NodeQuality 体检](https://nodequality.com/r/vh72PCNJ41m3QyP2F4fi5ZoQEpbrtD08) · [TcpQuality 三网回程](https://tcpquality.ibsgss.uk/r/sT_qWrWlmH) · [Geekbench 5](https://browser.geekbench.com/v5/cpu/24804190)
+
+完整图文版（含全部图表）：https://router-docs-sepia.vercel.app/vps-benchmark-comparison.html
+</script>
+
+<script type="text/plain" id="ns-lite">
+# V.PS vs VPS.Taxi 怎么选：一句话结论 + 实测数据
+
+两台都是现网在跑的机器，数据来自 NodeQuality 体检、TcpQuality 31 省市探针和实机复测，直接上结论。
+
+## 移动 / 联通家宽 → VPS.Taxi（亚太 / 美西）
+
+- 联通 10099 → 4837，31 省市 **0% 丢包**；移动 CMIN2 广东 **88ms**、湖南 90ms
+- 单线程回程：上海移动 24.5M、广东移动 23.8M；Apple 国际 19.6M / **0% 丢包**
+- IP 纯净：Scamalytics 0 分，原生解锁 ChatGPT / Netflix / Disney+ / TikTok
+- 实测 OpenAI API 14.12ms、Claude 18.87ms，Mihomo 里 GEOSITE,openai 直接指过来
+- 电信走 CN2GT / 163，190~225ms，晚高峰建议叠一层中转
+
+## 欧洲建站 / IPv6 / 算力 → V.PS（阿姆斯特丹）
+
+- AS3214 xTom，Tier1 直连 AMS-IX，法兰克福 153ms，原生双栈 2a0c:59c0::
+- 2C Xeon 6133 + 961M 内存 + 20G 盘，SHA256 262.7 MB/s，物理落盘 40.3 MB/s
+- AnyTLS 8443 + Reality 443 连跑 8 天无重启，内存还剩 646M
+
+## 共同点
+
+BBR + fq、AES-NI / AVX2、25 端口出站封锁；受测机 FIO 4K 随机读约 989 IOPS，磁盘不是瓶颈。
+
+> 补一句：单核跑分 EPYC 7H12（GB5 972）确实猛，但日常代理场景先看回程丢包，算力只要不拖后腿就够用。
+
+完整横评（含全部表格）：https://router-docs-sepia.vercel.app/vps-benchmark-comparison.html
+</script>
+
+<script>
+(function () {
+  var fullEl = document.getElementById('ns-full');
+  var liteEl = document.getElementById('ns-lite');
+  var preview = document.getElementById('ns-preview');
+  var meta = document.getElementById('ns-meta');
+  var toastEl = document.getElementById('ns-toast');
+  if (!fullEl || !preview) return;
+
+  var docs = {
+    full: fullEl.textContent.replace(/^\n+/, '').replace(/\s+$/, ''),
+    lite: liteEl.textContent.replace(/^\n+/, '').replace(/\s+$/, '')
+  };
+  var names = { full: 'vps-taxi-vs-vps-nodeseek-full.md', lite: 'vps-taxi-vs-vps-nodeseek-lite.md' };
+  var current = 'full';
+  var toastTimer;
+
+  function render() {
+    preview.textContent = docs[current];
+    meta.textContent = docs[current].length + ' 字符 · ' + docs[current].split('\n').length + ' 行';
+  }
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function copyCurrent() {
+    var text = docs[current];
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast('已复制 ' + text.length + ' 字符，去 NodeSeek 直接粘贴');
+      }, function () {
+        toast(fallbackCopy(text) ? '已复制，去 NodeSeek 直接粘贴' : '复制失败，请手动全选下方文本');
+      });
+    } else {
+      toast(fallbackCopy(text) ? '已复制，去 NodeSeek 直接粘贴' : '复制失败，请手动全选下方文本');
+    }
+  }
+
+  function download() {
+    var blob = new Blob([docs[current]], { type: 'text/markdown;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = names[current];
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    toast('已导出 ' + names[current]);
+  }
+
+  function activate(name) {
+    current = name;
+    Array.prototype.forEach.call(document.querySelectorAll('.ns-tab'), function (t) {
+      var on = t.getAttribute('data-ns') === name;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.ns-tab'), function (tab) {
+    tab.addEventListener('click', function () { activate(tab.getAttribute('data-ns')); });
+  });
+
+  document.getElementById('ns-copy').addEventListener('click', copyCurrent);
+  document.getElementById('ns-download').addEventListener('click', download);
+  document.getElementById('ns-float').addEventListener('click', function () {
+    activate('full');
+    copyCurrent();
+  });
+
+  render();
+})();
+</script>
 
 </body>
 </html>

@@ -6,7 +6,7 @@ const withBase = (path) => `${basePath}${path}`
 const docs = [
   {
     title: 'V.PS vs VPS.Taxi 深度 Benchmark 横评',
-    subtitle: 'NodeQuality · TcpQuality · 31省市三网回程 · 硬件算力',
+    subtitle: 'NodeQuality · TcpQuality · 31省市三网回程 · 硬件算力 · NodeSeek 格式一键导出',
     desc: '基于 NodeQuality 综合体检、TcpQuality 31 省市三网回程与现网实测：AMD 7H12 / Xeon 算力对标、联通 10099 全境零丢包、移动 CMIN2 华南 88ms、Scamalytics 0分极低风险、TikTok/Netflix/ChatGPT 原生解锁',
     href: '/vps-benchmark-comparison.html',
     tag: '横评',
