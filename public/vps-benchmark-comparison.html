@@ -413,7 +413,8 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 
     <p class="table-note">
       数据归属：<b>TcpQuality 受测机</b>（<code>AS54801 Zillion Network</code>，IP <code>207.56.*.*</code>），对全国 31 省市三大运营商做标准 SYN 探测 + 1200B 大包压力测试。<br>
-      测试方向：<b>中国 31 省探针 ↔ 受测机</b>，回程 = 服务器 → 国内，去程 = 国内 → 服务器；探针是分布在全国的节点，<b>不是你的电脑</b>。
+      测试方向：<b>中国 31 省探针 ↔ 受测机</b>，回程 = 服务器 → 国内，去程 = 国内 → 服务器；探针是分布在全国的节点，<b>不是你的电脑</b>。<br>
+      原始报告：<a href="https://tcpquality.ibsgss.uk/r/sT_qWrWlmH" target="_blank" rel="noopener">TcpQuality · sT_qWrWlmH ↗</a>
     </p>
 
     <div class="table-wrap">
@@ -479,7 +480,8 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
     </div>
     <p class="table-note">
       数据归属：<b>TcpQuality 受测机</b>（同上，<code>AS54801</code>）。<br>
-      测试方向：由国内测速节点与受测机互测，回程列 = 服务器 → 国内下行，去程列 = 国内 → 服务器上行；生产机未做同口径测速，勿直接套用。
+      测试方向：由国内测速节点与受测机互测，回程列 = 服务器 → 国内下行，去程列 = 国内 → 服务器上行；生产机未做同口径测速，勿直接套用。<br>
+      原始报告：<a href="https://tcpquality.ibsgss.uk/r/sT_qWrWlmH" target="_blank" rel="noopener">TcpQuality · sT_qWrWlmH ↗</a>（同一份报告里的「单线程测速」章节）
     </p>
 
     <div class="table-wrap">
@@ -538,7 +540,10 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
       <h2>六、受测机 IP 纯净度与解锁</h2>
       <span class="section-kicker">Fraud Risk & Media Unlock</span>
     </div>
-    <p class="table-note">数据归属：<b>NodeQuality 受测机</b>（VPS.Taxi 亚太新加坡）。生产机 IP 未做同口径检测，别把 0 分直接当成洛杉矶机或阿姆斯特丹机的分数。</p>
+    <p class="table-note">
+      数据归属：<b>NodeQuality 受测机</b>（<code>AS54801 Zillion Network</code>，IP <code>207.56.*.*</code>）。生产机 IP 未做同口径检测，别把 0 分直接当成荷兰机或洛杉矶机的分数。<br>
+      原始报告：<a href="https://nodequality.com/r/vh72PCNJ41m3QyP2F4fi5ZoQEpbrtD08" target="_blank" rel="noopener">NodeQuality · vh72PCNJ ↗</a> · <a href="https://browser.geekbench.com/v5/cpu/24804190" target="_blank" rel="noopener">Geekbench 5 ↗</a>
+    </p>
 
     <div class="table-wrap">
       <table>
@@ -683,6 +688,17 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
     <div class="quote-box warn">
       <strong>与你本机去程对照：</strong> 本机 → 荷兰 171 ms、→ 洛杉矶 139 ms；回程 荷兰 128~180 ms、洛杉矶 154~233 ms。荷兰机基本对称，洛杉矶机回程明显比去程慢。
     </div>
+
+    <div class="cmd" style="margin-top:16px">
+      <pre><span class="c"># 复现：在两台机器上各跑一遍（每点 20 包）</span>
+ssh vps  'for ip in 202.96.209.133 210.21.196.6 120.196.165.24 223.5.5.5; do ping -c 20 -i 0.2 -W 2 $ip | tail -2; done'
+ssh taxi 'for ip in 202.96.209.133 210.21.196.6 120.196.165.24 223.5.5.5; do ping -c 20 -i 0.2 -W 2 $ip | tail -2; done'
+
+<span class="c"># 本机去程（需绕过本地代理才准确）</span>
+<span class="c">ping -c 50 89.106.207.247     # 荷兰机</span>
+<span class="c">ping -c 50 217.216.189.82    # 洛杉矶机</span></pre>
+    </div>
+    <p class="table-note">本节是自测数据，没有外部报告链接；上面命令可原样复现，受测机的报告链接见第四～六节。</p>
   </section>
 
   <!-- SECTION 9: NodeSeek 格式导出 -->
@@ -783,6 +799,8 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 | 移动 | CMIN2 / CN2GT / CMI | 粤 **88** / 湘 90 / 桂 94 / 苏 113 ms | 零丢包，微量重传 <4% |
 | 电信 | CN2GT / 163 / CTGGIA | 粤 190 / 浙 205 / 京 213 / 川 225 ms | 0~8%，北方个别波动 |
 
+原始报告：[TcpQuality · sT_qWrWlmH](https://tcpquality.ibsgss.uk/r/sT_qWrWlmH)（受测机 AS54801）
+
 - IPv4 标准包（93 靶点）：零丢包 40 个（43.0%）、轻丢包 52 个（55.9%）、严重仅 1 个（辽宁电信）
 - IPv4 1200B 大包：零重传 19 个、轻度 72 个、高重传 2 个（河北电信 / 河南移动）；联通 10099 大包稳在 0~4%
 - 最优三省：海南 87ms / 广东 88ms / 湖南 90ms
@@ -818,6 +836,8 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 | Netflix / Disney+ | 原生直连 | 非自制剧可播，支持 4K HDR |
 | TikTok | 原生直连 | 刷流 / 评论正常 |
 | Reddit | 受限 | 需分流至美西或欧洲出口 |
+
+原始报告：[NodeQuality · vh72PCNJ](https://nodequality.com/r/vh72PCNJ41m3QyP2F4fi5ZoQEpbrtD08) · [Geekbench 5](https://browser.geekbench.com/v5/cpu/24804190)
 
 > 实测 API 延迟：OpenAI 14.12ms、Claude 18.87ms、GitHub 17.88ms、jsDelivr 6.58ms，全部 0% 重传。
 
