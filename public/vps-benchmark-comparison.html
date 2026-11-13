@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="V.PS 与 VPS.Taxi 实测横评：两台生产机（阿姆斯特丹 / 洛杉矶）规格与实机对照，外加一台 NodeQuality 第三方受测机的硬件、三网回程与解锁数据，数据归属逐项标注。">
+<title>V.PS vs VPS.Taxi 实测横评 · 两台生产机 + 第三方受测机</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;--bg-card:#141721;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#687089;
+  --blue:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;--cyan:#39c6dc;
+  --vps:#4f8ef7;--taxi:#f5a623;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.72;-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:.9em;background:var(--bg3);border:1px solid var(--border);padding:2px 6px;border-radius:5px;color:#c9d1d9}
+
+nav{position:sticky;top:0;z-index:100;height:52px;padding:0 24px;display:flex;align-items:center;gap:14px;background:rgba(15,17,23,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-home{font-size:12px;font-weight:650;color:#fff;text-decoration:none;padding:5px 12px;background:var(--blue);border-radius:6px;white-space:nowrap}
+.nav-title{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-title span{color:var(--green)}
+.nav-links{margin-left:auto;display:flex;height:52px;overflow-x:auto}
+.nav-links a{display:flex;align-items:center;padding:0 12px;border-bottom:2px solid transparent;color:var(--text2);font-size:12px;text-decoration:none;white-space:nowrap}
+.nav-links a:hover{color:var(--text);border-bottom-color:var(--green)}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px 80px}
+.hero{padding:54px 0 28px}
+.eyebrow{color:var(--green);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.hero h1{font-size:clamp(26px,4.5vw,40px);line-height:1.2;letter-spacing:-.025em;margin-bottom:14px}
+.hero p{max-width:880px;color:var(--text2);font-size:14px;line-height:1.8}
+
+/* 数据归属说明 */
+.owner-bar{margin:22px 0 0;padding:16px 18px;border:1px solid var(--border2);border-left:3px solid var(--green);border-radius:0 10px 10px 0;background:rgba(61,214,140,.05);font-size:12.5px;color:var(--text2);line-height:1.85}
+.owner-bar strong{color:var(--text)}
+.owner-bar b.vps{color:var(--vps)}
+.owner-bar b.taxi{color:var(--taxi)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font:600 11px var(--mono);border:1px solid var(--border2);color:var(--text2)}
+.chip::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.vps{color:#9cc2ff;border-color:rgba(79,142,247,.45);background:rgba(79,142,247,.1)}
+.chip.taxi{color:#ffcf8b;border-color:rgba(245,166,35,.45);background:rgba(245,166,35,.1)}
+.chip.bm{color:var(--text3);border-color:var(--border2);background:rgba(255,255,255,.03)}
+
+.verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:30px 0 46px}
+.verdict-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative}
+.verdict-card.vps{border-color:rgba(79,142,247,.38);background:linear-gradient(160deg,rgba(79,142,247,.09),transparent 75%),var(--bg2)}
+.verdict-card.taxi{border-color:rgba(245,166,35,.38);background:linear-gradient(160deg,rgba(245,166,35,.09),transparent 75%),var(--bg2)}
+.verdict-label{font:700 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.verdict-card.vps .verdict-label{color:#9cc2ff}
+.verdict-card.taxi .verdict-label{color:#ffcf8b}
+.verdict-value{font-size:19px;font-weight:750;line-height:1.3;margin-bottom:6px}
+.verdict-desc{font-size:12px;color:var(--text2);line-height:1.65}
+
+section{min-width:0;margin-bottom:64px;scroll-margin-top:72px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:22px}
+.section-head h2{font-size:20px;line-height:1.3}
+.section-kicker{font:10px var(--mono);color:var(--text3);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.panel-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px}
+.panel-card h3{font-size:15px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.panel-card p{font-size:13px;color:var(--text2);margin-bottom:14px}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--bg2);margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:13px;text-align:left}
+th,td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+th{background:rgba(255,255,255,.03);color:var(--text2);font-weight:650;font-size:12px;letter-spacing:.03em;white-space:nowrap}
+th.vps{background:rgba(79,142,247,.1);color:#9cc2ff}
+th.taxi{background:rgba(245,166,35,.1);color:#ffcf8b}
+th.bm{background:rgba(255,255,255,.04);color:var(--text3)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+td.vps{background:rgba(79,142,247,.035)}
+td.taxi{background:rgba(245,166,35,.035)}
+.table-note{font-size:12px;color:var(--text3);margin:-4px 0 16px;line-height:1.8}
+.table-note b{color:var(--text2)}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font:700 11px var(--mono);white-space:nowrap}
+.badge.green{background:rgba(61,214,140,.12);color:var(--green);border:1px solid rgba(61,214,140,.3)}
+.badge.blue{background:rgba(79,142,247,.12);color:var(--blue);border:1px solid rgba(79,142,247,.3)}
+.badge.taxi{background:rgba(245,166,35,.12);color:var(--amber);border:1px solid rgba(245,166,35,.3)}
+.badge.purple{background:rgba(192,132,252,.12);color:var(--purple);border:1px solid rgba(192,132,252,.3)}
+.badge.amber{background:rgba(245,166,35,.12);color:var(--amber);border:1px solid rgba(245,166,35,.3)}
+.badge.red{background:rgba(240,96,96,.12);color:var(--red);border:1px solid rgba(240,96,96,.3)}
+.badge.gray{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border2)}
+
+.metric-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.metric-row:last-child{border-bottom:none}
+.metric-name{color:var(--text2)}
+.metric-val{font-family:var(--mono);font-weight:600;text-align:right}
+
+.quote-box{margin:18px 0;padding:16px 20px;border-left:4px solid var(--blue);background:rgba(79,142,247,.06);border-radius:0 8px 8px 0;color:var(--text2);font-size:13px}
+.quote-box strong{color:var(--text)}
+.quote-box.warn{border-left-color:var(--amber);background:rgba(245,166,35,.06)}
+
+/* 第三方受测机区块 */
+.bench-block{border:1px solid var(--border2);border-left:3px solid var(--text3);border-radius:0 12px 12px 0;padding:20px 20px 8px;background:rgba(255,255,255,.015)}
+.bench-label{display:flex;align-items:flex-start;gap:8px;font:600 11.5px var(--mono);color:var(--text3);margin-bottom:16px;line-height:1.7}
+.bench-label b{color:var(--text2);font-weight:700}
+
+/* 机器识别 */
+.cmd{position:relative;margin:0 0 16px;padding:16px 18px;border:1px solid var(--border);border-radius:10px;background:#0b0d12;overflow-x:auto}
+.cmd pre{margin:0;font:12px/1.8 var(--mono);color:#c9d1d9;white-space:pre}
+.cmd pre .c{color:#687089}
+.id-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.id-card{border:1px solid var(--border);border-radius:10px;padding:16px 18px;background:var(--bg2)}
+.id-card.vps{border-left:3px solid var(--vps)}
+.id-card.taxi{border-left:3px solid var(--taxi)}
+.id-card h4{font-size:13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.id-card h4 span{font:700 11px var(--mono);color:var(--text3)}
+.id-card .metric-row{font-size:12.5px}
+.node-head{display:flex;align-items:center;gap:10px;padding:13px 16px;margin:-16px -18px 14px;border-bottom:1px solid var(--border2)}
+.id-card.vps .node-head{background:linear-gradient(90deg,rgba(79,142,247,.18),rgba(79,142,247,.04))}
+.id-card.taxi .node-head{background:linear-gradient(90deg,rgba(245,166,35,.18),rgba(245,166,35,.04))}
+.node-head strong{font-size:17px;font-weight:800;letter-spacing:.01em}
+.node-badge{padding:3px 9px;border-radius:6px;font:800 12px var(--mono);white-space:nowrap}
+.node-badge.vps{background:rgba(79,142,247,.22);color:#c3daff;border:1px solid rgba(79,142,247,.55)}
+.node-badge.taxi{background:rgba(245,166,35,.22);color:#ffdca8;border:1px solid rgba(245,166,35,.55)}
+.node-host{margin-left:auto;font:600 10.5px var(--mono);color:var(--text3);white-space:nowrap}
+@media (max-width:480px){.node-head strong{font-size:15px}.node-host{display:none}}
+
+.report-links{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+.report-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font:600 12px var(--sans);transition:all .2s}
+.report-btn:hover{border-color:var(--blue);background:rgba(79,142,247,.12);text-decoration:none}
+
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.rec-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.rec-box.taxi{border-color:rgba(245,166,35,.35);background:linear-gradient(180deg,rgba(245,166,35,.06),transparent 80%),var(--bg2)}
+.rec-box.vps{border-color:rgba(79,142,247,.35);background:linear-gradient(180deg,rgba(79,142,247,.06),transparent 80%),var(--bg2)}
+.rec-box h4{font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.rec-box ul{padding-left:18px;color:var(--text2);font-size:13px}
+.rec-box li{margin-bottom:6px}
+
+footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color:var(--text3);font-size:12px}
+
+/* NodeSeek 发帖格式导出 */
+.ns-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ns-tab{padding:7px 14px;border:1px solid var(--border2);border-radius:8px;background:var(--bg3);color:var(--text2);font:600 12px var(--sans);cursor:pointer;transition:all .15s}
+.ns-tab:hover{color:var(--text);border-color:var(--blue)}
+.ns-tab.active{background:rgba(79,142,247,.16);border-color:rgba(79,142,247,.5);color:#fff}
+.ns-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px}
+.ns-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:1px solid rgba(61,214,140,.4);border-radius:8px;background:rgba(61,214,140,.12);color:var(--green);font:700 12px var(--sans);cursor:pointer;transition:all .15s}
+.ns-btn:hover{background:rgba(61,214,140,.2);text-decoration:none}
+.ns-btn.blue{border-color:rgba(79,142,247,.4);background:rgba(79,142,247,.12);color:var(--blue)}
+.ns-btn.blue:hover{background:rgba(79,142,247,.2)}
+.ns-meta{font:11px var(--mono);color:var(--text3)}
+.ns-preview{margin:0;padding:18px;max-height:440px;overflow:auto;border:1px solid var(--border);border-radius:10px;background:#0b0d12;color:#c9d1d9;font:12px/1.72 var(--mono);white-space:pre-wrap;word-break:break-word;tab-size:2}
+.ns-tip{margin-top:12px;color:var(--text3);font-size:12px;line-height:1.85}
+.ns-tip code{font-size:11px}
+.ns-float{position:fixed;right:22px;bottom:22px;z-index:150;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border:1px solid rgba(61,214,140,.45);border-radius:999px;background:rgba(24,28,37,.94);backdrop-filter:blur(8px);color:var(--green);font:700 12px var(--sans);cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.45)}
+.ns-float:hover{background:rgba(61,214,140,.18)}
+.ns-toast{position:fixed;left:50%;bottom:86px;z-index:300;padding:10px 18px;border:1px solid rgba(61,214,140,.5);border-radius:999px;background:rgba(61,214,140,.15);color:var(--green);font:600 12px var(--sans);opacity:0;transform:translate(-50%,12px);transition:opacity .22s,transform .22s;pointer-events:none}
+.ns-toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:640px){
+  .ns-float{right:14px;bottom:14px;padding:10px 13px;font-size:11px}
+  .wrap{padding:0 16px 72px}
+  th,td{padding:9px 10px;font-size:12px}
+  .verdict-value{font-size:17px}
+  .section-head{flex-wrap:wrap;gap:4px}
+  .ns-preview{font-size:11px;padding:14px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-home" href="/">← 资料库首页</a>
+  <div class="nav-title">V.PS vs VPS.Taxi · <span>两台生产机 + 第三方受测机</span></div>
+  <div class="nav-links">
+    <a href="#specs">规格对照</a>
+    <a href="#identify">机器识别</a>
+    <a href="#bench">受测机算力</a>
+    <a href="#network">三网回程</a>
+    <a href="#speed">单线程测速</a>
+    <a href="#unlock">IP 与解锁</a>
+    <a href="#recommendation">选型建议</a>
+    <a href="#local">本机实测</a>
+    <a href="#return">回程实测</a>
+    <a href="#nodeseek">NodeSeek 格式</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Two Production Nodes + One Third-Party Benchmark Node</div>
+    <h1>V.PS 与 VPS.Taxi 实测横评</h1>
+    <p>
+      本文的数据其实来自<b>三台不同的机器</b>，所以先把归属讲清楚：两台是正在跑 sing-box 的<b>生产机</b>（V.PS 荷兰阿姆斯特丹 / VPS.Taxi 美西洛杉矶），另一台是 NodeQuality + TcpQuality 的<b>第三方受测机</b>（VPS.Taxi 亚太新加坡）。下面的表格只保留两列做生产机对照，受测机数据全部单独成节并逐项标注。
+    </p>
+
+    <div class="owner-bar">
+      <strong>数据归属（先看这个）</strong><br>
+      ▸ <b class="vps">生产机 A · V.PS（荷兰机）</b>：阿姆斯特丹，<code>AS3214 xTom</code>，2C Xeon 6133，961 MB，原生 IPv6。<br>
+      ▸ <b class="taxi">生产机 B · VPS.Taxi（洛杉矶机）</b>：洛杉矶，<code>AS149513 Vertex</code>，1C Xeon 6138，458 MB，纯 IPv4。<br>
+      ▸ <b>第三方受测机</b>：VPS.Taxi 亚太节点，<code>AS54801 Zillion Network Inc.</code>（IP 报告打码为 <code>207.56.*.*</code>），1C EPYC 7H12 —— GB5、内存吞吐、FIO、三网回程、单线程测速、IP 纯净度与解锁全部出自这台，<b>不代表上面两台生产机</b>。<br>
+      ▸ <b>测试方向</b>：硬件类在机器本机跑；回程与测速由中国 31 省探针 ↔ 受测机互测。<b>没有一项是从你本机发出的</b>。
+      <div class="legend">
+        <span class="chip vps">V.PS · 蓝</span>
+        <span class="chip taxi">VPS.Taxi · 橙</span>
+        <span class="chip bm">第三方受测机 · 灰</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="report-links">
+    <a class="report-btn" href="https://nodequality.com/r/vh72PCNJ41m3QyP2F4fi5ZoQEpbrtD08" target="_blank" rel="noopener">📊 NodeQuality 原生体检报告 ↗</a>
+    <a class="report-btn" href="https://tcpquality.ibsgss.uk/r/sT_qWrWlmH" target="_blank" rel="noopener">🌐 TcpQuality 三网回程报告 ↗</a>
+    <a class="report-btn" href="https://browser.geekbench.com/v5/cpu/24804190" target="_blank" rel="noopener">⚡ Geekbench 5 跑分记录 ↗</a>
+  </div>
+
+  <div class="verdict">
+    <div class="verdict-card taxi">
+      <div class="verdict-label">VPS.Taxi · 洛杉矶生产机</div>
+      <div class="verdict-value">家宽代理首选</div>
+      <div class="verdict-desc">
+        1C Xeon 6138，SHA256 <strong>310.6 MB/s</strong>（单核反而更快），458 MB 内存余 306 MB，AnyTLS + Reality 连跑 6 天。亚太同品牌的受测机联通 31 省市 <strong>0% 丢包</strong>。
+      </div>
+    </div>
+    <div class="verdict-card vps">
+      <div class="verdict-label">V.PS · 阿姆斯特丹生产机</div>
+      <div class="verdict-value">欧洲建站 / IPv6 双栈</div>
+      <div class="verdict-desc">
+        2C Xeon 6133，961 MB 内存余 646 MB，20 GB 磁盘，原生 <code>2a0c:59c0::</code>，xTom Tier1 直连 AMS-IX，物理落盘 40.3 MB/s。
+      </div>
+    </div>
+    <div class="verdict-card">
+      <div class="verdict-label">第三方受测机 · 仅供参考</div>
+      <div class="verdict-value">EPYC 7H12 硬件天花板</div>
+      <div class="verdict-desc">
+        GB5 单核 <strong>972</strong>、内存读 <strong>45,057 MB/s</strong>、FIO 4K 989 IOPS、Scamalytics 0 分。这些数字属于受测机，不能当成 V.PS 或洛杉矶机的成绩。
+      </div>
+    </div>
+    <div class="verdict-card">
+      <div class="verdict-label">最容易混淆的一点</div>
+      <div class="verdict-value">同品牌 ≠ 同机器</div>
+      <div class="verdict-desc">
+        VPS.Taxi 既有洛杉矶生产机，也有亚太受测机，ASN 与 CPU 完全不同；V.PS 则是另一家（xTom）。看 ASN 和内存大小最不容易认错。
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: 生产机规格 -->
+  <section id="specs">
+    <div class="section-head">
+      <h2>一、两台生产机规格对照</h2>
+      <span class="section-kicker">Production Nodes Only</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>指标</th>
+            <th class="vps">V.PS · 荷兰机（AMS）</th>
+            <th class="taxi">VPS.Taxi · 洛杉矶机（LAX）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>所属商家</strong></td><td class="vps">V.PS（xTom 旗下云主机品牌）</td><td class="taxi">VPS.Taxi（专注亚太 / 美西优化线路）</td></tr>
+          <tr><td><strong>自治系统 (ASN)</strong></td><td class="vps"><code>AS3214 xTom GmbH</code></td><td class="taxi"><code>AS149513 Vertex Connectivity LLC</code></td></tr>
+          <tr><td><strong>物理机房</strong></td><td class="vps">荷兰 · 阿姆斯特丹 (AMS)</td><td class="taxi">美国 · 洛杉矶 (LAX)</td></tr>
+          <tr><td><strong>处理器</strong></td><td class="vps">2 vCPU · Intel Xeon Gold 6133 @ 2.50GHz</td><td class="taxi">1 vCPU · Intel Xeon Gold 6138 @ 2.00GHz</td></tr>
+          <tr><td><strong>内存与 Swap</strong></td><td class="vps">961 MB + 256 MB Swap</td><td class="taxi">458 MB + 512 MB Swap</td></tr>
+          <tr><td><strong>磁盘</strong></td><td class="vps">20 GB KVM（可用 14 GB）</td><td class="taxi">8.7 GB KVM（可用 4.1 GB）</td></tr>
+          <tr><td><strong>网络栈</strong></td><td class="vps">IPv4 + 原生公网 IPv6 <code>2a0c:59c0::</code></td><td class="taxi">纯 IPv4（中转优化出海）</td></tr>
+          <tr><td><strong>内核 / 拥塞控制</strong></td><td class="vps">Linux 6.8.0 <code>bbr + fq</code></td><td class="taxi">Linux 6.8.0 <code>bbr + fq</code></td></tr>
+          <tr><td><strong>现网代理服务</strong></td><td class="vps">sing-box AnyTLS (8443) + Reality (443)</td><td class="taxi">sing-box AnyTLS (8443) + Reality (443)</td></tr>
+          <tr><td><strong>SSH 入口（本机）</strong></td><td class="vps"><code>vps</code> / <code>v.ps</code> · 89.106.207.247:22</td><td class="taxi"><code>taxi</code> / <code>vps-taxi</code> · 217.216.189.82:52068</td></tr>
+          <tr><td><strong>反查域名</strong></td><td class="vps"><code>s64333.vps.hosting</code></td><td class="taxi">无 rDNS</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">上表只有两台生产机，第三方受测机的规格移到第四节单独列，避免三台机器混读。</p>
+
+    <div class="card-grid">
+      <div class="panel-card">
+        <h3>现网实测（OpenSSL EVP + Direct IO 物理落盘）<span class="badge green">两台真机</span></h3>
+        <div class="metric-row"><span class="metric-name">V.PS SHA256（2 核）</span><span class="metric-val">262,766 k (262.7 MB/s)</span></div>
+        <div class="metric-row"><span class="metric-name">VPS.Taxi SHA256（1 核）</span><span class="metric-val" style="color:var(--taxi)">310,678 k (310.6 MB/s)</span></div>
+        <div class="metric-row"><span class="metric-name">V.PS 物理落盘 64K（1 GB）</span><span class="metric-val">40.3 MB/s</span></div>
+        <div class="metric-row"><span class="metric-name">VPS.Taxi 物理落盘 64K（256 MB）</span><span class="metric-val">39.3 MB/s</span></div>
+        <div class="metric-row"><span class="metric-name">V.PS 运行状态</span><span class="metric-val">8 天无重启 / 余 646M</span></div>
+        <div class="metric-row"><span class="metric-name">VPS.Taxi 运行状态</span><span class="metric-val">6 天无重启 / 余 306M</span></div>
+        <div class="metric-row"><span class="metric-name">共同指令集</span><span class="metric-val">AES-NI / AVX2 / EPT</span></div>
+      </div>
+
+      <div class="panel-card">
+        <h3>两台机器的差异一句话<span class="badge blue">选型速记</span></h3>
+        <p>同样是 sing-box 双端口，但定位完全不同：</p>
+        <div class="metric-row"><span class="metric-name">V.PS 强在</span><span class="metric-val">内存翻倍、磁盘 20G、原生 IPv6、欧洲 Tier1</span></div>
+        <div class="metric-row"><span class="metric-name">VPS.Taxi 强在</span><span class="metric-val">单核 SHA256 更高、美西直连亚洲、端口即指纹</span></div>
+        <div class="metric-row"><span class="metric-name">共同瓶颈</span><span class="metric-val">链路抖动，而非 CPU 算力</span></div>
+        <div class="metric-row"><span class="metric-name">推荐组合</span><span class="metric-val">洛杉矶出口 + 阿姆斯特丹备援</span></div>
+      </div>
+    </div>
+
+    <div class="quote-box">
+      <strong>算力结论：</strong> 两台 Xeon 在跑 AnyTLS / Reality 时都能吃满几百兆的 TLS / ChaCha 加解密需求，真实瓶颈在网络抖动而非单核算力；真正需要重算力的场景（并发加解密、大分流表匹配）才轮到受测机那类 EPYC 7H12 发挥。
+    </div>
+  </section>
+
+  <!-- SECTION 2: 机器识别 -->
+  <section id="identify">
+    <div class="section-head">
+      <h2>二、两台机器怎么一眼分清</h2>
+      <span class="section-kicker">Node Fingerprint</span>
+    </div>
+    <p class="table-note" style="margin-top:-6px">名字像、配置也接近，最容易搞混。下面四个特征任意命中一个就不会认错。</p>
+
+    <div class="id-grid">
+      <div class="id-card vps">
+        <h4>V.PS <span>AS3214 xTom</span></h4>
+        <div class="metric-row"><span class="metric-name">SSH 别名</span><span class="metric-val">vps / v.ps / vps6</span></div>
+        <div class="metric-row"><span class="metric-name">地址与端口</span><span class="metric-val">89.106.207.247:22</span></div>
+        <div class="metric-row"><span class="metric-name">IPv6</span><span class="metric-val">2a0c:59c0:12::1265</span></div>
+        <div class="metric-row"><span class="metric-name">CPU / 内存</span><span class="metric-val">2C 6133 / 961 MB</span></div>
+      </div>
+      <div class="id-card taxi">
+        <h4>VPS.Taxi <span>AS149513 Vertex</span></h4>
+        <div class="metric-row"><span class="metric-name">SSH 别名</span><span class="metric-val">taxi / vps-taxi</span></div>
+        <div class="metric-row"><span class="metric-name">地址与端口</span><span class="metric-val">217.216.189.82:52068</span></div>
+        <div class="metric-row"><span class="metric-name">IPv6</span><span class="metric-val">无（纯 IPv4）</span></div>
+        <div class="metric-row"><span class="metric-name">CPU / 内存</span><span class="metric-val">1C 6138 / 458 MB</span></div>
+      </div>
+    </div>
+
+    <div class="cmd" style="margin-top:16px">
+      <pre><span class="c"># 一条命令自证身份：看 ASN + CPU + 内存</span>
+ssh vps  'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
+ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
+
+<span class="c"># 输出 xTom GmbH  → V.PS（阿姆斯特丹）</span>
+<span class="c"># 输出 Vertex ... → VPS.Taxi（洛杉矶）</span></pre>
+    </div>
+
+    <div class="quote-box warn">
+      <strong>三个最快的判断点：</strong> ① 端口 <code>52068</code> 就是 taxi，<code>22</code> 就是 vps；② <code>free -m</code> 总内存 961 与 458 一眼分开；③ <code>ip -6 addr</code> 里出现 <code>2a0c:59c0::</code> 的一定是 V.PS。
+    </div>
+  </section>
+
+  <!-- SECTION 3: 受测机硬件 -->
+  <section id="bench">
+    <div class="section-head">
+      <h2>三、第三方受测机：硬件、内存与磁盘</h2>
+      <span class="section-kicker">Third-Party Benchmark Node</span>
+    </div>
+    <div class="bench-block">
+      <div class="bench-label">⚠️ <b>数据归属：</b>NodeQuality 受测机 · VPS.Taxi 亚太（<code>AS54801 Zillion Network Inc.</code>，1C EPYC 7H12）—— 不是上面两台生产机</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th class="bm">项目</th><th class="bm">受测机信息</th><th class="bm">来源 / 说明</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>ASN</strong></td><td><code>AS54801 Zillion Network Inc.</code></td><td>TcpQuality 报告头部实测值</td></tr>
+            <tr><td><strong>IP 地址</strong></td><td><code>207.56.*.*</code>（报告打码）</td><td>完整 IP 仅报告作者可见</td></tr>
+            <tr><td><strong>区域</strong></td><td>亚太 · 新加坡（原记录）</td><td>报告未标注城市，仅显示 ASN</td></tr>
+            <tr><td><strong>规格</strong></td><td>1 vCPU EPYC 7H12 · 967 MB · 46 GB</td><td>硬件明细见下方两张卡片</td></tr>
+            <tr><td><strong>原始报告</strong></td><td><a href="https://tcpquality.ibsgss.uk/r/sT_qWrWlmH" target="_blank" rel="noopener">TcpQuality ↗</a> · <a href="https://nodequality.com/r/vh72PCNJ41m3QyP2F4fi5ZoQEpbrtD08" target="_blank" rel="noopener">NodeQuality ↗</a></td><td>地址与归属以报告为准</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-grid">
+        <div class="panel-card">
+          <h3>算力与内存<span class="badge green">全网 TOP 3.5%</span></h3>
+          <p>AMD EPYC 7H12（64 核 Rome），大三级缓存与高并发指令调度：</p>
+          <div class="metric-row"><span class="metric-name">Geekbench 5 单核 / 多核</span><span class="metric-val">972 / 957</span></div>
+          <div class="metric-row"><span class="metric-name">Sysbench CPU 单线程</span><span class="metric-val">1555.01</span></div>
+          <div class="metric-row"><span class="metric-name">Sysbench 内存读取</span><span class="metric-val" style="color:var(--green)">45,057.0 MB/s</span></div>
+          <div class="metric-row"><span class="metric-name">Sysbench 内存写入</span><span class="metric-val" style="color:var(--green)">20,481.8 MB/s</span></div>
+          <div class="metric-row"><span class="metric-name">内存访问延迟</span><span class="metric-val">161 ns</span></div>
+          <div class="metric-row"><span class="metric-name">HQ 硬件加权评分</span><span class="metric-val" style="color:var(--green)">24,399</span></div>
+        </div>
+
+        <div class="panel-card">
+          <h3>磁盘与规格<span class="badge gray">受测机</span></h3>
+          <p>FIO 与规格全部来自这台受测机，不可套到生产机上：</p>
+          <div class="metric-row"><span class="metric-name">FIO 4K 随机读 Q1 / Q32</span><span class="metric-val">989 / 917 IOPS</span></div>
+          <div class="metric-row"><span class="metric-name">FIO 顺序读 / 写</span><span class="metric-val">219 / 148 MB/s</span></div>
+          <div class="metric-row"><span class="metric-name">内存 / Swap</span><span class="metric-val">967 MB + 3.8 GB</span></div>
+          <div class="metric-row"><span class="metric-name">磁盘</span><span class="metric-val">46 GB LVM</span></div>
+          <div class="metric-row"><span class="metric-name">网络栈</span><span class="metric-val">单栈 IPv4</span></div>
+          <div class="metric-row"><span class="metric-name">内核</span><span class="metric-val">Linux 6.12.43 bbr+fq</span></div>
+        </div>
+      </div>
+
+      <div class="quote-box warn" style="margin-bottom:20px">
+        <strong>读表提醒：</strong> 看到 <code>GB5 972</code>、<code>45,057 MB/s</code>、<code>989 IOPS</code> 时，请默认它们是<b>受测机</b>的成绩。生产机的真实数字只有上一节的 SHA256、物理落盘与 uptime。
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: 受测机回程 -->
+  <section id="network">
+    <div class="section-head">
+      <h2>四、受测机三网回程与大包抗压</h2>
+      <span class="section-kicker">第三台机器 · 不是你的两台</span>
+    </div>
+
+    <div class="owner-bar" style="border-left-color:var(--text3);background:rgba(255,255,255,.03);margin:0 0 20px">
+      <strong>⚠️ 第四～六节全部是「受测机」的数据</strong><br>
+      受测机 = <code>AS54801 Zillion Network</code>，IP <code>207.56.*.*</code>，既不是<b class="vps">荷兰机（V.PS）</b>，也不是<b class="taxi">洛杉矶机（VPS.Taxi）</b>。<br>
+      想看你自己两台的回程 → <a href="#return">跳到第九节「两台机器自己的回程实测」</a>。
+    </div>
+
+    <p class="table-note">
+      数据归属：<b>TcpQuality 受测机</b>（<code>AS54801 Zillion Network</code>，IP <code>207.56.*.*</code>），对全国 31 省市三大运营商做标准 SYN 探测 + 1200B 大包压力测试。<br>
+      测试方向：<b>中国 31 省探针 ↔ 受测机</b>，回程 = 服务器 → 国内，去程 = 国内 → 服务器；探针是分布在全国的节点，<b>不是你的电脑</b>。
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="bm">运营商</th>
+            <th class="bm">主力回程路径 (AS Path)</th>
+            <th class="bm">代表性省份延迟</th>
+            <th class="bm">丢包与重传</th>
+            <th class="bm">综合评级</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>中国联通</strong></td>
+            <td><code>10099 → 4837</code></td>
+            <td>京 197 / 沪 203 / 粤 206 / 豫 196 ms</td>
+            <td><span class="badge green">31 省市 0% 丢包</span></td>
+            <td><span class="badge green">极佳（Tier 1 级）</span></td>
+          </tr>
+          <tr>
+            <td><strong>中国移动</strong></td>
+            <td><code>CMIN2 / CN2GT / CMI</code></td>
+            <td>粤 88 / 湘 90 / 桂 94 / 苏 113 ms</td>
+            <td>零丢包，微量重传 &lt; 4%</td>
+            <td><span class="badge blue">优质（华南极快）</span></td>
+          </tr>
+          <tr>
+            <td><strong>中国电信</strong></td>
+            <td><code>CN2GT / 163 / CTGGIA</code></td>
+            <td>粤 190 / 浙 205 / 京 213 / 川 225 ms</td>
+            <td>0~8% 重传，北方个别波动</td>
+            <td><span class="badge amber">良好（高峰期建议中转）</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-grid">
+      <div class="panel-card">
+        <h3>IPv4 标准包统计<span class="badge green">92/93 节点可用</span></h3>
+        <div class="metric-row"><span class="metric-name">零丢包节点</span><span class="metric-val" style="color:var(--green)">40 个（43.0%）</span></div>
+        <div class="metric-row"><span class="metric-name">轻微丢包 1%~20%</span><span class="metric-val" style="color:var(--blue)">52 个（55.9%）</span></div>
+        <div class="metric-row"><span class="metric-name">严重异常 &gt; 20%</span><span class="metric-val" style="color:var(--red)">1 个（辽宁电信）</span></div>
+        <div class="metric-row"><span class="metric-name">最优三省</span><span class="metric-val">海南 87 / 广东 88 / 湖南 90 ms</span></div>
+      </div>
+      <div class="panel-card">
+        <h3>IPv4 1200B 大包<span class="badge purple">模拟 4K 视频流</span></h3>
+        <div class="metric-row"><span class="metric-name">零重传节点</span><span class="metric-val">19 个</span></div>
+        <div class="metric-row"><span class="metric-name">轻度重传 1%~20%</span><span class="metric-val">72 个</span></div>
+        <div class="metric-row"><span class="metric-name">高重传 &gt; 20%</span><span class="metric-val" style="color:var(--amber)">2 个（河北电信 / 河南移动）</span></div>
+        <div class="metric-row"><span class="metric-name">联通 10099 大包</span><span class="metric-val" style="color:var(--green)">稳定 0~4%</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: 受测机测速 -->
+  <section id="speed">
+    <div class="section-head">
+      <h2>五、受测机单线程测速与国际互联</h2>
+      <span class="section-kicker">Benchmark Node Throughput</span>
+    </div>
+    <p class="table-note">
+      数据归属：<b>TcpQuality 受测机</b>（同上，<code>AS54801</code>）。<br>
+      测试方向：由国内测速节点与受测机互测，回程列 = 服务器 → 国内下行，去程列 = 国内 → 服务器上行；生产机未做同口径测速，勿直接套用。
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="bm">测速节点</th>
+            <th class="bm">回程</th>
+            <th class="bm">去程</th>
+            <th class="bm">延迟</th>
+            <th class="bm">丢包 / 重传</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>北京电信</strong></td><td><code>22.2 Mbps</code></td><td>15.5 Mbps</td><td>227 ms</td><td>4.00%</td></tr>
+          <tr><td><strong>北京联通</strong></td><td><code>21.0 Mbps</code></td><td>16.6 Mbps</td><td>200 ms</td><td>11.00%</td></tr>
+          <tr><td><strong>北京移动</strong></td><td><code>21.2 Mbps</code></td><td>13.9 Mbps</td><td>625 ms</td><td>14.15%</td></tr>
+          <tr><td><strong>上海电信</strong></td><td><code>1.0 Mbps</code>（骨干限速）</td><td>0.7 Mbps</td><td>225 ms</td><td>10.50%</td></tr>
+          <tr><td><strong>上海联通</strong></td><td><code>19.3 Mbps</code></td><td>4.4 Mbps</td><td>209 ms</td><td>6.99%</td></tr>
+          <tr><td><strong>上海移动</strong></td><td><strong style="color:var(--green)">24.5 Mbps</strong></td><td>14.6 Mbps</td><td>103 ms</td><td>9.00%</td></tr>
+          <tr><td><strong>广东电信</strong></td><td><code>18.6 Mbps</code></td><td>15.4 Mbps</td><td>206 ms</td><td>9.42%</td></tr>
+          <tr><td><strong>广东联通</strong></td><td><code>19.8 Mbps</code></td><td>15.9 Mbps</td><td>278 ms</td><td>7.61%</td></tr>
+          <tr><td><strong>广东移动</strong></td><td><strong style="color:var(--green)">23.8 Mbps</strong></td><td>17.4 Mbps</td><td>121 ms</td><td>9.53%</td></tr>
+          <tr><td><strong>Apple 国际</strong></td><td><code>19.6 Mbps</code></td><td>26.8 Mbps</td><td>47 ms</td><td><span class="badge green">0.00%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-grid">
+      <div class="panel-card">
+        <h3>全球枢纽与 Telegram DC<span class="badge blue">受测机</span></h3>
+        <div class="metric-row"><span class="metric-name">亚太（新加坡 / 香港 / 日本）</span><span class="metric-val" style="color:var(--green)">1 / 41 / 74 ms</span></div>
+        <div class="metric-row"><span class="metric-name">美洲（洛杉矶 / 达拉斯 / 芝加哥）</span><span class="metric-val">174 / 205 / 234 ms</span></div>
+        <div class="metric-row"><span class="metric-name">欧洲（法兰克福 / 伦敦 / 阿姆）</span><span class="metric-val">153 / 162 / 161 ms</span></div>
+        <div class="metric-row"><span class="metric-name">大洋洲（悉尼）</span><span class="metric-val">99 ms</span></div>
+        <div class="metric-row"><span class="metric-name">Telegram DC5（新加坡）</span><span class="metric-val" style="color:var(--green)">16.6 ms / 0%</span></div>
+        <div class="metric-row"><span class="metric-name">Telegram DC2 / DC4</span><span class="metric-val">158.9 / 159.8 ms</span></div>
+        <div class="metric-row"><span class="metric-name">Telegram DC1 / DC3</span><span class="metric-val">249.8 / 252.4 ms</span></div>
+      </div>
+      <div class="panel-card">
+        <h3>开发者服务与公共 CDN<span class="badge purple">受测机</span></h3>
+        <div class="metric-row"><span class="metric-name">jsDelivr Multi-CDN</span><span class="metric-val" style="color:var(--green)">6.58 ms / 0%</span></div>
+        <div class="metric-row"><span class="metric-name">Cloudflare CDNJS / Dashboard</span><span class="metric-val">11.89 / 15.49 ms</span></div>
+        <div class="metric-row"><span class="metric-name">Akamai Edge / Fastly</span><span class="metric-val">12.39 / 12.67 ms</span></div>
+        <div class="metric-row"><span class="metric-name">OpenAI API</span><span class="metric-val" style="color:var(--green)">14.12 ms / 0%</span></div>
+        <div class="metric-row"><span class="metric-name">Claude AI</span><span class="metric-val" style="color:var(--green)">18.87 ms / 0%</span></div>
+        <div class="metric-row"><span class="metric-name">ChatGPT Web</span><span class="metric-val">23.11 ms / 0%</span></div>
+        <div class="metric-row"><span class="metric-name">GitHub API</span><span class="metric-val">17.88 ms / 0%</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: 受测机 IP -->
+  <section id="unlock">
+    <div class="section-head">
+      <h2>六、受测机 IP 纯净度与解锁</h2>
+      <span class="section-kicker">Fraud Risk & Media Unlock</span>
+    </div>
+    <p class="table-note">数据归属：<b>NodeQuality 受测机</b>（VPS.Taxi 亚太新加坡）。生产机 IP 未做同口径检测，别把 0 分直接当成洛杉矶机或阿姆斯特丹机的分数。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="bm">评测项目</th>
+            <th class="bm">检验结果</th>
+            <th class="bm">风险判定 / 解锁区域</th>
+            <th class="bm">业务影响</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Scamalytics 欺诈分</strong></td><td><code>0 分</code></td><td><span class="badge green">极低风险</span></td><td>Google / Stripe / PayPal 少触发二次验证</td></tr>
+          <tr><td><strong>IP2Location 风险</strong></td><td><code>3 分</code></td><td><span class="badge green">低风险</span></td><td>正规商业机房广播 IP，非高危代理池</td></tr>
+          <tr><td><strong>AbuseIPDB 举报</strong></td><td><code>0 次</code></td><td><span class="badge green">完全纯净</span></td><td>无扫描 / 爆破 / 垃圾邮件历史</td></tr>
+          <tr><td><strong>25 端口出站</strong></td><td><code>TCP 25 Blocked</code></td><td><span class="badge amber">阻断保护</span></td><td>防邻居滥发邮件拖黑整个 C 段</td></tr>
+          <tr><td><strong>ChatGPT / OpenAI</strong></td><td>原生直连</td><td><span class="badge green">原生解锁 [SG]</span></td><td>无需套 WARP 即可调用 API 与网页登录</td></tr>
+          <tr><td><strong>Netflix / Disney+</strong></td><td>原生直连</td><td><span class="badge green">原生解锁 [SG]</span></td><td>可播非自制剧与 4K HDR</td></tr>
+          <tr><td><strong>TikTok</strong></td><td>原生直连</td><td><span class="badge green">原生解锁 [SG]</span></td><td>刷流 / 评论 / 主页加载正常</td></tr>
+          <tr><td><strong>Reddit OAuth</strong></td><td>连接受限</td><td><span class="badge red">封锁阻断</span></td><td>需分流到美西或欧洲出口</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 7: 选型建议 -->
+  <section id="recommendation">
+    <div class="section-head">
+      <h2>七、选型与生产落地建议</h2>
+      <span class="section-kicker">Deployment Best Practices</span>
+    </div>
+    <div class="rec-grid">
+      <div class="rec-box taxi">
+        <h4>🟠 家庭软路由出口 → VPS.Taxi 洛杉矶</h4>
+        <ul>
+          <li><strong>端口 52068 那台就是它</strong>，1C 6138 单核 SHA256 310.6 MB/s，比 V.PS 双核还高。</li>
+          <li><strong>同品牌亚太受测机的线路成绩</strong>：联通 10099 全境 0 丢包、移动华南 CMIN2 88ms，可作选线参考。</li>
+          <li><strong>双端口容灾</strong>：AnyTLS 8443 + Reality 443 同时监听，抗主动探测。</li>
+          <li><strong>内存偏紧</strong>：458 MB 只剩 306 MB，别在上面再塞数据库。</li>
+        </ul>
+      </div>
+      <div class="rec-box vps">
+        <h4>🔵 欧洲建站 / IPv6 / 反代中继 → V.PS 阿姆斯特丹</h4>
+        <ul>
+          <li><strong>原生双栈</strong> <code>2a0c:59c0::</code>，直连 AMS-IX，欧洲云与 GitHub 访问稳定。</li>
+          <li><strong>资源宽裕</strong>：961 MB 内存余 646 MB、20 GB 磁盘，跑 Docker、轻量数据库、反代都够。</li>
+          <li><strong>Reddit 补齐</strong>：亚太出口被拦时，分流到 V.PS 欧洲出口即可。</li>
+          <li><strong>端口 22 + IPv6</strong> 是它的两个识别特征。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="quote-box" style="margin-top:18px">
+      <strong>组合建议：</strong> 洛杉矶负责日常出海与流媒体，阿姆斯特丹负责建站、IPv6 与备援；两台都用 <code>GEOSITE,openai,VPS-TAXI</code> 这类显式分流，避免把「同品牌受测机」的成绩误当成自家机器的表现。
+    </div>
+  </section>
+
+  <!-- SECTION 8: 本机实测 -->
+  <section id="local">
+    <div class="section-head">
+      <h2>八、本机实测：我的宽带 → 两台生产机</h2>
+      <span class="section-kicker">Home Broadband Test · 2026-11-13 20:20</span>
+    </div>
+    <p class="table-note">
+      测试点：家里宽带（中国移动，经 ImmortalWrt 网关）→ 两台机器各测一遍。<br>
+      对照方式：<b style="color:#9cc2ff">蓝色卡 = 荷兰机（V.PS）</b>，<b style="color:#ffcf8b">橙色卡 = 洛杉矶机（VPS.Taxi）</b>。<br>
+      口径：<b>ICMP 为直连实测</b>；TCP 被本地透明代理接管，所以吞吐按 <b>SSH 单线程经代理链路</b>测得。
+    </p>
+
+    <div class="id-grid">
+      <div class="id-card vps">
+        <div class="node-head">
+          <span class="node-badge vps">V.PS</span>
+          <strong>荷兰机 · 阿姆斯特丹</strong>
+          <span class="node-host">AMS · s64333</span>
+        </div>
+        <div class="metric-row"><span class="metric-name">IP / SSH 端口</span><span class="metric-val">89.106.207.247 : 22</span></div>
+        <div class="metric-row"><span class="metric-name">ICMP 丢包（50 包）</span><span class="metric-val" style="color:var(--green)">0.0%</span></div>
+        <div class="metric-row"><span class="metric-name">延迟 min / avg / max</span><span class="metric-val">165.7 / <b>170.8</b> / 175.0 ms</span></div>
+        <div class="metric-row"><span class="metric-name">抖动 stddev</span><span class="metric-val">2.57 ms</span></div>
+        <div class="metric-row"><span class="metric-name">下载 100 MB</span><span class="metric-val" style="color:var(--green)">2.13 MB/s（17.0 Mbps）</span></div>
+        <div class="metric-row"><span class="metric-name">上传 50 MB</span><span class="metric-val">1.42 MB/s（11.4 Mbps）</span></div>
+        <div class="metric-row"><span class="metric-name">回程入口</span><span class="metric-val">223.120.180.41 → xtom AMS</span></div>
+      </div>
+
+      <div class="id-card taxi">
+        <div class="node-head">
+          <span class="node-badge taxi">VPS.Taxi</span>
+          <strong>洛杉矶机 · 美国</strong>
+          <span class="node-host">LAX · LA</span>
+        </div>
+        <div class="metric-row"><span class="metric-name">IP / SSH 端口</span><span class="metric-val">217.216.189.82 : 52068</span></div>
+        <div class="metric-row"><span class="metric-name">ICMP 丢包（50 包）</span><span class="metric-val" style="color:var(--green)">0.0%</span></div>
+        <div class="metric-row"><span class="metric-name">延迟 min / avg / max</span><span class="metric-val">136.7 / <b>138.7</b> / 141.1 ms</span></div>
+        <div class="metric-row"><span class="metric-name">抖动 stddev</span><span class="metric-val">0.95 ms</span></div>
+        <div class="metric-row"><span class="metric-name">下载 100 MB</span><span class="metric-val" style="color:var(--amber)">0.39 MB/s（3.1 Mbps）</span></div>
+        <div class="metric-row"><span class="metric-name">上传 50 MB</span><span class="metric-val" style="color:var(--amber)">0.39 MB/s（3.1 Mbps）</span></div>
+        <div class="metric-row"><span class="metric-name">回程入口</span><span class="metric-val">223.120.161.6 → 94.241.161.1</span></div>
+      </div>
+    </div>
+
+    <div class="quote-box" style="margin-top:18px">
+      <strong>一句话对比：</strong> 延迟是 <b style="color:#ffcf8b">洛杉矶机（VPS.Taxi）</b> 更快 —— 139 ms vs <b style="color:#9cc2ff">荷兰机（V.PS）</b> 171 ms；下载吞吐是 <b style="color:#9cc2ff">荷兰机（V.PS）</b> 更高 —— 2.13 MB/s vs 洛杉矶机 0.39 MB/s，快 5.5 倍。
+    </div>
+    <div class="quote-box warn">
+      <strong>待复核：</strong> 洛杉矶机（VPS.Taxi）上下行都卡在 0.39 MB/s，建议先在机器上跑 <code>iperf3 -s</code> 或看 <code>tc qdisc</code>，排除限速与单线程 SSH 双重加密的影响。
+    </div>
+  </section>
+
+  <!-- SECTION 9: 两台机器自己的回程 -->
+  <section id="return">
+    <div class="section-head">
+      <h2>九、两台机器自己的回程实测（VPS → 国内）</h2>
+      <span class="section-kicker">Your Nodes · Return Path · 2026-11-13</span>
+    </div>
+    <p class="table-note">
+      测试方式：直接在<b>你的两台机器</b>上 ping 国内三网端点（每点 20 包），反映「服务器 → 国内」方向，也就是你下载时走的回程。<br>
+      注意：ICMP 到公共 DNS 可能被限速，丢包率仅作相对参考；这组数据来自你的两台机器，和第四节的受测机不是同一台。
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>国内目标</th>
+            <th class="vps">荷兰机（V.PS）</th>
+            <th class="taxi">洛杉矶机（VPS.Taxi）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>上海电信</strong> <code>202.96.209.133</code></td><td class="vps">167.1 ms / <span class="badge green">0%</span></td><td class="taxi">154.8 ms / <span class="badge red">25% 丢包</span></td></tr>
+          <tr><td><strong>广东联通</strong> <code>210.21.196.6</code></td><td class="vps">180.2 ms / 0%</td><td class="taxi">232.7 ms / 0%</td></tr>
+          <tr><td><strong>广东移动</strong> <code>120.196.165.24</code></td><td class="vps"><strong style="color:var(--green)">133.3 ms</strong> / 0%</td><td class="taxi">156.2 ms / 0%</td></tr>
+          <tr><td><strong>阿里 DNS</strong> <code>223.5.5.5</code></td><td class="vps"><strong style="color:var(--green)">127.7 ms</strong> / 0%</td><td class="taxi">153.9 ms / 0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="quote-box">
+      <strong>怎么读：</strong> 荷兰机（V.PS）回程整体更顺 —— 移动方向 133 ms、阿里 128 ms，全部 0 丢包；洛杉矶机（VPS.Taxi）到联通 233 ms 偏高、到上海电信 25% 丢包，和它下载只有 0.39 MB/s 是同一组症状。
+    </div>
+    <div class="quote-box warn">
+      <strong>与你本机去程对照：</strong> 本机 → 荷兰 171 ms、→ 洛杉矶 139 ms；回程 荷兰 128~180 ms、洛杉矶 154~233 ms。荷兰机基本对称，洛杉矶机回程明显比去程慢。
+    </div>
+  </section>
+
+  <!-- SECTION 9: NodeSeek 格式导出 -->
+  <section id="nodeseek">
+    <div class="section-head">
+      <h2>十、NodeSeek 发帖格式（一键复制）</h2>
+      <span class="section-kicker">NodeSeek Markdown Export</span>
+    </div>
+    <p style="color:var(--text2);margin-bottom:18px;">
+      两版都已按 NodeSeek 语法整理：GFM 表格、<code>&gt;</code> 引用、<code>**加粗**</code> 与 <code>[spoiler]</code> 折叠块都能原生渲染，复制后直接粘贴到 NodeSeek 编辑器即可发布。文本里的数据归属也已同步改成「生产机 / 受测机」两段，不会再把三台机器混在一起。
+    </p>
+
+    <div class="ns-tabs" role="tablist">
+      <button class="ns-tab active" data-ns="full" role="tab" aria-selected="true">完整版 · 含全部表格</button>
+      <button class="ns-tab" data-ns="lite" role="tab" aria-selected="false">精简版 · 手机友好</button>
+    </div>
+
+    <div class="ns-actions">
+      <button class="ns-btn" id="ns-copy" type="button">📋 复制当前版本</button>
+      <button class="ns-btn blue" id="ns-download" type="button">⬇ 下载 .md</button>
+      <span class="ns-meta" id="ns-meta"></span>
+    </div>
+
+    <pre class="ns-preview" id="ns-preview"></pre>
+
+    <p class="ns-tip">
+      贴士：NodeSeek 的表格在手机上会横向滚动，正文建议保留 4~5 列；<code>[spoiler]…[/spoiler]</code> 内的长表默认折叠；图片需在 NodeSeek 编辑器里单独上传，外链图容易触发防盗链。
+    </p>
+  </section>
+
+  <footer>
+    <p>NanoPi R5C Gateway Lab · V.PS &amp; VPS.Taxi 实测归档 · 两台生产机 + 一台第三方受测机</p>
+  </footer>
+</div>
+
+<button class="ns-float" id="ns-float" type="button">📋 复制 NodeSeek 格式</button>
+<div class="ns-toast" id="ns-toast" role="status" aria-live="polite"></div>
+
+<script type="text/plain" id="ns-full">
+# V.PS vs VPS.Taxi 实测横评：两台生产机 + 一台第三方受测机
+
+> 先说数据归属，不然一定看错：**生产机** = V.PS 阿姆斯特丹（AS3214 xTom，2C 6133，961M）与 VPS.Taxi 洛杉矶（AS149513 Vertex，1C 6138，458M），两台都在跑 sing-box；**受测机** = NodeQuality / TcpQuality 的第三方机器（VPS.Taxi 亚太，AS54801 Zillion Network Inc.，IP 报告打码为 207.56.*.*），GB5、内存吞吐、FIO、三网回程、测速、IP 纯净度全部出自它。
+
+**测试方向**：硬件类在机器本机跑；回程与测速由中国 31 省探针 ↔ 受测机互测（回程 = 服务器 → 国内，去程 = 国内 → 服务器）。没有一项是从本机电脑发出的。
+
+**一句话结论**：家宽出海优先 VPS.Taxi 洛杉矶；欧洲建站、IPv6 双栈选 V.PS 阿姆斯特丹。
+
+## 一、怎么一眼分清两台机器
+
+| 特征 | V.PS | VPS.Taxi |
+| --- | --- | --- |
+| SSH 别名 | vps / v.ps / vps6 | taxi / vps-taxi |
+| 地址端口 | 89.106.207.247:22 | 217.216.189.82:52068 |
+| ASN | AS3214 xTom GmbH | AS149513 Vertex |
+| 机房 | 荷兰阿姆斯特丹 | 美国洛杉矶 |
+| CPU | 2C Xeon 6133 | 1C Xeon 6138 |
+| 内存 | 961 MB（余 646M） | 458 MB（余 306M） |
+| IPv6 | 原生 2a0c:59c0:: | 无 |
+
+一条命令自证：
+
+```bash
+ssh vps  'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
+ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
+```
+
+输出 xTom GmbH = V.PS，Vertex = VPS.Taxi；端口 52068 是 taxi 的天然指纹。
+
+## 二、生产机实测（两台真机）
+
+| 项目 | V.PS（2C 6133） | VPS.Taxi（1C 6138） |
+| --- | --- | --- |
+| SHA256 | 262.7 MB/s | **310.6 MB/s** |
+| 物理落盘 64K Direct IO | 40.3 MB/s | 39.3 MB/s |
+| 已运行 | 8 天无重启 | 6 天无重启 |
+| 内存余量 | 646 MB | 306 MB |
+| 指令集 | AES-NI / AVX2 / EPT | 同 |
+
+> 两台 Xeon 跑 AnyTLS / Reality 都能吃满几百兆 TLS 吞吐，瓶颈在链路抖动而不是单核算力。
+
+## 三、第三方受测机（NodeQuality）硬件
+
+- 归属：**AS54801 Zillion Network Inc.**，IP `207.56.*.*`（报告打码），区域按原记录为亚太 / 新加坡，报告本身只给 ASN
+- 1 vCPU EPYC 7H12、967 MB + 3.8 GB Swap、46 GB LVM、单栈 IPv4、Linux 6.12.43
+- GB5 单核 **972** / 多核 957；Sysbench 单线程 1555.01；HQ 24,399（TOP 3.5%）
+- 内存读 **45,057 MB/s**、写 20,481.8 MB/s、延迟 161 ns
+- FIO 4K 随机读 989 / 917 IOPS；顺序 219 / 148 MB/s
+
+> 以上全部是受测机成绩，别拿它给 V.PS 或洛杉矶机贴标签。
+
+## 四、受测机三网回程与大包
+
+> 测试方向：中国 31 省探针 ↔ 受测机，回程 = 服务器 → 国内，去程 = 国内 → 服务器；探针不是你的电脑。
+
+| 运营商 | 回程路径 | 代表延迟 | 丢包 / 重传 |
+| --- | --- | --- | --- |
+| 联通 | 10099 → 4837 | 京 197 / 沪 203 / 粤 206 / 豫 196 ms | **31 省市 0%** |
+| 移动 | CMIN2 / CN2GT / CMI | 粤 **88** / 湘 90 / 桂 94 / 苏 113 ms | 零丢包，微量重传 <4% |
+| 电信 | CN2GT / 163 / CTGGIA | 粤 190 / 浙 205 / 京 213 / 川 225 ms | 0~8%，北方个别波动 |
+
+- IPv4 标准包（93 靶点）：零丢包 40 个（43.0%）、轻丢包 52 个（55.9%）、严重仅 1 个（辽宁电信）
+- IPv4 1200B 大包：零重传 19 个、轻度 72 个、高重传 2 个（河北电信 / 河南移动）；联通 10099 大包稳在 0~4%
+- 最优三省：海南 87ms / 广东 88ms / 湖南 90ms
+
+## 五、受测机单线程测速
+
+[spoiler]
+**10 个测速节点明细（单位 Mbps，点开查看）**
+
+| 节点 | 回程 | 去程 | 延迟 | 丢包 |
+| --- | --- | --- | --- | --- |
+| 北京电信 | 22.2 | 15.5 | 227 ms | 4.00% |
+| 北京联通 | 21.0 | 16.6 | 200 ms | 11.00% |
+| 北京移动 | 21.2 | 13.9 | 625 ms | 14.15% |
+| 上海电信 | 1.0（骨干限速） | 0.7 | 225 ms | 10.50% |
+| 上海联通 | 19.3 | 4.4 | 209 ms | 6.99% |
+| 上海移动 | **24.5** | 14.6 | 103 ms | 9.00% |
+| 广东电信 | 18.6 | 15.4 | 206 ms | 9.42% |
+| 广东联通 | 19.8 | 15.9 | 278 ms | 7.61% |
+| 广东移动 | **23.8** | 17.4 | 121 ms | 9.53% |
+| Apple 国际 | 19.6 | 26.8 | 47 ms | **0.00%** |
+[/spoiler]
+
+## 六、受测机 IP 纯净度与解锁
+
+| 项目 | 结果 | 判定 |
+| --- | --- | --- |
+| Scamalytics | 0 分 | 极低风险，谷歌 / Stripe / PayPal 少触发验证 |
+| IP2Location | 3 分 | 低风险，正规商业机房广播 IP |
+| AbuseIPDB | 0 次举报 | 完全纯净，无扫描 / 爆破 / 垃圾邮件史 |
+| 25 端口 | 出站 Blocked | 防邻居滥发邮件拖黑整段 |
+| ChatGPT / OpenAI | 原生直连 | 原生解锁 SG，无需套 WARP |
+| Netflix / Disney+ | 原生直连 | 非自制剧可播，支持 4K HDR |
+| TikTok | 原生直连 | 刷流 / 评论正常 |
+| Reddit | 受限 | 需分流至美西或欧洲出口 |
+
+> 实测 API 延迟：OpenAI 14.12ms、Claude 18.87ms、GitHub 17.88ms、jsDelivr 6.58ms，全部 0% 重传。
+
+## 七、选型建议
+
+**① 家庭软路由出口 → VPS.Taxi 洛杉矶**
+
+- 1C 6138 单核 SHA256 310.6 MB/s，比 V.PS 双核还高
+- 同品牌亚太受测机联通 10099 全境 0 丢包、移动华南 CMIN2 88ms，可作选线参考
+- 458 MB 内存只剩 306 MB，别再塞数据库
+- AnyTLS 8443 + Reality 443 双端口容灾
+
+**② 欧洲建站 / IPv6 / 反代中继 → V.PS 阿姆斯特丹**
+
+- 原生双栈 2a0c:59c0::，直连 AMS-IX，欧洲云与 GitHub 稳定
+- 961 MB 内存余 646 MB、20 GB 磁盘，Docker 与轻量数据库都够
+- 亚太出口被 Reddit 拦时，分流到 V.PS 出口补齐
+
+## 八、本机实测：我家宽带 → 两台生产机（2026-11-13 20:20）
+
+> 口径：ICMP 为 Mac 直连实测；TCP 被本地透明代理接管，故吞吐按 SSH 单线程经代理链路测得，代表实际使用速度。
+
+**荷兰机 · V.PS（阿姆斯特丹）** — `89.106.207.247:22`，主机名 s64333
+
+- 丢包 0%（50 包），延迟 165.7 / **170.8** / 175.0 ms，抖动 2.57 ms
+- 下载 100 MB 47.0 s → **2.13 MB/s**（17 Mbps）；上传 50 MB 35.2 s → 1.42 MB/s（11.4 Mbps）
+- 回程入口 223.120.180.41 → xtom AMS
+
+**洛杉矶机 · VPS.Taxi（美国）** — `217.216.189.82:52068`，主机名 LA
+
+- 丢包 0%（50 包），延迟 136.7 / **138.7** / 141.1 ms，抖动 0.95 ms
+- 下载 100 MB 256.4 s → **0.39 MB/s**（3.1 Mbps）；上传 50 MB 127.7 s → 0.39 MB/s（3.1 Mbps）
+- 回程入口 223.120.161.6 → 94.241.161.1
+
+> 对比：延迟 **洛杉矶机（VPS.Taxi）** 更快，139 vs 171 ms；下载吞吐 **荷兰机（V.PS）** 更高，2.13 vs 0.39 MB/s。洛杉矶机上下行都卡在 0.39 MB/s，先查限速 / 拥塞。
+
+## 九、两台机器自己的回程实测（VPS → 国内）
+
+在你自己两台机器上 ping 国内三网端点，每点 20 包，反映「服务器 → 国内」回程：
+
+| 国内目标 | 荷兰机（V.PS） | 洛杉矶机（VPS.Taxi） |
+| --- | --- | --- |
+| 上海电信 202.96.209.133 | 167.1 ms / 0% | 154.8 ms / **25% 丢包** |
+| 广东联通 210.21.196.6 | 180.2 ms / 0% | 232.7 ms / 0% |
+| 广东移动 120.196.165.24 | **133.3 ms** / 0% | 156.2 ms / 0% |
+| 阿里 DNS 223.5.5.5 | **127.7 ms** / 0% | 153.9 ms / 0% |
+
+- 荷兰机回程更顺：移动 133 ms、阿里 128 ms，全部 0 丢包
+- 洛杉矶机联通 233 ms 偏高、电信 25% 丢包，与 0.39 MB/s 吞吐是同一组症状
+- ICMP 到公共 DNS 可能被限速，丢包率仅作相对参考
+
+---
+
+原始报告：[NodeQuality 体检](https://nodequality.com/r/vh72PCNJ41m3QyP2F4fi5ZoQEpbrtD08) · [TcpQuality 三网回程](https://tcpquality.ibsgss.uk/r/sT_qWrWlmH) · [Geekbench 5](https://browser.geekbench.com/v5/cpu/24804190)
+
+完整图文版：https://router-docs-sepia.vercel.app/vps-benchmark-comparison.html
+</script>
+
+<script type="text/plain" id="ns-lite">
+# V.PS vs VPS.Taxi 怎么选：先分清是哪台机器
+
+名字像、配置也接近，但本文的数据其实来自三台机器，先划清界限再谈选型。
+
+## 一、三台机器分别是谁
+
+- **荷兰机 · V.PS 生产机**：阿姆斯特丹，AS3214 xTom，2C Xeon 6133，961M 内存，原生 IPv6 2a0c:59c0::
+- **洛杉矶机 · VPS.Taxi 生产机**：洛杉矶，AS149513 Vertex，1C Xeon 6138，458M 内存，纯 IPv4
+- **第三方受测机**：VPS.Taxi 亚太，AS54801 Zillion Network Inc.（IP 报告打码为 207.56.*.*），1C EPYC 7H12 —— GB5、内存吞吐、FIO、三网回程、测速、IP 纯净度都是它的成绩
+
+> 测试方向：硬件在机器本机跑，回程与测速由中国 31 省探针 ↔ 受测机互测（回程 = 服务器 → 国内）；没有一项是从你本机发出的。
+
+## 二、3 秒分辨两台生产机
+
+- 端口 52068 = taxi，22 = vps
+- free -m 总内存 961 vs 458
+- ip -6 addr 出现 2a0c:59c0:: 一定是 V.PS
+- 一条命令：ssh vps 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'，输出 xTom 或 Vertex 一目了然
+
+## 三、生产机实测（只有这两台）
+
+- V.PS：SHA256 262.7 MB/s，物理落盘 40.3 MB/s，8 天无重启，余 646M
+- VPS.Taxi：SHA256 **310.6 MB/s**，物理落盘 39.3 MB/s，6 天无重启，余 306M
+- 两台都是 AES-NI / AVX2 / EPT，跑 AnyTLS + Reality，瓶颈在链路不在算力
+
+## 四、受测机参考数据（别套到生产机）
+
+- GB5 单核 972 / 多核 957，内存读 45,057 MB/s，FIO 4K 989 IOPS，HQ 24,399
+- 联通 10099 → 4837 全境 0 丢包；移动 CMIN2 广东 88ms；电信 CN2GT 190~225ms
+- Scamalytics 0 分，原生解锁 ChatGPT / Netflix / Disney+ / TikTok，Reddit 受限
+
+## 五、怎么选
+
+- 日常出海、流媒体、AI → VPS.Taxi 洛杉矶，内存别塞满
+- 建站、IPv6、反代备援 → V.PS 阿姆斯特丹
+- 两台都做显式分流，别把受测机成绩当成自家机器的表现
+
+## 六、我家宽带到两台机的实测（2026-11-13 20:20）
+
+**荷兰机 · V.PS（阿姆斯特丹）** — `89.106.207.247:22`
+
+- 丢包 0%（50 包），平均延迟 **170.8 ms**，抖动 2.57 ms
+- 下载 100 MB → **2.13 MB/s**（17 Mbps）；上传 50 MB → 1.42 MB/s（11.4 Mbps）
+
+**洛杉矶机 · VPS.Taxi（美国）** — `217.216.189.82:52068`
+
+- 丢包 0%（50 包），平均延迟 **138.7 ms**，抖动 0.95 ms
+- 下载 100 MB → **0.39 MB/s**（3.1 Mbps）；上传 50 MB → 0.39 MB/s（3.1 Mbps）
+
+> 延迟洛杉矶机（VPS.Taxi）更快，139 vs 171 ms；下载吞吐荷兰机（V.PS）更高，2.13 vs 0.39 MB/s。洛杉矶机上下行都卡 0.39 MB/s，建议先排查限速。
+
+## 七、两台机器自己的回程（VPS → 国内，20 包）
+
+- 荷兰机（V.PS）：上海电信 167 ms / 0%，广东联通 180 ms / 0%，广东移动 **133 ms** / 0%
+- 洛杉矶机（VPS.Taxi）：上海电信 155 ms / **25% 丢包**，广东联通 233 ms / 0%，广东移动 156 ms / 0%
+- 结论：荷兰机回程更顺；洛杉矶机回程偏慢且有丢包，和 0.39 MB/s 是同一组症状
+
+完整横评（含全部表格）：https://router-docs-sepia.vercel.app/vps-benchmark-comparison.html
+</script>
+
+<script>
+(function () {
+  var fullEl = document.getElementById('ns-full');
+  var liteEl = document.getElementById('ns-lite');
+  var preview = document.getElementById('ns-preview');
+  var meta = document.getElementById('ns-meta');
+  var toastEl = document.getElementById('ns-toast');
+  if (!fullEl || !preview) return;
+
+  var docs = {
+    full: fullEl.textContent.replace(/^\n+/, '').replace(/\s+$/, ''),
+    lite: liteEl.textContent.replace(/^\n+/, '').replace(/\s+$/, '')
+  };
+  var names = { full: 'vps-taxi-vs-vps-nodeseek-full.md', lite: 'vps-taxi-vs-vps-nodeseek-lite.md' };
+  var current = 'full';
+  var toastTimer;
+
+  function render() {
+    preview.textContent = docs[current];
+    meta.textContent = docs[current].length + ' 字符 · ' + docs[current].split('\n').length + ' 行';
+  }
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function copyCurrent() {
+    var text = docs[current];
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast('已复制 ' + text.length + ' 字符，去 NodeSeek 直接粘贴');
+      }, function () {
+        toast(fallbackCopy(text) ? '已复制，去 NodeSeek 直接粘贴' : '复制失败，请手动全选下方文本');
+      });
+    } else {
+      toast(fallbackCopy(text) ? '已复制，去 NodeSeek 直接粘贴' : '复制失败，请手动全选下方文本');
+    }
+  }
+
+  function download() {
+    var blob = new Blob([docs[current]], { type: 'text/markdown;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = names[current];
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    toast('已导出 ' + names[current]);
+  }
+
+  function activate(name) {
+    current = name;
+    Array.prototype.forEach.call(document.querySelectorAll('.ns-tab'), function (t) {
+      var on = t.getAttribute('data-ns') === name;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.ns-tab'), function (tab) {
+    tab.addEventListener('click', function () { activate(tab.getAttribute('data-ns')); });
+  });
+
+  document.getElementById('ns-copy').addEventListener('click', copyCurrent);
+  document.getElementById('ns-download').addEventListener('click', download);
+  document.getElementById('ns-float').addEventListener('click', function () {
+    activate('full');
+    copyCurrent();
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
