@@ -116,6 +116,15 @@ td.taxi{background:rgba(245,166,35,.035)}
 .id-card h4{font-size:13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .id-card h4 span{font:700 11px var(--mono);color:var(--text3)}
 .id-card .metric-row{font-size:12.5px}
+.node-head{display:flex;align-items:center;gap:10px;padding:13px 16px;margin:-16px -18px 14px;border-bottom:1px solid var(--border2)}
+.id-card.vps .node-head{background:linear-gradient(90deg,rgba(79,142,247,.18),rgba(79,142,247,.04))}
+.id-card.taxi .node-head{background:linear-gradient(90deg,rgba(245,166,35,.18),rgba(245,166,35,.04))}
+.node-head strong{font-size:17px;font-weight:800;letter-spacing:.01em}
+.node-badge{padding:3px 9px;border-radius:6px;font:800 12px var(--mono);white-space:nowrap}
+.node-badge.vps{background:rgba(79,142,247,.22);color:#c3daff;border:1px solid rgba(79,142,247,.55)}
+.node-badge.taxi{background:rgba(245,166,35,.22);color:#ffdca8;border:1px solid rgba(245,166,35,.55)}
+.node-host{margin-left:auto;font:600 10.5px var(--mono);color:var(--text3);white-space:nowrap}
+@media (max-width:480px){.node-head strong{font-size:15px}.node-host{display:none}}
 
 .report-links{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
 .report-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font:600 12px var(--sans);transition:all .2s}
@@ -187,8 +196,8 @@ footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color
 
     <div class="owner-bar">
       <strong>数据归属（先看这个）</strong><br>
-      ▸ <b class="vps">生产机 A · V.PS</b>：阿姆斯特丹，<code>AS3214 xTom</code>，2C Xeon 6133，961 MB，原生 IPv6。<br>
-      ▸ <b class="taxi">生产机 B · VPS.Taxi</b>：洛杉矶，<code>AS149513 Vertex</code>，1C Xeon 6138，458 MB，纯 IPv4。<br>
+      ▸ <b class="vps">生产机 A · V.PS（荷兰机）</b>：阿姆斯特丹，<code>AS3214 xTom</code>，2C Xeon 6133，961 MB，原生 IPv6。<br>
+      ▸ <b class="taxi">生产机 B · VPS.Taxi（洛杉矶机）</b>：洛杉矶，<code>AS149513 Vertex</code>，1C Xeon 6138，458 MB，纯 IPv4。<br>
       ▸ <b>第三方受测机</b>：VPS.Taxi 亚太节点，<code>AS54801 Zillion Network Inc.</code>（IP 报告打码为 <code>207.56.*.*</code>），1C EPYC 7H12 —— GB5、内存吞吐、FIO、三网回程、单线程测速、IP 纯净度与解锁全部出自这台，<b>不代表上面两台生产机</b>。<br>
       ▸ <b>测试方向</b>：硬件类在机器本机跑；回程与测速由中国 31 省探针 ↔ 受测机互测。<b>没有一项是从你本机发出的</b>。
       <div class="legend">
@@ -247,8 +256,8 @@ footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color
         <thead>
           <tr>
             <th>指标</th>
-            <th class="vps">V.PS · 阿姆斯特丹</th>
-            <th class="taxi">VPS.Taxi · 洛杉矶</th>
+            <th class="vps">V.PS · 荷兰机（AMS）</th>
+            <th class="taxi">VPS.Taxi · 洛杉矶机（LAX）</th>
           </tr>
         </thead>
         <tbody>
@@ -586,13 +595,18 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
       <span class="section-kicker">Home Broadband Test · 2026-11-13 20:20</span>
     </div>
     <p class="table-note">
-      测试点：家里宽带（中国移动，经 ImmortalWrt 网关）→ 两台机器各测一遍，下面两张卡片分开写，别混着看。<br>
+      测试点：家里宽带（中国移动，经 ImmortalWrt 网关）→ 两台机器各测一遍。<br>
+      对照方式：<b style="color:#9cc2ff">蓝色卡 = 荷兰机（V.PS）</b>，<b style="color:#ffcf8b">橙色卡 = 洛杉矶机（VPS.Taxi）</b>。<br>
       口径：<b>ICMP 为直连实测</b>；TCP 被本地透明代理接管，所以吞吐按 <b>SSH 单线程经代理链路</b>测得。
     </p>
 
     <div class="id-grid">
       <div class="id-card vps">
-        <h4>🇳🇱 V.PS · 荷兰 · 阿姆斯特丹 <span>s64333</span></h4>
+        <div class="node-head">
+          <span class="node-badge vps">V.PS</span>
+          <strong>荷兰机 · 阿姆斯特丹</strong>
+          <span class="node-host">AMS · s64333</span>
+        </div>
         <div class="metric-row"><span class="metric-name">IP / SSH 端口</span><span class="metric-val">89.106.207.247 : 22</span></div>
         <div class="metric-row"><span class="metric-name">ICMP 丢包（50 包）</span><span class="metric-val" style="color:var(--green)">0.0%</span></div>
         <div class="metric-row"><span class="metric-name">延迟 min / avg / max</span><span class="metric-val">165.7 / <b>170.8</b> / 175.0 ms</span></div>
@@ -603,7 +617,11 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
       </div>
 
       <div class="id-card taxi">
-        <h4>🇺🇸 VPS.Taxi · 美国 · 洛杉矶 <span>LA</span></h4>
+        <div class="node-head">
+          <span class="node-badge taxi">VPS.Taxi</span>
+          <strong>洛杉矶机 · 美国</strong>
+          <span class="node-host">LAX · LA</span>
+        </div>
         <div class="metric-row"><span class="metric-name">IP / SSH 端口</span><span class="metric-val">217.216.189.82 : 52068</span></div>
         <div class="metric-row"><span class="metric-name">ICMP 丢包（50 包）</span><span class="metric-val" style="color:var(--green)">0.0%</span></div>
         <div class="metric-row"><span class="metric-name">延迟 min / avg / max</span><span class="metric-val">136.7 / <b>138.7</b> / 141.1 ms</span></div>
@@ -615,10 +633,10 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
     </div>
 
     <div class="quote-box" style="margin-top:18px">
-      <strong>一句话对比：</strong> 延迟是 <b>洛杉矶（VPS.Taxi）</b> 更快 —— 139 ms vs 荷兰（V.PS）171 ms；下载吞吐是 <b>荷兰（V.PS）</b> 更高 —— 2.13 MB/s vs 洛杉矶 0.39 MB/s，快 5.5 倍。
+      <strong>一句话对比：</strong> 延迟是 <b style="color:#ffcf8b">洛杉矶机（VPS.Taxi）</b> 更快 —— 139 ms vs <b style="color:#9cc2ff">荷兰机（V.PS）</b> 171 ms；下载吞吐是 <b style="color:#9cc2ff">荷兰机（V.PS）</b> 更高 —— 2.13 MB/s vs 洛杉矶机 0.39 MB/s，快 5.5 倍。
     </div>
     <div class="quote-box warn">
-      <strong>待复核：</strong> 洛杉矶（VPS.Taxi）上下行都卡在 0.39 MB/s，建议先在机器上跑 <code>iperf3 -s</code> 或看 <code>tc qdisc</code>，排除限速与单线程 SSH 双重加密的影响。
+      <strong>待复核：</strong> 洛杉矶机（VPS.Taxi）上下行都卡在 0.39 MB/s，建议先在机器上跑 <code>iperf3 -s</code> 或看 <code>tc qdisc</code>，排除限速与单线程 SSH 双重加密的影响。
     </div>
   </section>
 
@@ -777,19 +795,19 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 
 > 口径：ICMP 为 Mac 直连实测；TCP 被本地透明代理接管，故吞吐按 SSH 单线程经代理链路测得，代表实际使用速度。
 
-**🇳🇱 V.PS · 荷兰 · 阿姆斯特丹**（89.106.207.247:22，主机名 s64333）
+**荷兰机 · V.PS（阿姆斯特丹）** — `89.106.207.247:22`，主机名 s64333
 
 - 丢包 0%（50 包），延迟 165.7 / **170.8** / 175.0 ms，抖动 2.57 ms
 - 下载 100 MB 47.0 s → **2.13 MB/s**（17 Mbps）；上传 50 MB 35.2 s → 1.42 MB/s（11.4 Mbps）
 - 回程入口 223.120.180.41 → xtom AMS
 
-**🇺🇸 VPS.Taxi · 美国 · 洛杉矶**（217.216.189.82:52068，主机名 LA）
+**洛杉矶机 · VPS.Taxi（美国）** — `217.216.189.82:52068`，主机名 LA
 
 - 丢包 0%（50 包），延迟 136.7 / **138.7** / 141.1 ms，抖动 0.95 ms
 - 下载 100 MB 256.4 s → **0.39 MB/s**（3.1 Mbps）；上传 50 MB 127.7 s → 0.39 MB/s（3.1 Mbps）
 - 回程入口 223.120.161.6 → 94.241.161.1
 
-> 对比：延迟 **洛杉矶（VPS.Taxi）** 更快，139 vs 171 ms；下载吞吐 **荷兰（V.PS）** 更高，2.13 vs 0.39 MB/s。洛杉矶上下行都卡在 0.39 MB/s，先查限速 / 拥塞。
+> 对比：延迟 **洛杉矶机（VPS.Taxi）** 更快，139 vs 171 ms；下载吞吐 **荷兰机（V.PS）** 更高，2.13 vs 0.39 MB/s。洛杉矶机上下行都卡在 0.39 MB/s，先查限速 / 拥塞。
 
 ---
 
@@ -805,8 +823,8 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 
 ## 一、三台机器分别是谁
 
-- **V.PS 生产机**：阿姆斯特丹，AS3214 xTom，2C Xeon 6133，961M 内存，原生 IPv6 2a0c:59c0::
-- **VPS.Taxi 生产机**：洛杉矶，AS149513 Vertex，1C Xeon 6138，458M 内存，纯 IPv4
+- **荷兰机 · V.PS 生产机**：阿姆斯特丹，AS3214 xTom，2C Xeon 6133，961M 内存，原生 IPv6 2a0c:59c0::
+- **洛杉矶机 · VPS.Taxi 生产机**：洛杉矶，AS149513 Vertex，1C Xeon 6138，458M 内存，纯 IPv4
 - **第三方受测机**：VPS.Taxi 亚太，AS54801 Zillion Network Inc.（IP 报告打码为 207.56.*.*），1C EPYC 7H12 —— GB5、内存吞吐、FIO、三网回程、测速、IP 纯净度都是它的成绩
 
 > 测试方向：硬件在机器本机跑，回程与测速由中国 31 省探针 ↔ 受测机互测（回程 = 服务器 → 国内）；没有一项是从你本机发出的。
@@ -838,17 +856,17 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 
 ## 六、我家宽带到两台机的实测（2026-11-13 20:20）
 
-**🇳🇱 V.PS · 荷兰 · 阿姆斯特丹**（89.106.207.247:22）
+**荷兰机 · V.PS（阿姆斯特丹）** — `89.106.207.247:22`
 
 - 丢包 0%（50 包），平均延迟 **170.8 ms**，抖动 2.57 ms
 - 下载 100 MB → **2.13 MB/s**（17 Mbps）；上传 50 MB → 1.42 MB/s（11.4 Mbps）
 
-**🇺🇸 VPS.Taxi · 美国 · 洛杉矶**（217.216.189.82:52068）
+**洛杉矶机 · VPS.Taxi（美国）** — `217.216.189.82:52068`
 
 - 丢包 0%（50 包），平均延迟 **138.7 ms**，抖动 0.95 ms
 - 下载 100 MB → **0.39 MB/s**（3.1 Mbps）；上传 50 MB → 0.39 MB/s（3.1 Mbps）
 
-> 延迟洛杉矶（VPS.Taxi）更快，139 vs 171 ms；下载吞吐荷兰（V.PS）更高，2.13 vs 0.39 MB/s。洛杉矶上下行都卡 0.39 MB/s，建议先排查限速。
+> 延迟洛杉矶机（VPS.Taxi）更快，139 vs 171 ms；下载吞吐荷兰机（V.PS）更高，2.13 vs 0.39 MB/s。洛杉矶机上下行都卡 0.39 MB/s，建议先排查限速。
 
 完整横评（含全部表格）：https://router-docs-sepia.vercel.app/vps-benchmark-comparison.html
 </script>
