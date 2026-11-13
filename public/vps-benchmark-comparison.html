@@ -172,6 +172,7 @@ footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color
     <a href="#speed">单线程测速</a>
     <a href="#unlock">IP 与解锁</a>
     <a href="#recommendation">选型建议</a>
+    <a href="#local">本机实测</a>
     <a href="#nodeseek">NodeSeek 格式</a>
   </div>
 </nav>
@@ -578,10 +579,63 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
     </div>
   </section>
 
-  <!-- SECTION 8: NodeSeek 格式导出 -->
+  <!-- SECTION 8: 本机实测 -->
+  <section id="local">
+    <div class="section-head">
+      <h2>八、本机实测：我的宽带 → 两台生产机</h2>
+      <span class="section-kicker">Home Broadband Test · 2026-11-13 20:20</span>
+    </div>
+    <p class="table-note">
+      测试点：家里宽带（中国移动，经 ImmortalWrt 网关，Mac 直连测 ICMP）→ 两台生产机。<br>
+      口径说明：<b>ICMP 为直连实测</b>；TCP 被本地透明代理接管（连关闭端口都能 5 ms 握手），所以不列 TCP RTT，吞吐按 <b>SSH 单线程经代理链路</b>测得，代表你实际使用时能拿到的速度。
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>指标</th>
+            <th class="vps">V.PS · 阿姆斯特丹</th>
+            <th class="taxi">VPS.Taxi · 洛杉矶</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>ICMP 丢包（50 包）</strong></td><td class="vps"><span class="badge green">0.0%</span></td><td class="taxi"><span class="badge green">0.0%</span></td></tr>
+          <tr><td><strong>ICMP 延迟 min / avg / max</strong></td><td class="vps">165.7 / <strong>170.8</strong> / 175.0 ms</td><td class="taxi">136.7 / <strong>138.7</strong> / 141.1 ms</td></tr>
+          <tr><td><strong>抖动 (stddev)</strong></td><td class="vps">2.57 ms</td><td class="taxi">0.95 ms</td></tr>
+          <tr><td><strong>下载 100 MB（SSH 单线程）</strong></td><td class="vps">47.0 s → <strong>2.13 MB/s</strong>（17.0 Mbps）</td><td class="taxi">256.4 s → <strong>0.39 MB/s</strong>（3.1 Mbps）</td></tr>
+          <tr><td><strong>上传 50 MB（SSH 单线程）</strong></td><td class="vps">35.2 s → <strong>1.42 MB/s</strong>（11.4 Mbps）</td><td class="taxi">127.7 s → <strong>0.39 MB/s</strong>（3.1 Mbps）</td></tr>
+          <tr><td><strong>回程入口</strong></td><td class="vps"><code>223.120.180.41</code> → <code>a2.waves.cr01.ams01.xtom.nl</code></td><td class="taxi"><code>223.120.161.6</code> → <code>94.241.161.1</code></td></tr>
+          <tr><td><strong>主机名 / 已运行</strong></td><td class="vps"><code>s64333</code> / 8 天</td><td class="taxi"><code>LA</code> / 6 天</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-grid">
+      <div class="panel-card">
+        <h3>去程路径（本机 → 目标）<span class="badge blue">中国移动</span></h3>
+        <div class="metric-row"><span class="metric-name">V.PS 关键跳</span><span class="metric-val">221.183.92.142 33ms → 223.120.180.41 165ms → xtom AMS 158ms</span></div>
+        <div class="metric-row"><span class="metric-name">VPS.Taxi 关键跳</span><span class="metric-val">221.183.92.122 12ms → 223.120.161.6 147ms → 94.241.161.1 → LAX 139ms</span></div>
+        <div class="metric-row"><span class="metric-name">共同前段</span><span class="metric-val">192.168.1.1 → 10.187.0.1（移动接入）</span></div>
+      </div>
+      <div class="panel-card">
+        <h3>怎么读这组数据<span class="badge amber">结论</span></h3>
+        <div class="metric-row"><span class="metric-name">延迟</span><span class="metric-val" style="color:var(--taxi)">taxi 快 32ms（139 vs 171）</span></div>
+        <div class="metric-row"><span class="metric-name">吞吐</span><span class="metric-val" style="color:var(--vps)">V.PS 快 5.5 倍（2.13 vs 0.39 MB/s）</span></div>
+        <div class="metric-row"><span class="metric-name">稳定性</span><span class="metric-val">两台 0 丢包，taxi 抖动更小</span></div>
+        <div class="metric-row"><span class="metric-name">待复核</span><span class="metric-val">taxi 吞吐异常低，查节点限速/拥塞</span></div>
+      </div>
+    </div>
+
+    <div class="quote-box warn">
+      <strong>说明：</strong> 这组数字来自你家里的宽带，和第三～七节的受测机数据不是同一口径，别混着比。taxi 的 0.39 MB/s 明显偏低，建议先在 VPS 上跑 <code>iperf3 -s</code> 或看 <code>tc qdisc</code>，排除单线程 SSH + 双重加密的影响。
+    </div>
+  </section>
+
+  <!-- SECTION 9: NodeSeek 格式导出 -->
   <section id="nodeseek">
     <div class="section-head">
-      <h2>八、NodeSeek 发帖格式（一键复制）</h2>
+      <h2>九、NodeSeek 发帖格式（一键复制）</h2>
       <span class="section-kicker">NodeSeek Markdown Export</span>
     </div>
     <p style="color:var(--text2);margin-bottom:18px;">
@@ -729,6 +783,23 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 - 961 MB 内存余 646 MB、20 GB 磁盘，Docker 与轻量数据库都够
 - 亚太出口被 Reddit 拦时，分流到 V.PS 出口补齐
 
+## 八、本机实测：我家宽带 → 两台生产机（2026-11-13 20:20）
+
+> 口径：ICMP 为 Mac 直连实测；TCP 被本地透明代理接管，故吞吐按 SSH 单线程经代理链路测得，代表实际使用速度。
+
+| 指标 | V.PS 阿姆斯特丹 | VPS.Taxi 洛杉矶 |
+| --- | --- | --- |
+| ICMP 丢包（50 包） | 0% | 0% |
+| ICMP min / avg / max | 165.7 / **170.8** / 175.0 ms | 136.7 / **138.7** / 141.1 ms |
+| 抖动 stddev | 2.57 ms | 0.95 ms |
+| 下载 100 MB | 47.0 s → **2.13 MB/s**（17 Mbps） | 256.4 s → **0.39 MB/s**（3.1 Mbps） |
+| 上传 50 MB | 35.2 s → **1.42 MB/s**（11.4 Mbps） | 127.7 s → **0.39 MB/s**（3.1 Mbps） |
+| 回程入口 | 223.120.180.41 → xtom AMS | 223.120.161.6 → 94.241.161.1 |
+
+- 去程走中国移动：221.183.x → 223.120.x 国际段，两台 0 丢包
+- 延迟 taxi 低 32ms，但吞吐 V.PS 快 5.5 倍
+- taxi 的 0.39 MB/s 偏低，建议先排除节点限速 / 拥塞，再下结论
+
 ---
 
 原始报告：[NodeQuality 体检](https://nodequality.com/r/vh72PCNJ41m3QyP2F4fi5ZoQEpbrtD08) · [TcpQuality 三网回程](https://tcpquality.ibsgss.uk/r/sT_qWrWlmH) · [Geekbench 5](https://browser.geekbench.com/v5/cpu/24804190)
@@ -773,6 +844,12 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 - 日常出海、流媒体、AI → VPS.Taxi 洛杉矶，内存别塞满
 - 建站、IPv6、反代备援 → V.PS 阿姆斯特丹
 - 两台都做显式分流，别把受测机成绩当成自家机器的表现
+
+## 六、我家宽带到两台机的实测（2026-11-13 20:20）
+
+- 中国移动出口，两台 ICMP 50 包 **0% 丢包**：V.PS 平均 170.8ms，taxi 平均 138.7ms
+- SSH 单线程吞吐：V.PS 下载 2.13 MB/s、上传 1.42 MB/s；taxi 上下行均 0.39 MB/s
+- 延迟 taxi 更低，吞吐 V.PS 快 5.5 倍；taxi 那 0.39 MB/s 建议先排查限速/拥塞
 
 完整横评（含全部表格）：https://router-docs-sepia.vercel.app/vps-benchmark-comparison.html
 </script>
