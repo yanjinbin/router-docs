@@ -5,9 +5,9 @@ const withBase = (path) => `${basePath}${path}`
 
 const docs = [
   {
-    title: 'V.PS vs VPS.Taxi 深度 Benchmark 横评',
-    subtitle: 'NodeQuality · TcpQuality · 31省市三网回程 · 硬件算力 · NodeSeek 格式一键导出',
-    desc: '基于 NodeQuality 综合体检、TcpQuality 31 省市三网回程与现网实测：AMD 7H12 / Xeon 算力对标、联通 10099 全境零丢包、移动 CMIN2 华南 88ms、Scamalytics 0分极低风险、TikTok/Netflix/ChatGPT 原生解锁',
+    title: 'V.PS vs VPS.Taxi 实测横评',
+    subtitle: '两台生产机 + 第三方受测机 · 数据归属逐项标注 · NodeSeek 格式导出',
+    desc: 'V.PS 阿姆斯特丹（AS3214 xTom，2C 6133）与 VPS.Taxi 洛杉矶（AS149513 Vertex，1C 6138）两台生产机实机对照，另附 NodeQuality 受测机（VPS.Taxi 亚太新加坡，EPYC 7H12）的 GB5 / 内存吞吐 / 三网回程 / 解锁数据，并给出 SSH 别名、端口、ASN、内存与 IPv6 指纹，避免把三台机器混读',
     href: '/vps-benchmark-comparison.html',
     tag: '横评',
     tagColor: '#f5a623',
