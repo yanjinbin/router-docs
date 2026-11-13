@@ -188,7 +188,8 @@ footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color
       <strong>数据归属（先看这个）</strong><br>
       ▸ <b class="vps">生产机 A · V.PS</b>：阿姆斯特丹，<code>AS3214 xTom</code>，2C Xeon 6133，961 MB，原生 IPv6。<br>
       ▸ <b class="taxi">生产机 B · VPS.Taxi</b>：洛杉矶，<code>AS149513 Vertex</code>，1C Xeon 6138，458 MB，纯 IPv4。<br>
-      ▸ <b>第三方受测机</b>：VPS.Taxi 亚太新加坡，<code>AS18186 Nebula</code>，1C EPYC 7H12 —— GB5、内存吞吐、FIO、三网回程、单线程测速、IP 纯净度与解锁全部出自这台，<b>不代表上面两台生产机</b>。
+      ▸ <b>第三方受测机</b>：VPS.Taxi 亚太节点，<code>AS54801 Zillion Network Inc.</code>（IP 报告打码为 <code>207.56.*.*</code>），1C EPYC 7H12 —— GB5、内存吞吐、FIO、三网回程、单线程测速、IP 纯净度与解锁全部出自这台，<b>不代表上面两台生产机</b>。<br>
+      ▸ <b>测试方向</b>：硬件类在机器本机跑；回程与测速由中国 31 省探针 ↔ 受测机互测。<b>没有一项是从你本机发出的</b>。
       <div class="legend">
         <span class="chip vps">V.PS · 蓝</span>
         <span class="chip taxi">VPS.Taxi · 橙</span>
@@ -339,7 +340,22 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
       <span class="section-kicker">Third-Party Benchmark Node</span>
     </div>
     <div class="bench-block">
-      <div class="bench-label">⚠️ <b>数据归属：</b>NodeQuality 受测机 · VPS.Taxi 亚太新加坡（<code>AS18186 Nebula</code>，1C EPYC 7H12）—— 不是上面两台生产机</div>
+      <div class="bench-label">⚠️ <b>数据归属：</b>NodeQuality 受测机 · VPS.Taxi 亚太（<code>AS54801 Zillion Network Inc.</code>，1C EPYC 7H12）—— 不是上面两台生产机</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th class="bm">项目</th><th class="bm">受测机信息</th><th class="bm">来源 / 说明</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>ASN</strong></td><td><code>AS54801 Zillion Network Inc.</code></td><td>TcpQuality 报告头部实测值</td></tr>
+            <tr><td><strong>IP 地址</strong></td><td><code>207.56.*.*</code>（报告打码）</td><td>完整 IP 仅报告作者可见</td></tr>
+            <tr><td><strong>区域</strong></td><td>亚太 · 新加坡（原记录）</td><td>报告未标注城市，仅显示 ASN</td></tr>
+            <tr><td><strong>规格</strong></td><td>1 vCPU EPYC 7H12 · 967 MB · 46 GB</td><td>硬件明细见下方两张卡片</td></tr>
+            <tr><td><strong>原始报告</strong></td><td><a href="https://tcpquality.ibsgss.uk/r/sT_qWrWlmH" target="_blank" rel="noopener">TcpQuality ↗</a> · <a href="https://nodequality.com/r/vh72PCNJ41m3QyP2F4fi5ZoQEpbrtD08" target="_blank" rel="noopener">NodeQuality ↗</a></td><td>地址与归属以报告为准</td></tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="card-grid">
         <div class="panel-card">
@@ -377,7 +393,10 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
       <h2>四、三网回程与大包抗压</h2>
       <span class="section-kicker">TcpQuality · Benchmark Node</span>
     </div>
-    <p class="table-note">数据归属：<b>TcpQuality 受测机</b>（VPS.Taxi 亚太新加坡）对全国 31 省市三大运营商的标准 SYN 探测 + 1200B 大包压力测试。</p>
+    <p class="table-note">
+      数据归属：<b>TcpQuality 受测机</b>（<code>AS54801 Zillion Network</code>，IP <code>207.56.*.*</code>），对全国 31 省市三大运营商做标准 SYN 探测 + 1200B 大包压力测试。<br>
+      测试方向：<b>中国 31 省探针 ↔ 受测机</b>，回程 = 服务器 → 国内，去程 = 国内 → 服务器；探针是分布在全国的节点，<b>不是你的电脑</b>。
+    </p>
 
     <div class="table-wrap">
       <table>
@@ -440,7 +459,10 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
       <h2>五、单线程测速与国际互联</h2>
       <span class="section-kicker">Benchmark Node Throughput</span>
     </div>
-    <p class="table-note">数据归属：<b>TcpQuality 受测机</b>（同上）。生产机未做同口径测速，勿直接套用。</p>
+    <p class="table-note">
+      数据归属：<b>TcpQuality 受测机</b>（同上，<code>AS54801</code>）。<br>
+      测试方向：由国内测速节点与受测机互测，回程列 = 服务器 → 国内下行，去程列 = 国内 → 服务器上行；生产机未做同口径测速，勿直接套用。
+    </p>
 
     <div class="table-wrap">
       <table>
@@ -595,7 +617,9 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 <script type="text/plain" id="ns-full">
 # V.PS vs VPS.Taxi 实测横评：两台生产机 + 一台第三方受测机
 
-> 先说数据归属，不然一定看错：**生产机** = V.PS 阿姆斯特丹（AS3214 xTom，2C 6133，961M）与 VPS.Taxi 洛杉矶（AS149513 Vertex，1C 6138，458M），两台都在跑 sing-box；**受测机** = NodeQuality / TcpQuality 的第三方机器（VPS.Taxi 亚太新加坡，AS18186 Nebula），GB5、内存吞吐、FIO、三网回程、测速、IP 纯净度全部出自它。
+> 先说数据归属，不然一定看错：**生产机** = V.PS 阿姆斯特丹（AS3214 xTom，2C 6133，961M）与 VPS.Taxi 洛杉矶（AS149513 Vertex，1C 6138，458M），两台都在跑 sing-box；**受测机** = NodeQuality / TcpQuality 的第三方机器（VPS.Taxi 亚太，AS54801 Zillion Network Inc.，IP 报告打码为 207.56.*.*），GB5、内存吞吐、FIO、三网回程、测速、IP 纯净度全部出自它。
+
+**测试方向**：硬件类在机器本机跑；回程与测速由中国 31 省探针 ↔ 受测机互测（回程 = 服务器 → 国内，去程 = 国内 → 服务器）。没有一项是从本机电脑发出的。
 
 **一句话结论**：家宽出海优先 VPS.Taxi 洛杉矶；欧洲建站、IPv6 双栈选 V.PS 阿姆斯特丹。
 
@@ -634,6 +658,7 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 
 ## 三、第三方受测机（NodeQuality）硬件
 
+- 归属：**AS54801 Zillion Network Inc.**，IP `207.56.*.*`（报告打码），区域按原记录为亚太 / 新加坡，报告本身只给 ASN
 - 1 vCPU EPYC 7H12、967 MB + 3.8 GB Swap、46 GB LVM、单栈 IPv4、Linux 6.12.43
 - GB5 单核 **972** / 多核 957；Sysbench 单线程 1555.01；HQ 24,399（TOP 3.5%）
 - 内存读 **45,057 MB/s**、写 20,481.8 MB/s、延迟 161 ns
@@ -642,6 +667,8 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 > 以上全部是受测机成绩，别拿它给 V.PS 或洛杉矶机贴标签。
 
 ## 四、受测机三网回程与大包
+
+> 测试方向：中国 31 省探针 ↔ 受测机，回程 = 服务器 → 国内，去程 = 国内 → 服务器；探针不是你的电脑。
 
 | 运营商 | 回程路径 | 代表延迟 | 丢包 / 重传 |
 | --- | --- | --- | --- |
@@ -718,7 +745,9 @@ ssh taxi 'lscpu | grep "Model name"; free -m | sed -n 2p; curl -s ipinfo.io/org'
 
 - **V.PS 生产机**：阿姆斯特丹，AS3214 xTom，2C Xeon 6133，961M 内存，原生 IPv6 2a0c:59c0::
 - **VPS.Taxi 生产机**：洛杉矶，AS149513 Vertex，1C Xeon 6138，458M 内存，纯 IPv4
-- **第三方受测机**：VPS.Taxi 亚太新加坡，AS18186 Nebula，1C EPYC 7H12 —— GB5、内存吞吐、FIO、三网回程、测速、IP 纯净度都是它的成绩
+- **第三方受测机**：VPS.Taxi 亚太，AS54801 Zillion Network Inc.（IP 报告打码为 207.56.*.*），1C EPYC 7H12 —— GB5、内存吞吐、FIO、三网回程、测速、IP 纯净度都是它的成绩
+
+> 测试方向：硬件在机器本机跑，回程与测速由中国 31 省探针 ↔ 受测机互测（回程 = 服务器 → 国内）；没有一项是从你本机发出的。
 
 ## 二、3 秒分辨两台生产机
 
