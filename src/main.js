@@ -5,6 +5,14 @@ const withBase = (path) => `${basePath}${path}`
 
 const docs = [
   {
+    title: 'R5C 出境线路实测 · USA / NL 去回程对照',
+    subtitle: 'CMIN2 双向对称 vs v4 阻断 + v6 绕行',
+    desc: '从家里 R5C（移动浙江 PPPoE）分别到 VPS.Taxi.USA 与 V.PS：双向 traceroute/mtr、逐跳 AS 标注、延迟与丢包、8 个节点可用性，判定是否绕路，并给出 CMIN2 与普通 CMI 的 AS 判定口径',
+    href: '/r5c-route-reports.html',
+    tag: '实测',
+    tagColor: '#f5a623',
+  },
+  {
     title: 'V.PS vs VPS.Taxi 实测横评',
     subtitle: '两台生产机 + 第三方受测机 · 数据归属逐项标注 · NodeSeek 格式导出',
     desc: 'V.PS 阿姆斯特丹（AS3214 xTom，2C 6133）与 VPS.Taxi 洛杉矶（AS149513 Vertex，1C 6138）两台生产机实机对照，另附 NodeQuality 受测机（VPS.Taxi 亚太新加坡，EPYC 7H12）的 GB5 / 内存吞吐 / 三网回程 / 解锁数据，并给出 SSH 别名、端口、ASN、内存与 IPv6 指纹，避免把三台机器混读',

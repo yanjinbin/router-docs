@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R5C 出境线路实测 · VPS.Taxi.USA vs V.PS · 去程回程对照</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181c25;--bg3:#1e2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf0;--text2:#9aa0b4;--text3:#5f6680;
+  --accent:#4f8ef7;--green:#3dd68c;--amber:#f5a623;--red:#f06060;--purple:#c084fc;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:52px;gap:10px}
+.nav-home{font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:5px 12px;background:#4f8ef7;border-radius:6px;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.nav-home:hover{opacity:.8}
+.nav-brand{font-size:13px;font-weight:600;color:var(--text);margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-brand span{color:var(--accent)}
+.nav-links{display:flex;gap:0;overflow-x:auto;margin-left:auto;flex-shrink:0}
+.nav-links a{font-size:12px;color:var(--text2);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.nav-links a:hover{color:var(--text);border-bottom-color:var(--accent)}
+
+.wrap{max-width:1020px;margin:0 auto;padding:0 24px 80px}
+.hero{padding:48px 0 28px}
+.hero-tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero h1{font-size:clamp(20px,3.5vw,30px);font-weight:700;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:13px;color:var(--text2);max-width:720px}
+
+.section{margin-bottom:44px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.section-title{font-size:15px;font-weight:600}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;vertical-align:middle}
+.badge-blue{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-green{background:rgba(61,214,140,.12);color:var(--green)}
+.badge-amber{background:rgba(245,166,35,.12);color:var(--amber)}
+.badge-red{background:rgba(240,96,96,.12);color:var(--red)}
+
+.alert{display:flex;gap:10px;align-items:flex-start;padding:.9rem 1.1rem;border-radius:8px;font-size:12px;line-height:1.7;margin:0 0 20px}
+.alert-blue{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.25)}
+.alert-amber{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25)}
+.alert-green{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.25)}
+.alert-red{background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.25)}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.card-sub{font-size:12px;color:var(--text2);margin-bottom:12px}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0 4px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);font-weight:600}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.ok{color:var(--green);font-weight:600}
+.bad{color:var(--red);font-weight:600}
+.warn{color:var(--amber);font-weight:600}
+
+pre.hops{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:11.5px;line-height:1.55;color:#c8cede;margin:10px 0 4px}
+pre.hops .dim{color:var(--text3)}
+.note{font-size:11.5px;color:var(--text3);margin-top:8px}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 14px;font-size:12.5px}
+.kv dt{color:var(--text3)}
+.kv dd{color:var(--text)}
+
+h3.sub{font-size:13px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+
+.__site-nav{position:relative;margin-top:48px;border-top:1px solid rgba(255,255,255,0.08);padding:32px 24px 40px;background:#0f1117;font-family:var(--sans)}
+.__site-nav h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5f6680;margin-bottom:16px}
+.__site-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.__site-nav-link{display:flex;flex-direction:column;padding:14px 16px;background:#181c25;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .12s}
+.__site-nav-link:hover{border-color:rgba(79,142,247,0.45);transform:translateY(-1px)}
+.__site-nav-title{font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:3px}
+.__site-nav-sub{font-size:11px;color:#9aa0b4}
+.__site-nav-home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4f8ef7;text-decoration:none;margin-top:20px;opacity:.8}
+.__site-nav-home:hover{opacity:1}
+@media(max-width:700px){
+  .kv{grid-template-columns:1fr}
+  pre.hops{font-size:10.5px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-home" href="/">← 首页</a>
+  <span class="nav-brand">R5C 出境线路实测 · <span>USA / NL 去回程对照</span></span>
+  <div class="nav-links">
+    <a href="#method">测试方法</a>
+    <a href="#usa">VPS.Taxi.USA</a>
+    <a href="#nl">V.PS</a>
+    <a href="#lines">线路判定</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-tag">Route &amp; Latency Audit · 2026-11-21</div>
+    <h1>R5C 出境线路实测：VPS.Taxi.USA vs V.PS</h1>
+    <p>从家里的 NanoPi R5C（ImmortalWrt · 中国移动浙江 PPPoE）分别到洛杉矶与荷兰两台生产机，双向 traceroute / mtr，标注 AS 与归属，判断是否绕路。</p>
+  </div>
+
+  <div class="alert alert-blue">
+    <span>ℹ️</span>
+    <div>本页所有跳点归属由 RIPEstat / ipinfo 查询得到；回程测试在服务器侧执行（mtr → r5c 公网地址），去程在 r5c 侧执行（<code>traceroute -i pppoe-wan</code>，绕开 mihomo 代理，走真实 PPPoE 出口）。中间跳的丢包多为 ICMP 限速，判断以端点丢包为准。</div>
+  </div>
+
+  <div class="section" id="method">
+    <div class="section-header"><span class="section-title">测试方法与环境</span></div>
+    <dl class="kv">
+      <dt>测试端</dt><dd>NanoPi R5C · ImmortalWrt 25.12 · Nikki(Mihomo) · 192.168.1.1</dd>
+      <dt>上行线路</dt><dd>中国移动浙江 PPPoE，IPv4 为 CGNAT（公网出口 <code>112.10.225.4</code>），IPv6 <code>2409:8a28:6f7:1b6:c1ca:5937:857e:94c1</code></dd>
+      <dt>去程测量</dt><dd>r5c 上 <code>traceroute -n -i pppoe-wan</code>（绑定 WAN 物理口，避免被 TUN/规则接管）</dd>
+      <dt>回程测量</dt><dd>服务器上 <code>mtr -r -n -c 8</code> 打回 r5c 的公网 v4 / v6 地址</dd>
+      <dt>延迟 / 丢包</dt><dd>r5c 上 <code>ping -c 20 -I pppoe-wan</code>，同时用代理端健康检查交叉验证</dd>
+      <dt>公网 v4 获取</dt><dd>r5c 直连 ping，服务器 <code>tcpdump</code> 抓源地址（CGNAT，回程止于运营商出口）</dd>
+    </dl>
+  </div>
+
+  <!-- ============ USA ============ -->
+  <div class="section" id="usa">
+    <div class="section-header">
+      <span class="section-title">报告 1 · VPS.Taxi.USA（洛杉矶）</span>
+      <span class="badge badge-green">CMIN2 · 双向对称</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">基础信息</div>
+      <dl class="kv">
+        <dt>IPv4 / IPv6</dt><dd><code>217.216.188.217</code> / <code>2402:1920:fc:bc::2</code></dd>
+        <dt>ASN / 上游</dt><dd>AS149513 Vertex Connectivity LLC（Los Angeles）</dd>
+        <dt>服务端口</dt><dd>2096 vless · 8443 anytls · 443 hysteria2(udp) · 10443 tuic(udp)</dd>
+        <dt>国际线路</dt><dd><b>AS58807 CMIN2</b>（223.120.161 / 197 / 200）</dd>
+      </dl>
+    </div>
+
+    <h3 class="sub">延迟与丢包（ICMP，各 20 包）</h3>
+    <table>
+      <thead><tr><th>地址族</th><th>最小</th><th>平均</th><th>最大</th><th>丢包</th><th>代理实测</th></tr></thead>
+      <tbody>
+        <tr><td>IPv4</td><td class="num">132.9</td><td class="num ok">134.4 ms</td><td class="num">136.9</td><td class="ok">0%</td><td class="num">VLESS 134 · AnyTLS 135 · Hy2 135 · TUIC 133</td></tr>
+        <tr><td>IPv6</td><td class="num">142.2</td><td class="num ok">143.6 ms</td><td class="num">144.1</td><td class="ok">0%</td><td class="num">133 – 149 ms</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">去程（r5c → LA，IPv4）</h3>
+<pre class="hops"> 1  10.187.0.1            3.2   移动浙江 CGNAT 网关
+ 2  120.199.254.157       3.1   移动浙江
+ 3  211.138.114.177       3.9   移动浙江
+ 5  183.248.141.133       5.6   CMNET 骨干
+ 6  111.24.10.169         4.4   CMNET 骨干
+ 7  221.183.87.241        7.1   移动骨干 (AS9808)
+ 8  221.183.87.218        7.6   移动骨干
+ 9  221.183.92.122        7.3   移动骨干
+10  223.120.161.6       133.6   CMI/CMIN2 洛杉矶 (AS58807)
+11  223.120.197.2       133.9   CMI/CMIN2 洛杉矶
+12  223.120.200.46      135.2   CMI/CMIN2 洛杉矶
+14  94.241.161.1        262.0   AS149513 Vertex, LA <span class="dim">(ICMP 低优先级)</span>
+15  217.216.188.217     137.6   目标</pre>
+
+    <h3 class="sub">回程（LA → r5c，IPv4，mtr）</h3>
+<pre class="hops"> 1  217.216.188.1         4.9   机房网关
+ 3  223.120.200.45        3.0   CMI/CMIN2 洛杉矶
+ 4  223.120.197.1       128.0   CMI/CMIN2 洛杉矶
+ 5  223.120.161.5       126.0   CMI/CMIN2 洛杉矶 → 上海
+ 6  221.183.92.121      128.3   移动骨干 (AS9808)
+ 7  221.183.87.245      127.5   移动骨干
+ 8  221.183.87.238      131.8   移动骨干
+10  112.11.232.42       134.2   移动杭州
+11  120.199.254.154     133.8   移动上海（CGNAT 边缘）</pre>
+
+    <h3 class="sub">IPv6 去程 / 回程</h3>
+<pre class="hops">去程: 2409:8028(浙江) → 2409:8080(移动骨干) → 2402:4f00(CMI) → 2402:1920:fc::1 → 目标
+      140.9ms / 0% 丢包
+
+回程: 2402:1920:fc::1 → 2401:8a00::/ 联通国际(HK) → 2408:8120(联通 9929) → 2408:8000(联通 4837)
+      → 2409:8028(移动浙江) → r5c
+      138.9ms / 0% 丢包 <span class="dim">(跨运营商轻度绕行，但不影响延迟)</span></pre>
+
+    <div class="alert alert-green">
+      <span>✅</span>
+      <div><b>结论：无绕路。</b>去程/回程均为「移动浙江 → CMNET → 移动骨干 → CMIN2 洛杉矶 → 机房」，双向对称，134ms 接近中美西海岸直连的物理下限；0% 丢包。IPv6 回程额外经过联通国际/9929 再交回移动，属于跨网交接，实测 138.9ms 反而略优于去程，可忽略。</div>
+    </div>
+  </div>
+
+  <!-- ============ NL ============ -->
+  <div class="section" id="nl">
+    <div class="section-header">
+      <span class="section-title">报告 2 · V.PS（荷兰 · 阿姆斯特丹）</span>
+      <span class="badge badge-amber">CMIN2 · v4 被阻断 · v6 绕行</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">基础信息</div>
+      <dl class="kv">
+        <dt>IPv4 / IPv6</dt><dd><code>89.106.207.247</code> / <code>2a0c:59c0:12::1265</code></dd>
+        <dt>ASN / 上游</dt><dd>AS3214 xTom GmbH</dd>
+        <dt>服务端口</dt><dd>2096 vless · 8443 anytls · 443 hysteria2(udp) · 10443 tuic(udp)</dd>
+        <dt>国际线路</dt><dd><b>AS58807 CMIN2</b>（223.120.175 / 171 / 180，法兰克福口）</dd>
+      </dl>
+    </div>
+
+    <h3 class="sub">延迟、丢包与可用性</h3>
+    <table>
+      <thead><tr><th>地址族</th><th>最小</th><th>平均</th><th>最大</th><th>丢包</th><th>代理可用性</th></tr></thead>
+      <tbody>
+        <tr><td>IPv4</td><td class="num">152.8</td><td class="num">156.2 ms</td><td class="num">160.0</td><td class="ok">0%</td><td class="bad">全部不可用（TCP 被阻断）</td></tr>
+        <tr><td>IPv6</td><td class="num">237.6</td><td class="num warn">238.7 ms</td><td class="num">239.2</td><td class="bad">15%</td><td class="warn">可用但抖动</td></tr>
+      </tbody>
+    </table>
+    <table>
+      <thead><tr><th>节点</th><th>地址族 / 端口</th><th>结果</th></tr></thead>
+      <tbody>
+        <tr><td>VLESS</td><td class="num">v4 :2096</td><td class="bad">504 超时</td></tr>
+        <tr><td>AnyTLS</td><td class="num">v4 :8443</td><td class="bad">504 超时</td></tr>
+        <tr><td>Hysteria2</td><td class="num">v4 :443/udp</td><td class="bad">503 不可用</td></tr>
+        <tr><td>TUIC</td><td class="num">v4 :10443/udp</td><td class="bad">503 不可用</td></tr>
+        <tr><td>VLESS-IPv6</td><td class="num">v6 :2096</td><td class="warn">922 ms（抖动大）</td></tr>
+        <tr><td>AnyTLS-IPv6</td><td class="num">v6 :8443</td><td class="ok">240 ms（最稳）</td></tr>
+        <tr><td>Hysteria2-IPv6</td><td class="num">v6 :443/udp</td><td class="warn">510 ms</td></tr>
+        <tr><td>TUIC-IPv6</td><td class="num">v6 :10443/udp</td><td class="ok">242 ms</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">去程（r5c → NL，IPv4）</h3>
+<pre class="hops"> 1  10.187.0.1            3.1   移动浙江 CGNAT 网关
+ 2  120.199.254.157       3.8   移动浙江
+ 3  218.205.61.121        4.7   移动浙江
+ 5  183.248.141.133       4.7   CMNET 骨干
+ 6  111.24.10.169         4.5   CMNET 骨干
+ 7  221.183.161.97        7.4   移动骨干 (AS9808)
+ 8  221.183.161.198      31.2   移动骨干
+ 9  221.183.89.94        30.0   移动骨干
+10  221.183.92.146       31.1   移动骨干
+11  223.120.180.41      171.7   CMI/CMIN2 (AS58807)
+12  223.120.171.14      152.3   CMI/CMIN2
+13  223.120.175.54      173.2   CMI/CMIN2 法兰克福
+14  91.200.241.189      158.0   法兰克福
+15  91.200.241.197      154.2   法兰克福
+16  89.106.207.247      157.4   目标</pre>
+
+    <h3 class="sub">回程（NL → r5c，IPv4，mtr）</h3>
+<pre class="hops"> 1  172.31.1.1          19.1   机房网关
+ 2  91.200.241.170       7.4   法兰克福
+ 3  91.200.241.188      10.1   法兰克福
+ 4  223.120.175.53      10.6   CMI/CMIN2 法兰克福
+ 5  223.120.171.13     458.8   CMI <span class="dim">(12.5% 丢包，抖动大)</span>
+ 6  223.120.181.25     132.8   CMI
+ 7  221.183.92.145     164.5   移动骨干
+ 8  221.183.89.81      129.3   移动骨干
+ 9  221.183.161.189    151.0   移动浙江
+10  221.183.161.86     152.7   移动浙江
+13  120.199.254.154    154.6   移动上海（CGNAT 边缘）</pre>
+
+    <h3 class="sub">IPv6 去程 / 回程</h3>
+<pre class="hops">去程: 2409:8028(浙江) → 2409:8080(移动骨干) → 2402:4f00(CMI) → 2001:470:0:6cc::2(HE)
+      → 2001:470:e:1b::1(HE 伦敦) → 2001:7f8:10f::c8e:48(AMS-IX 阿姆斯特丹) → 目标
+      247ms
+
+回程: 目标 → 2a09:0:1337::1(阿姆斯特丹) → AMS-IX → 2001:470:e:49::2(HE 伦敦, 62.5% 丢包, 330ms)
+      → 2402:4f00(CMI) → 2409:8080(移动骨干) → 2409:8028(浙江) → r5c
+      237ms / 15% 丢包</pre>
+
+    <div class="alert alert-red">
+      <span>⚠️</span>
+      <div><b>结论：v4 不绕路但不可用；v6 可用但有绕行与丢包。</b><br>
+      · IPv4 去回程都是「移动 → CMIN2 法兰克福 → 机房」，双向对称、157ms，路径本身很干净；问题在于 CN→NL 方向的 <b>TCP 被阻断</b>（ICMP 反而 0% 丢包），所以四个 v4 节点全部连不上 —— 这是封锁，不是绕路。<br>
+      · IPv6 回程先到阿姆斯特丹 AMS-IX，再绕到 <b>伦敦的 HE</b> 才接回 CMI，HE 段单跳丢包 62.5%、CMI 段 12.5%，端点实测 15% 丢包；VLESS-IPv6 的 922ms 就是这条抖动路径造成的。</div>
+    </div>
+  </div>
+
+  <!-- ============ 线路判定 ============ -->
+  <div class="section" id="lines">
+    <div class="section-header"><span class="section-title">线路判定：这是 CMIN2，不是普通 CMI</span></div>
+
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">两台机器的国际段跳点均查询为 AS58807（APNIC 登记名 CMI-INT-AS，PeeringDB 别名 CMIN2），并非 AS58453。社区常用的判定口径如下：</p>
+
+    <table>
+      <thead><tr><th>ASN</th><th>名称</th><th>定位</th><th>常见跳点</th></tr></thead>
+      <tbody>
+        <tr><td class="num">AS58807</td><td>CMI-INT-AS（CMIN2）</td><td class="ok">移动精品国际网，对标电信 CN2 GIA</td><td class="num">223.120.128.0/17 等，NextTrace 标 <code>[CMIN2-NET]</code></td></tr>
+        <tr><td class="num">AS58453</td><td>CMI-INT-HK（普通 CMI）</td><td class="warn">移动常规国际出口</td><td class="num">223.118.0.0/15、223.120.0.0/17</td></tr>
+        <tr><td class="num">AS9808</td><td>CMNET</td><td>移动国内骨干</td><td class="num">221.176.0.0 – 221.183.255.255</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-amber">
+      <span>💡</span>
+      <div>线路等级不等于实际体验：v.ps 的 AS 同为 CMIN2，但 IPv6 回程绕伦敦 HE 且丢包，实测被 15% 丢包拖累。判断一台机器好不好，要同时看 <b>AS 号（线路等级）</b>、<b>回程路径（有无绕行）</b> 与 <b>端点丢包</b>，只看商家宣传的「CMI/CMIN2」没意义。</div>
+    </div>
+
+    <div class="alert alert-green">
+      <span>🎯</span>
+      <div><b>家用建议：</b>家里是移动宽带，VPS.Taxi.USA 的 CMIN2 直连就是当前最优解（134ms / 0 丢包）；V.PS 请优先用 <code>AnyTLS-IPv6</code>（240ms）或 <code>TUIC-IPv6</code>（242ms），避开 <code>VLESS-IPv6</code>；需要 v4 稳定入口时走「V.PS → 洛杉矶中转」链路（约 370ms）。</div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<div class="__site-nav">
+  <h3>相关文档</h3>
+  <div class="__site-nav-grid">
+    <a class="__site-nav-link" href="/vps-benchmark-comparison.html"><span class="__site-nav-title">V.PS vs VPS.Taxi 实测横评</span><span class="__site-nav-sub">两台生产机 · 数据归属逐项标注</span></a>
+    <a class="__site-nav-link" href="/ipv6-enable-guide.html"><span class="__site-nav-title">各设备开启 IPv6</span><span class="__site-nav-sub">订阅勾选前必读</span></a>
+    <a class="__site-nav-link" href="/nikki-dns-compare.html"><span class="__site-nav-title">Nikki DNS 分流配置对比</span><span class="__site-nav-sub">ImmortalWrt R5C · 两套策略</span></a>
+    <a class="__site-nav-link" href="/mihomo-traffic-flow.html"><span class="__site-nav-title">Mihomo 完整流量路径图解</span><span class="__site-nav-sub">TPROXY · fake-ip · 三路出口</span></a>
+  </div>
+  <a class="__site-nav-home" href="/">← 返回首页</a>
+</div>
+
+</body>
+</html>
